@@ -1,0 +1,134 @@
+.profileAbout {
+    display: flex;
+    height: 100%;
+    width: 98%;
+    margin: 1.25rem auto 0;
+    flex-direction: row;
+    gap: 1.5rem;
+}
+
+.profileAbout::-webkit-scrollbar {
+    width: 0.47rem;
+    height: 0.47rem;
+}
+
+.profileAbout::-webkit-scrollbar-thumb {
+    background-color: rgba(48, 48, 48, 0.8);
+    border-radius: 0.625rem;
+}
+
+.profileAboutLeft {
+    display: flex;
+    flex: 2; 
+    overflow-y: auto;
+    min-width: 0;
+}
+
+.profileAboutLeftContainer {
+    background-color: rgba(32, 32, 32, 0.9);
+    width: 100%;
+    border-radius: 0.625rem;
+    padding: 1rem;
+}
+
+.profileAboutRight {
+    flex: 1; 
+    padding: 1rem;
+    min-width: 0; 
+    background-color: #202020;
+    border-radius: 10px;
+}
+
+.profileAboutRightOptions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1rem;
+    width: 100%;
+    padding: 1rem 0;
+    box-sizing: border-box;
+}
+
+.profileAboutRightOption {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    height: 5rem;
+    background-color: #151515;
+}
+
+.profileAboutRightOption:hover {
+    transform: translateY(-0.25rem);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.profileAboutRightOptionName {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.profileAboutRightOptionValue {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+@media (max-width: 1024px) {
+    .profileAbout {
+        flex-direction: column-reverse; 
+    }
+
+    .profileAboutLeft,
+    .profileAboutRight {
+        width: 100%;
+        flex: none;
+    }
+
+    .profileAboutRight {
+        padding: 1rem 0;
+    }
+
+    .profileAboutRightOptions {
+        grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+        padding: 1rem;
+        margin: 0 auto;
+        width: calc(100% - 2rem);
+    }
+}
+
+@media (max-width: 640px) {
+    .profileAbout {
+        width: 100%;
+        margin: 1rem auto 0;
+    }
+
+    .profileAboutRightOptions {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        padding: 0.75rem;
+        width: calc(100% - 1.5rem); 
+    }
+
+    .profileAboutRightOption {
+        height: 4.5rem;
+        padding: 1rem;
+    }
+
+    .profileAboutRightOptionValue {
+        font-size: 1.25rem;
+    }
+
+    .profileAboutRightOptionName {
+        font-size: 0.75rem;
+    }
+}

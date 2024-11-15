@@ -1,0 +1,243 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_verificationContract",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "AlreadyHasCreativeID",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "CreativeIDTaken",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "InvalidCountryCode",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "InvalidRegistryCode",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "InvalidVerificationContract",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "Unauthorized",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "UserNotVerified",
+		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "creativeId",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint40",
+				"name": "timestamp",
+				"type": "uint40"
+			}
+		],
+		"name": "CreativeIDRegistered",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "paused",
+				"type": "bool"
+			}
+		],
+		"name": "EmergencyAction",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "Paused",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "Unpaused",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getCreativeID",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "id",
+				"type": "string"
+			},
+			{
+				"internalType": "uint40",
+				"name": "timestamp",
+				"type": "uint40"
+			},
+			{
+				"internalType": "bool",
+				"name": "exists",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getTotalCreativeIDs",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "hasCreativeID",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "creativeId",
+				"type": "string"
+			}
+		],
+		"name": "isCreativeIDTaken",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "paused",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "countryCode",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "registryCode",
+				"type": "string"
+			}
+		],
+		"name": "register",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "toggleEmergencyPause",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "verificationContract",
+		"outputs": [
+			{
+				"internalType": "contract IHitmakrVerification",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]

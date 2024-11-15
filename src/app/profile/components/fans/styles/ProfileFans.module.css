@@ -1,0 +1,147 @@
+.profileFans {
+    padding: 20px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.profileFans::-webkit-scrollbar {
+    display: none;
+}
+
+.fansGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fanCard {
+    background-color: #202020;
+    border-radius: 10px;
+    padding: 18px;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fanCard:hover {
+    background-color: #252525;
+    border-color: #666;
+}
+
+.leftSection {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.followButtonContainer {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.imageContainer {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #2A2A2A;
+    flex-shrink: 0;
+}
+
+.userInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.userName {
+    font-size: 16px;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.userAddress {
+    font-size: 12px;
+    color: #888;
+    font-family: monospace;
+}
+
+.loadMore {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loadMoreButton {
+    background-color: #353535;
+    color: rgb(255, 255, 255);
+    padding: 0.75rem;
+    border-radius: 2rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.loadMoreButton i {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+}
+
+.loadMoreButton:hover {
+    background-color: #454545;
+    transform: translateY(-1px);
+}
+
+.loadMoreButton:disabled {
+    background-color: #4a4a4a;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.noFans {
+    text-align: center;
+    padding: 2rem;
+    color: #888888;
+    font-size: 1.125rem;
+    background-color: #1e1e1e;
+    border-radius: 0.5rem;
+    margin: 1rem;
+}
+
+.noMore {
+    text-align: center;
+    color: #888888;
+    font-size: 1rem;
+    margin: 2rem 0;
+}
+
+@media (max-width: 768px) {
+    .profileFans {
+        padding: 16px;
+    }
+
+    .fanCard {
+        padding: 12px;
+    }
+
+    .userName {
+        font-size: 14px;
+    }
+
+    .userAddress {
+        font-size: 11px;
+    }
+}

@@ -1,0 +1,215 @@
+/* Resource.module.css */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.dsrcItem {
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    margin: 16px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.dsrcContent {
+    padding: 20px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.detailsWrapper {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.title {
+    font-size: 16px;
+    color: #ffffff;
+    margin: 0;
+    font-family: "Rubik Mono One", monospace;
+    cursor: pointer;
+}
+
+.description {
+    color: #888;
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.chainPill {
+    background: #202020;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #fff;
+    border: 1px solid #333;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chainPillAddress {
+    color: #888888;
+    font-size: 12px;
+}
+
+.attributesWrapper {
+    margin-top: 16px;
+}
+
+.attributesRow {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.attributeCard {
+    background: #202020;
+    padding: 12px;
+    border-radius: 8px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.attrValue {
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.earningsWrapper {
+    margin-top: 16px;
+}
+
+.earningsRow {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.earningCard {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    padding: 16px;
+    flex: 1;
+    min-width: 200px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.value {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.dsrcMetadata {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-top: 1px solid #202020;
+}
+
+.dsrcMetadataLeftOptions {
+    display: flex;
+    gap: 12px;
+}
+
+.dsrcMetadataLeftOption {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #252525;
+    transition: all 0.2s ease;
+    border: none;
+    color: #888;
+}
+
+.dsrcMetadataLeftOption:hover {
+    background: #303030;
+    color: #fff;
+}
+
+.dsrcMetadataRight button {
+    background: #252525;
+    color: #ffffff;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dsrcMetadataRight button:hover {
+    background: #303030;
+    transform: translateY(-1px);
+}
+
+.noContent {
+    text-align: center;
+    padding: 40px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    margin: 20px;
+    color: #888;
+}
+
+.idContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .dsrcContent {
+        flex-direction: column;
+    }
+
+    .title {
+        font-size: 20px;
+    }
+
+    .attributesRow,
+    .earningsRow {
+        flex-direction: column;
+    }
+
+    .attributeCard,
+    .earningCard {
+        min-width: unset;
+    }
+
+    .dsrcMetadata {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .dsrcMetadataRight button {
+        width: 100%;
+    }
+}

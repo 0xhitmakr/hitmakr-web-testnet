@@ -1,0 +1,347 @@
+.playlist{
+    width: 100%;
+}
+
+.playlistHeader{
+    display: flex;
+    align-items: center;
+    padding: 18px;
+}
+
+.playlistHeader p {
+    font-family: "Rubik Mono One", monospace;
+    font-size: 18px;
+}
+
+.playlistHeaderOptions{
+    display: flex;
+    padding: 0px 10px;
+}
+
+.playlistHeaderOption{
+    padding: 5px 12.5px;
+    background-color: #202020;
+    margin: 0px 5px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+}
+
+.playlistHeaderOption:hover{
+    background-color: #252525;
+}
+
+.playlistHeaderOption span{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.playlistHeaderOption span i{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.playlistHeaderOptionActive{
+    padding: 5px 12.5px;
+    background-color: #8023E4;
+    margin: 0px 5px;
+    border-radius: 100px;
+    cursor: pointer;
+    color: #fff;
+}
+
+.playlistContainer{
+    display: flex;
+    width: 100%;
+    height: 65vh;
+    margin-top: 10px;
+}
+
+.playlistContainerLeft,.playlistContainerCenter,.playlistContainerRight{
+    display: flex;
+    flex: 1;
+    width: 100%;
+    justify-content: left;
+    height: 100%;
+    background-color: #252525;
+    margin: 5px;
+    border-radius: 10px;
+}
+
+
+.hitmakrForm{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: 100%;
+}
+
+.hitmakrFormContainer{
+    border-radius: 10px;
+    position: relative;
+    margin-left: 0px;
+    width: 400px;
+}
+
+.formDetailsSave{
+    width: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.formDetails{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.formDetailsLabel{
+    padding: 10px;
+    font-size: 14px;
+    margin: 0px 5px;
+}
+
+.formDetailsInput{
+    margin: 0px 10px;
+    padding: 10px;
+    outline: none;
+    background-color: #202020;
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 5px;
+    font-size: 18px;
+}
+
+.formDetails textarea {
+    resize: none;
+    height: 150px;
+}
+
+.formDetails textarea::-webkit-scrollbar {
+    width: 7.5px;
+    height: 7.5px;
+}
+  
+.formDetails textarea::-webkit-scrollbar-thumb {
+    background-color: #303030;
+    border-radius: 10px;
+}
+
+ 
+
+.submitButton{
+    margin: 25px 0px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.formDetails {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 20px; 
+}
+
+.formDetailsLabel {
+    padding: 10px;
+    font-size: 14px;
+    margin: 0px 5px;
+}
+
+.formDetailsInput {
+    margin: 0px 10px;
+    padding: 10px;
+    outline: none;
+    background-color: #202020;
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 5px;
+    font-size: 16px;
+    
+}
+
+.formDetailsRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; 
+}
+
+.formDetailsRow .formDetails {
+    flex: 1; 
+}
+
+.formDetailsLabel p{
+    color: #808080;
+}
+
+.formDetailsLabel p b{
+    color: white;
+    font-weight: 600;
+}
+
+.createUploadContainerInputImage {
+    width: 300px; 
+    height: 300px; 
+    border: 2px dashed #8b8b8b; 
+    border-radius: 10px;
+    background-color: #202020;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer; 
+    margin-left: 20px;
+}
+
+
+.createUploadContainerInputImage:hover {
+    background-color: #252525;
+}
+
+
+.createUploadContainerInputImageCover {
+    width: 640px; 
+    height: 213px;
+    border: 2px dashed #8b8b8b;
+    border-radius: 10px;
+    background-color: #202020;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  .createUploadContainerInputImageCover:hover {
+    background-color: #252525;
+  }
+  
+  .createUploadContainerInputImageCover img {
+    border-radius: 10px;
+    object-fit: cover;
+  }
+
+.placeholderImage { 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #828282;
+    width: 300px;
+    height: 300px;
+}
+
+.placeholderImage i {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.createUploadContainerInputCover img{
+    border-radius: 10px;
+}
+
+@media (max-width: 950px) {
+    .hitmakrFormContainer{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .createUploadContainerInputImageCover {
+        width: 90%;
+      }
+  }
+
+  @media (max-width: 750px) {
+    .hitmakrFormContainer{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .createUploadContainerInputImageCover {
+        width: 100%; 
+    }
+
+    .createUploadContainerInputImage {
+        width: 300px; 
+        height: 300px; 
+        border: 2px dashed #8b8b8b; 
+        border-radius: 10px;
+        background-color: #202020;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer; 
+        margin-left: 10px;
+    }
+  }
+
+  .profileSettingsOption:active {
+    transform: scale(0.95); 
+    transition: transform 0.1s ease;
+  }
+
+  .imageContainer {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .imageOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 10px;
+  }
+  
+  .imageContainer:hover .imageOverlay {
+    opacity: 1;
+  }
+  
+  .imageOverlay i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .imageOverlay p {
+    margin: 0.5rem 0;
+  }
+  
+  .imageOverlay small {
+    opacity: 0.8;
+  }
+  
+  .createUploadContainerInputImage {
+    cursor: pointer;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    padding: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  
+  .createUploadContainerInputImage:hover {
+    border-color: #666;
+  }

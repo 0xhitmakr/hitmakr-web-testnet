@@ -1,0 +1,1 @@
+export const licenseOptions = ["Creative Commons", "All rights reserved"];

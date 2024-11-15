@@ -1,0 +1,747 @@
+
+.topLikedContainer {
+    width: 95%;
+    margin: 16px auto;
+}
+
+.sectionHeader{
+    width: 95%;
+    margin: 16px auto;
+}
+
+.sectionTitle {
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 20px;
+    font-family: "Rubik Mono One", monospace;
+}
+
+.scrollContainer {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding: 10px 0;
+    margin: 0 -20px; 
+    padding: 10px 20px; 
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+
+.scrollContainer::-webkit-scrollbar {
+    display: none;  
+}
+
+.dsrcCard {
+    flex: 0 0 auto;
+    width: 180px;
+    background: #202020;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    position: relative;
+}
+
+
+
+.dsrcCard:hover {
+    transform: translateY(-2px);
+}
+
+.imageContainer {
+    position: relative;
+    width: 180px;
+    height: 180px;
+}
+
+.coverImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.playOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.imageContainer:hover .playOverlay {
+    opacity: 1;
+}
+
+.playButton {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.playButton:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.playButton i {
+    color: white;
+    font-size: 20px;
+}
+
+.dsrcInfo {
+    padding: 12px;
+    min-height: 120px; 
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    color: #ffffff;
+    font-size: 14px;
+    margin: 0 0 8px 0;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    max-width: 100%;
+}
+
+.title:hover {
+    text-decoration: underline;
+}
+
+.creatorInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex: 0 0 auto;
+}
+
+.creator {
+    color: #888;
+    font-size: 12px;
+    margin: 0;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 70%;
+}
+
+.creator:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.likesCount {
+    color: #888;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.likesCount i {
+    color: #ff3b5c;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+}
+
+.menuContainer {
+    position: relative;
+}
+
+.menuButton {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #252525;
+    transition: all 0.2s ease;
+    border: none;
+    padding: 0;
+}
+
+.menuButton i {
+    font-size: 16px;
+    color: #888;
+    transition: color 0.2s ease;
+}
+
+.menuButton:hover {
+    background: #303030;
+}
+
+.menuButton:hover i {
+    color: #fff;
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #202020;
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 200px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    margin-top: 8px;
+}
+
+.dropdown button {
+    width: 100%;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s ease;
+}
+
+.dropdown button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown button i {
+    font-size: 16px;
+    color: #888;
+}
+
+.actionButton {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #252525;
+    transition: all 0.2s ease;
+    border: none;
+    padding: 0;
+}
+
+.actionButton i {
+    font-size: 16px;
+    color: #888;
+    transition: color 0.2s ease;
+}
+
+.actionButton:hover {
+    background: #303030;
+}
+
+.actionButton:hover i {
+    color: #fff;
+}
+
+.loading {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .topLikedContainer {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .sectionTitle {
+        font-size: 20px;
+        padding: 0 16px;
+    }
+
+    .scrollContainer {
+        gap: 12px;
+        padding: 10px 16px;
+        margin: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .sectionTitle {
+        font-size: 18px;
+    }
+
+    .dsrcCard {
+        width: 140px; /* Smaller cards on mobile */
+    }
+
+    .imageContainer {
+        width: 140px;
+        height: 140px;
+    }
+
+    .dsrcInfo {
+        padding: 8px;
+        min-height: 100px;
+    }
+
+    .title {
+        font-size: 12px;
+    }
+
+    .creator {
+        font-size: 11px;
+    }
+
+    .actionButton {
+        width: 32px;
+        height: 32px;
+    }
+
+    .actionButton i {
+        font-size: 14px;
+    }
+}
+
+.dsrcCard {
+    flex: 0 0 auto;
+    width: 180px;
+    background: #202020;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.menuContainer {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+}
+
+.menuButton {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(32, 32, 32, 0.8);
+    transition: all 0.2s ease;
+    border: none;
+    padding: 0;
+}
+
+.menuButton i {
+    font-size: 16px;
+    color: #888;
+    transition: color 0.2s ease;
+}
+
+.menuButton:hover {
+    background: #303030;
+}
+
+.menuButton:hover i {
+    color: #fff;
+}
+
+.dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: #202020;
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 200px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    border: 1px solid #303030;
+    margin-left: 10px;
+}
+
+.dropdown button {
+    width: 100%;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.dropdown button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown button i {
+    font-size: 16px;
+    color: #888;
+}
+
+.dropdown button:hover i {
+    color: #fff;
+}
+
+.dsrcCard {
+    flex: 0 0 auto;
+    width: 180px;
+    background: #202020;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.menuContainer {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+}
+
+.menuButton {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(32, 32, 32, 0.8);
+    transition: all 0.2s ease;
+    border: none;
+    padding: 0;
+}
+
+.menuButton i {
+    font-size: 16px;
+    color: #888;
+    transition: color 0.2s ease;
+}
+
+.menuButton:hover {
+    background: #303030;
+}
+
+.menuButton:hover i {
+    color: #fff;
+}
+
+.dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: -50px;
+    transform: translateX(-50%);
+    background: #202020;
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 160px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    border: 1px solid #303030;
+}
+
+/* Ensure dropdown stays visible when near screen edges */
+.menuContainer {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+}
+
+@media (max-width: 480px) {
+    .dropdown {
+        min-width: 140px;
+    }
+}
+
+.dropdown button {
+    width: 100%;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.dropdown button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown button i {
+    font-size: 16px;
+    color: #888;
+}
+
+.dropdown button:hover i {
+    color: #fff;
+}
+
+/* Add these styles to your existing TopLiked.module.css */
+
+.commentCount {
+    color: #888;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.commentCount i {
+    color: #888;
+    transition: color 0.2s ease;
+}
+
+.dsrcCard:hover .commentCount i {
+    color: #fff;
+}
+
+/* Update the existing creatorInfo class if needed */
+.creatorInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+/* Add to your TopLiked.module.css */
+
+.dsrcStats {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.price {
+    color: #888;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.price i {
+    color: #888;
+    transition: color 0.2s ease;
+}
+
+.dsrcCard:hover .price i {
+    color: #fff;
+}
+
+.loading{
+    height: 180px;
+}
+
+.skeletonImage {
+    width: 180px;
+    height: 180px;
+    background: linear-gradient(90deg,#252525 0%,#303030 50%,#252525 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+.skeletonTitle {
+    width: 80%;
+    height: 16px;
+    background: linear-gradient(90deg,#252525 0%,#303030 50%,#252525 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.skeletonCreator {
+    width: 60%;
+    height: 12px;
+    background: linear-gradient(90deg,#252525 0%,#303030 50%,#252525 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.skeletonActions {
+    display: flex;
+    gap: 8px;
+}
+
+.skeletonButton {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(90deg,#252525 0%,#303030 50%,#252525 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 50%;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .skeletonImage {
+        width: 140px;
+        height: 140px;
+    }
+}
+
+.loadMore {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.loadMoreButton {
+    background-color: #353535;
+    color: rgb(255, 255, 255);
+    padding: 0.75rem;
+    border-radius: 2rem;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.loadMoreButton i {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+}
+
+.loadMoreButton:hover {
+    transform: translateY(-1px);
+}
+
+.loadMoreButton:disabled {
+    background-color: #4a4a4a;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loading state */
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    color: #ffffff;
+    font-size: 1.125rem;
+}
+
+/* Media Queries */
+@media (max-width: 950px) {
+
+    .resultsGrid {
+        gap: 12px;
+    }
+
+    .dsrcItem {
+        margin: 0;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .resultsGrid {
+        gap: 10px;
+    }
+
+    .resultsCount {
+        font-size: 1rem;
+        margin-bottom: 16px;
+    }
+
+    .loadMoreButton {
+        padding: 0.5rem;
+    }
+
+    .loadMoreButton i {
+        font-size: 20px;
+    }
+
+    .noResults {
+        padding: 2rem 0;
+        font-size: 1rem;
+    }
+}
+
+.imageContainer {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    flex-shrink: 0;
+}
+
+.coverImage {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    aspect-ratio: 1;
+}
+
+.dsrcCard {
+    flex: 0 0 auto;
+    width: 180px;
+    background: #202020;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    position: relative;
+}
+
+@media (max-width: 480px) {
+    .dsrcCard {
+        width: 140px;
+    }
+
+    .imageContainer {
+        width: 100%;
+        aspect-ratio: 1;
+    }
+}

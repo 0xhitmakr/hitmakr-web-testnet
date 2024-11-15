@@ -1,0 +1,285 @@
+.profilePage{
+    width: 100%;
+}
+
+.profilePageHeader{
+    display: flex;
+    align-items: center;
+    padding: 18px;
+}
+
+.profilePageLoading{
+    width: 100%;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profilePageHeader p {
+    font-family: "Rubik Mono One", monospace;
+    font-size: 18px;
+}
+
+.profilePageMain{
+    width: calc(100% - 18px);
+    margin: auto;
+    border-radius: 10px;
+    position: relative;
+    height: 250px;
+}
+
+.profilePageImage{
+    position: absolute;
+    bottom: -50px;
+    left: 25px;
+}
+
+.profilePageImage img{
+    border-radius: 1000px;
+    object-fit: cover;
+    object-position: center;
+    border: 10px solid #151515;
+}
+
+.profilePageName{
+    position: absolute;
+    left: 200px;
+    top: 210px;
+    font-weight: bolder;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    height: 50px;
+}
+
+.profilePageNameItem{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: left;
+}
+
+.profilePageNameItem i{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-left: 5px;
+    color: gold;
+}
+
+.profilePageName p{
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: left;
+}
+
+.profilePageNameAddress{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: left;
+}
+
+.profilePageNameAddress p{
+    font-size: 14px;
+    font-weight: 600;
+    color: #bababa;
+    text-align: left;
+    cursor: pointer;
+}
+
+.profilePageOptions{
+    position: absolute;
+    right: 18px;
+    display: flex;
+    align-items: center;
+    height: 60px;
+}
+
+.profilePageOption{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.profilePageOption i{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+}
+
+.profilePageOptionFollow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 10px;
+    margin-left: 10px;
+    background-color: #fff;
+    color: #000;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.profilePageOptionFollow:hover {
+    background-color: #f5f5f5;
+}
+
+.profilePageOptionFollow p {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.profilePageNavbar{
+    margin-top: 50px;
+    margin-left: 10px;
+    border-bottom: 2px solid #202020;
+}
+
+.profilePageNavbarOptions{
+    display: flex;
+    overflow-x: auto;
+}
+
+.profilePageNavbarOptions::-webkit-scrollbar {
+    width: 7.5px;
+    height: 7.5px;
+    display: none;
+  }
+  
+  .profilePageNavbarOptions::-webkit-scrollbar-thumb {
+    background-color: #303030;
+    border-radius: 10px;
+    display: none;
+  }
+
+.profilePageNavbarOption{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 15px;
+    margin: 0px 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #bababa;
+}
+
+
+
+.profilePageNavbarOption:hover p{
+    color: white;
+}
+
+.profilePageDisplay{
+    min-height: 60vh;
+}
+
+.profilePageNavbarOption.active {
+    border-bottom: 2px solid #fff; /* Or your preferred accent color */
+    border-radius: 0px;
+    color: white;
+}
+
+.profilePageNavbarOption:hover {
+    opacity: 0.8;
+}
+
+
+
+@media (max-width: 1000px) {
+    
+    .profilePageMain{
+        width: calc(100% - 18px);
+        margin: auto;
+        border-radius: 10px;
+        position: relative;
+        height: 350px;
+    }
+
+    .profilePageImage{
+        position: absolute;
+        bottom: 50px;
+        left: 0px;
+        right: 0px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .profilePageName{
+        position: absolute;
+        left: 0px;
+        top: 310px;
+        font-weight: bolder;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        flex-direction: column;
+        height: 50px;
+        width: 100%;
+    }
+
+    .profilePageOptions{
+        position: absolute;
+        right: 0px;
+        display: flex;
+        align-items: center;
+        height: 60px;
+        top: 310px;
+    }
+
+    .profilePageNavbar{
+        margin-top: 30px;
+    }
+
+    .profilePageNavbarOption{
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        padding: 5px 10px;
+        margin: 0px 2.5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+}
+
+
+@media (max-width: 475px) {
+    .profilePageName p{
+        font-size: 16px;
+    }
+
+    .profilePageOptions{
+        position: absolute;
+        right: 0px;
+        display: flex;
+        align-items: center;
+        height: 50px;
+        top: 310px;
+    }
+
+    .profilePageNameItem i{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        margin-left: 5px;
+        color: gold;
+    }
+
+    .profilePageNameAddress p{
+        font-size: 14px;
+        font-weight: 600;
+        color: #bababa;
+        text-align: left;
+        cursor: pointer;
+    }
+}

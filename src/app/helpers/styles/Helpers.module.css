@@ -1,0 +1,152 @@
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.usernameContainer {
+  width: 100%;         
+  display: block;       
+  overflow: hidden;    
+}
+
+.usernameText {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;         
+  display: block;     
+}
+
+.usernameFallback {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;         
+  display: block;      
+}
+
+.usernameLoading {
+  width: 120px;
+  height: 1.5rem;
+  background-color: #202020;
+  border-radius: 1000px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.profilePicture {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profilePictureLoading {
+  border-radius: 50%;
+  background-color: #202020;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.flexCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;       
+}
+
+.textSm {
+  font-size: 0.875rem;
+}
+
+.textBase {
+  font-size: 1rem;
+}
+
+.textLg {
+  font-size: 1.125rem;
+}
+
+.textXl {
+  font-size: 1.25rem;
+}
+
+.text2xl {
+  font-size: 1.5rem;
+}
+
+.fontNormal {
+  font-weight: 400;
+}
+
+.fontMedium {
+  font-weight: 500;
+}
+
+.fontSemibold {
+  font-weight: 600;
+}
+
+.fontBold {
+  font-weight: 700;
+}
+
+.profilePageOption {
+  display: flex;
+  flex: 1;
+  min-width: 0;       
+}
+
+.profilePageOptionFollow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+  margin-left: 10px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 75px;
+}
+
+.profilePageOptionFollow p {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.profileContainer {
+  padding: 10px;
+}
+
+.profileContainerOption {
+  margin-bottom: 10px;
+}
+
+.profileContainerOption p {
+  color: #808080;
+  font-weight: 400;
+}
+
+.profileContainerOption p b {
+  color: white;
+}

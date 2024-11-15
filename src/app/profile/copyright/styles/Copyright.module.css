@@ -1,0 +1,119 @@
+.copyright{
+    width: 100%;
+}
+
+.copyrightHeader{
+    display: flex;
+    align-items: center;
+    padding: 18px;
+}
+
+.copyrightHeader p {
+    font-family: "Rubik Mono One", monospace;
+    font-size: 18px;
+}
+
+.formDetails{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.formDetailsLabel{
+    padding: 10px;
+    font-size: 14px;
+    margin: 0px 5px;
+}
+
+.formDetailsInput{
+    margin: 0px 10px;
+    padding: 10px;
+    outline: none;
+    background-color: #202020;
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 5px;
+    font-size: 18px;
+}
+
+.formDetails textarea {
+    resize: none;
+    height: 200px;
+}
+
+.submitButton{
+    margin: 25px 0px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.formDetails {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 20px; 
+}
+
+.formDetailsLabel {
+    padding: 10px;
+    font-size: 14px;
+    margin: 0px 5px;
+}
+
+.formDetailsInput {
+    margin: 0px 10px;
+    padding: 10px;
+    outline: none;
+    background-color: #202020;
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 5px;
+    font-size: 16px;
+    
+}
+
+.formDetailsRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; 
+}
+
+.formDetailsRow .formDetails {
+    flex: 1;
+}
+
+.submitButton{
+    width: 400px;
+}
+
+.copyrightContainer{
+    width: 400px;
+}
+
+.formDetailsLabel p{
+    color: #808080;
+}
+
+.formDetailsLabel p b{
+    color: white;
+    font-weight: 600;
+}
+
+.formDetailsLabel span{
+    color: white;
+    font-weight: bold;
+}
+
+@media (max-width: 775px) {
+    .submitButton{
+        width: 98%;
+    }
+    
+    .copyrightContainer{
+        width: 100%;
+    }
+
+}

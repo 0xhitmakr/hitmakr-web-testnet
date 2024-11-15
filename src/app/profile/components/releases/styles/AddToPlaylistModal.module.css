@@ -1,0 +1,282 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modalContent {
+    background: #282828;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    overflow: hidden;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.closeButton {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #b3b3b3);
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Controls Container */
+.controlsContainer {
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.searchAndSort {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.searchBar {
+    display: flex;
+    align-items: center;
+    position: relative;
+    min-width: 32px;
+    transition: all 0.3s ease;
+}
+
+.searchBar.expanded {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.searchButton {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary, #b3b3b3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.searchButton:hover {
+    color: #fff;
+}
+
+.searchInput {
+    position: absolute;
+    left: 32px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    width: calc(100% - 40px);
+    padding: 8px 8px 8px 0;
+    outline: none;
+}
+
+.searchInput::placeholder {
+    color: var(--text-secondary, #b3b3b3);
+}
+
+.sortDropdown {
+    position: relative;
+}
+
+.sortButton {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #b3b3b3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.sortButton:hover {
+    color: #fff;
+}
+
+.sortMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #282828;
+    border-radius: 4px;
+    padding: 4px;
+    min-width: 160px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.sortMenu button {
+    width: 100%;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #b3b3b3);
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 2px;
+}
+
+.sortMenu button:hover,
+.sortMenu button.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Playlists Container */
+.playlistsContainer {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+    min-height: 200px;
+    max-height: 400px;
+}
+
+.playlistsList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.playlistItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    transition: background-color 0.2s ease;
+}
+
+.playlistItem:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.playlistItem:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.playlistImageContainer {
+    flex-shrink: 0;
+}
+
+.playlistImage {
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.playlistInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.playlistName {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.playlistMeta {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--text-secondary, #b3b3b3);
+}
+
+.loadingState,
+.emptyState {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: var(--text-secondary, #b3b3b3);
+}
+
+.errorMessage {
+    color: #ff4444;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Scrollbar Styling */
+.playlistsContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+.playlistsContainer::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.playlistsContainer::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 4px;
+}
+
+.playlistsContainer::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+}

@@ -1,0 +1,88 @@
+
+.retroplayer{
+    height: 250px;
+    width: 100%;
+    border-radius: 10px;
+    position: relative;
+}
+
+.imageContainer{
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 200px;
+}
+
+.imageContainer img{
+    border-radius: 20px;
+    box-shadow: 0px 0px 20px 10px rgba(32, 32, 41, 0.54);
+    object-fit: cover;
+    object-position: center;
+}
+
+.basicDetails{
+    position: absolute;
+    right: 100px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.basicDetailsTitle{
+    display: flex;
+    justify-content: right;
+    align-items: center;
+}
+
+.basicDetailsTitle p{
+    font-size: 24px;
+    font-weight: bolder;
+    
+}
+
+.basicDetailsOptions{
+    display: flex;
+    justify-content: right;
+}
+
+.basicDetailsOption{
+    padding: 5px 7.5px;
+    background: rgba( 10, 10, 10, 0.5 );
+    backdrop-filter: blur( 10px );
+    -webkit-backdrop-filter: blur( 10px );
+    border-radius: 100px;
+    text-align: center;
+    margin: 0px 1.25px;
+    font-size: 14px;
+}
+
+.retroPlayPauseButton{
+    position: absolute;
+    right: 20px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.retroPlayPauseButton span{
+    padding: 18px;
+    background-color: #fff;
+    color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.retroPlayPauseButton span i{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+}

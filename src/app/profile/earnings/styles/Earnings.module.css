@@ -1,0 +1,392 @@
+/* styles/Earnings.module.css */
+
+.earnings {
+    min-height: 100vh;
+    background: #111111;
+    padding: 2rem;
+}
+
+.earningsHeader {
+    margin-bottom: 3rem;
+}
+
+.earningsTitle {
+    margin-bottom: 2rem;
+}
+
+.earningsTitle p {
+    font-family: "Rubik Mono One", monospace;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+}
+
+.earningsTitle span {
+    font-size: 1.2rem;
+    color: #666666;
+}
+
+.totalEarnings {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.earningCard {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.earningCard:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.earningCard h3 {
+    font-size: 1rem;
+    color: #666666;
+    margin-bottom: 0.5rem;
+}
+
+.earningCard p {
+    font-family: "Rubik Mono One", monospace;
+    font-size: 1rem;
+    color: #ffffff;
+    letter-spacing: -1px;
+}
+
+.dsrcGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.dsrcIds {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+
+.loading, .noCreativeId, .noDsrcs, .noMore {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    width: 100%;
+    color: #666666;
+    font-size: 1.1rem;
+}
+
+.loadMore {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.loadMoreButton {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 2rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.loadMoreButton:hover {
+    opacity: 1;
+    transform: translateY(-3px);
+}
+
+.loadMoreButton:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Enhanced DSRC Item Styling */
+.dsrcItem {
+    position: relative;
+    padding: 1rem;
+}
+
+.menuContainer {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+}
+
+.menuButton {
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: #ffffff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.menuButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    min-width: 150px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dropdown button {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background: none;
+    border: none;
+    color: #ffffff;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.dropdown button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.imageWrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    margin-bottom: 1rem;
+}
+
+.imageContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.coverImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.playOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.imageContainer:hover .playOverlay {
+    opacity: 1;
+}
+
+.playButton {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.playButton:hover {
+    transform: scale(1.1);
+    background: #ffffff;
+}
+
+.playButton i {
+    color: #000000;
+    font-size: 1.2rem;
+}
+
+.detailsWrapper {
+    padding: 1rem 0;
+}
+
+.title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.idContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.description {
+    font-family: "Roboto Mono", monospace;
+    font-size: 0.8rem;
+    color: #666666;
+}
+
+.chainPill {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    color: #ffffff;
+}
+
+.earningsWrapper {
+    margin-top: 1rem;
+}
+
+.earningsRow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.earningCard .label {
+    font-size: 0.8rem;
+    color: #666666;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.earningCard .value {
+    font-family: "Roboto Mono", monospace;
+    font-size: 1rem;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.dsrcMetadata {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dsrcMetadataLeftOptions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dsrcMetadataLeftOption {
+    color: #666666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dsrcMetadataLeftOption:hover {
+    color: #ffffff;
+}
+
+.dsrcMetadataLeftOptionPrice {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #ffffff;
+    font-family: "Roboto Mono", monospace;
+}
+
+.distributionButtons {
+    display: flex;
+    gap: 1rem;
+}
+
+.distributeButton {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.distributeButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.distributeButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .totalEarnings {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .earnings {
+        padding: 1rem;
+    }
+
+    .earningsTitle h1 {
+        font-size: 2rem;
+    }
+
+    .totalEarnings {
+        grid-template-columns: 1fr;
+    }
+
+    .dsrcGrid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .earningsTitle h1 {
+        font-size: 1.5rem;
+    }
+
+    .distributionButtons {
+        flex-direction: column;
+    }
+}
+

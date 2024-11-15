@@ -1,0 +1,111 @@
+.help{
+    width: 100%;
+}
+
+.helpHeader{
+    display: flex;
+    align-items: center;
+    padding: 18px;
+}
+
+.helpHeader p {
+    font-family: "Rubik Mono One", monospace;
+    font-size: 18px;
+}
+
+.helpContainer{
+    display: flex;
+    width: 100%;
+}
+
+.helpContainerLeft{
+    display: flex;
+    flex: 1;
+    background-color: #202020;
+    height: 70vh;
+    margin: 10px;
+    border-radius: 10px;
+    overflow-y: auto;
+    flex-direction: column;
+    align-items: center;
+}
+
+.helpContainerRight{
+    display: flex;
+    flex: 1;
+    background-color: #202020;
+    height: 70vh;
+    margin: 10px;
+    border-radius: 10px;
+    overflow-y: auto;
+    flex-direction: column;
+    align-items: center;
+}
+
+.helpContainerRight::-webkit-scrollbar{
+    width: 7.5px;
+    height: 7.5px;
+  }
+  
+.helpContainerRight::-webkit-scrollbar-thumb {
+    background-color: #303030;
+    border-radius: 10px;
+  }
+
+  .helpContainerLeft::-webkit-scrollbar{
+    width: 7.5px;
+    height: 7.5px;
+  }
+  
+.helpContainerLeft::-webkit-scrollbar-thumb {
+    background-color: #303030;
+    border-radius: 10px;
+  }
+
+  
+.helpContainerHeader{
+    width: 100%;
+}
+
+.helpContainerHeader p{
+    font-family: "Rubik Mono One", monospace;
+    font-size: 16px;
+    padding: 15px;
+    display: flex;
+    justify-content: left;
+}
+
+.helpContainerQuestions{
+    width: 98%;
+    margin-bottom: 20px;
+}
+
+.helpContainerQuestion{
+    padding: 10px ;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.helpContainerQuestion p{
+    color: #808080;
+    transition: background-color 0.3s ease;
+}
+
+.helpContainerQuestion:hover p{
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.helpContainerQuestion:hover{
+    background-color: #303030;
+    border-radius: 5px;
+}
+
+@media (max-width: 1200px) {
+    .helpContainer{
+        display: flex;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+    }
+}

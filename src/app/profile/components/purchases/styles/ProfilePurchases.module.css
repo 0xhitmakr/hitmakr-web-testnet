@@ -1,0 +1,52 @@
+/* Profile Releases Grid */
+.profileReleases {
+    padding: 20px;
+}
+
+
+
+.loadMore {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+}
+
+.loadMoreButton {
+    background: #202020;
+    color: #fff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 24px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.loadMoreButton:hover {
+    background: #303030;
+    transform: translateY(-1px);
+}
+
+.loadMoreButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.noWallet, .noCreativeId, .noDsrcs {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+    background: #121212;
+    border-radius: 12px;
+    margin: 16px;
+}
+
+.dsrcMetadataPurchaseButton button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dsrcMetadataPurchaseButton button i{
+    margin-left: 5px;
+}

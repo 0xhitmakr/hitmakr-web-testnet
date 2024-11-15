@@ -1,0 +1,133 @@
+.miniModal{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background: rgba(20,20,20, 0.5 );
+    backdrop-filter: blur( 15px );
+    -webkit-backdrop-filter: blur( 15px );
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.miniModalContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #202020;
+    width: 425px;
+    max-height: 500px;
+    position: fixed;
+    border-radius: 10px;
+    transition: width 250ms ease-in-out, height 250ms ease-in-out;
+    animation: popIn 0.25s ease forwards;
+    transition: 0.2s;
+    z-index: 101;
+}
+
+
+.miniModalContainerHeader{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    border-bottom: 2px solid #353535;
+    position: relative;
+}
+
+.miniModalContainerHeaderTitle{
+    display: flex;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: bolder;
+    padding: 15px;
+}
+
+.miniModalContainerHeaderClose{
+    display: flex;
+    justify-content: right;
+    padding: 5px;
+    position: absolute;
+    right: 5px;
+}
+
+.miniModalContainerHeaderClose span{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    font-size: 25px;
+}
+
+.miniModalContainerHeaderClose span i{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.miniModalContainerHeaderClose span:hover{
+    cursor: pointer;
+    background-color: #353535;
+    border-radius: 100px;
+}
+
+.miniModalContainerDescription{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.miniModalContainerDescription p{
+    margin: 15px 15px 0px 15px;
+    text-align: center;
+    font-size: 15px;
+}
+
+.miniModalContainerDescription p a{
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.miniModalContainerAction{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 20px 0px;
+}
+
+@media (max-width: 450px){
+    .miniModalContainer{
+        width: 98%;
+        bottom: 0;
+        max-height: 80vh;
+        border-radius: 0px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInBottom {
+    0% {
+        transform: translateY(100%);
+      }
+      100% {
+        transform: translateY(0);
+      }
+}

@@ -1,0 +1,921 @@
+.onboardPage{
+    width: 100%;
+}
+
+.onboardHeader{
+    display: flex;
+    align-items: center;
+    padding: 18px;
+}
+
+.onboardPageLoader{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.onboardHeader p {
+    font-family: "Rubik Mono One", monospace;
+    font-size: 18px;
+}
+
+.hitmakrCamp{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hitmakrCampWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.hitmakrCampContainer{
+    width: 800px;
+    height: 200px;
+    margin-top: 15px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.hitmakrCampContainer img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: bottom;
+    border-radius: 10px;
+    position: absolute;
+}
+
+.transparentLayer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to left, rgba(20, 20, 20, 0) 0%, rgba(20, 20, 20, 0.751) 100%);
+    border-radius: 10px;
+}
+
+.transparentLayer2 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to left, rgba(20, 20, 20, 0.751) 0%, rgba(20, 20, 20, 0) 100%);
+    border-radius: 10px;
+}
+
+.hitmakrCampHeader{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.hitmakrCampAuthPartner{
+    display: flex;
+    width: 100%;
+    flex: 1;
+    justify-content: left;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.hitmakrCampAuthButton{
+    display: flex;
+    width: 100%;
+    flex: 10;
+    justify-content: right;
+    align-items: center;
+    margin-right: 25px;
+}
+
+.hitmakrCampAuthSpotifyButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #1ED760;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.hitmakrCampAuthLoadingButton{
+    background-color: transparent;
+    padding: 10px 45px;
+}
+
+.hitmakrCampAuthSpotifyButton p{
+    margin-right: 5px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.hitmakrCampAuthSpotifyButton span{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hitmakrCampAuthSpotifyButton span i{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+}
+
+
+
+.hitmakrCampFooter{
+    position: absolute;
+    bottom: 10px;
+    display: flex;
+    width: 100%;
+}
+
+
+
+.hitmakrCampFooterDescription{
+    display: flex;
+    flex: 10;
+    justify-content: left;
+    align-items: center;
+    margin-left: 25px;
+    font-size: 14px;
+}
+
+.hitmakrCampFooterKnowmore{
+    display: flex;
+    flex: 1;
+    justify-content: right;
+    align-items: center;
+    margin-right: 25px;
+    width: 100%;
+    font-weight: bold;
+}
+
+
+
+.hitmakrCampFooterKnowmore p{
+    display: flex;
+    align-items: center;
+    margin-right: 5px;
+}
+
+.hitmakrCampFooterKnowmore p:hover{
+    cursor: pointer;
+    color: #bababa;
+}
+
+.hitmakrCampFooterKnowmore p i{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+}
+
+.hitmakrCampKnowmoreContainer {
+    width: 800px;
+    height: 400px;
+    background-color: #151515;
+    margin-top: 10px;
+    border-radius: 10px;
+    animation: slideInTop 0.25s ease forwards;
+    overflow: hidden;
+    top: 100%;
+    transform: translateY(-50%);
+    z-index: 10; 
+}
+
+
+.hitmakrCampKnowmoreContainer video {
+    width: calc(100% - 2.5px);
+    height: calc(100% - 2.5px);
+    object-fit: cover;
+    border-radius: 10px;
+    position: relative;
+}
+
+.hitmakrCampKnowmoreContainerVideo{
+    width: calc(100% - 2.5px);
+    height: calc(100% - 2.5px);
+    padding: 1.25px;
+}
+
+.hitmakrForm{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.hitmakrFormContainer{
+    width: 800px;
+    border-radius: 10px;
+    background-color: #202020;
+    position: relative;
+}
+
+.formDetails{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.formDetailsLabel{
+    padding: 10px;
+    font-size: 14px;
+    margin: 0px 5px;
+}
+
+.formDetailsInput{
+    margin: 0px 10px;
+    padding: 10px;
+    outline: none;
+    background-color: #202020;
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 5px;
+    font-size: 18px;
+}
+
+.formDetails textarea {
+    resize: none;
+}
+
+.submitButton{
+    margin: 25px 0px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.formDetails {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 20px; 
+}
+
+.formDetailsLabel {
+    padding: 10px;
+    font-size: 14px;
+    margin: 0px 5px;
+}
+
+.formDetailsInput {
+    margin: 0px 10px;
+    padding: 10px;
+    outline: none;
+    background-color: #151515;
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.formDetailsRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; 
+}
+
+.formDetailsRow .formDetails {
+    flex: 1; 
+}
+
+.creativeTypeSelect{
+    display: flex;
+    width: 100%;
+    margin: 20px 0px;
+}
+
+.creativeTypeSelectOption{
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 10px;
+    flex-direction: column;
+    margin: 0px 10px;
+}
+
+.creativeTypeSelectOption:hover{
+    background-color: #252525;
+}
+
+.creativeTypeSelectOption span{
+    padding: 10px 15px;
+}
+
+.creativeTypeSelectOptionSelected{
+    background-color: #151515;
+    color: #fff;
+    font-weight: bold;
+}
+
+.creativeTypeSelectOptionSelected:hover{
+    background-color: #252525;
+    color: #fff;
+    font-weight: bold;
+}
+
+.creativeTypeSelectOption span img{
+    width: 100px;
+    height: 100px;
+    border-radius: 100px;
+}
+
+.formSubmitted{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.formSubmittedContainer{
+    width: 100%;
+    height: 100%;
+    background-color: #101010;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    border-radius: 10px;
+}
+
+.formSubmittedContainer img{
+    width: 100%;
+    height: 25vh;
+    object-fit: cover;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    position: absolute;
+    top: 0px;
+}
+
+.formSubmittedContainer p{
+    margin-top: 30vh;
+    text-align: left;
+    width: 80%;
+    margin-bottom: 30px;
+}
+
+.formSubmittedContainer p span{
+    display: flex;
+    justify-content: left;
+}
+
+.formSubmittedContainer p i{
+    font-size: 35px;
+}
+
+.formSubmittedButtons{
+    display: flex;
+    width: 80%;
+    bottom: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.formSubmittedButtonLeft{
+    display: flex;
+    flex: 1;
+    width: 100%;
+    justify-content: center;
+}
+
+.formSubmittedButtonRight{
+    display: flex;
+    flex: 1;
+    width: 100%;
+    justify-content: center;
+}
+
+.hitmakrRcaId{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hitmakrRcaIdWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.hitmakrRcaIdContainer{
+    width: 800px;
+    height: 200px;
+    margin-top: 25px;
+    border-radius: 10px;
+    position: relative;
+    background-image: linear-gradient(to bottom right, #E1C737, #9D860B);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hitmakrRcaIdHeader{
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.hitmakrRcaIdHeader p{
+    font-family: "Rubik Mono One", monospace;
+}
+
+.hitmakrRcaIdInputs{
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.creativeCcInput {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.creativeCcInput select {
+    width: 80%;
+    margin: auto;
+    border-radius: 250px;
+    border: none;
+    font-size: 15px;
+    height: 40px;
+    transition: 0.2s;
+    outline: none;
+    background-color: #252525;
+    color: white;
+    text-indent: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none; 
+    cursor: pointer;
+    padding: 0px 10px;
+}
+
+.creativeCcInput {
+    position: relative;
+}
+
+.creativeCcInput::after {
+    position: absolute;
+    top: 50%;
+    right: 15%;
+    transform: translateY(-50%);
+    color: white;
+    pointer-events: none;
+}
+
+.creativeCcInput select option {
+    background-color: #252525;
+    color: white;
+    font-size: 15px;
+    padding: 10px;
+}
+
+.creativeCcInput select option:hover,
+.creativeCcInput select option:focus {
+    background-color: #3a3a3a;
+}
+
+.creativeCcInput select {
+    -moz-appearance: none;
+    text-indent: 0.01px;
+    text-overflow: '';
+}
+
+.creativeCcInput select::-ms-expand {
+    display: none;
+}
+
+.creativeRcaInput{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+.creativeRcaInput label{
+    width: 75%;
+    display: flex;
+    justify-content: left;
+    margin: 5px 0px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.creativeRcaInput input{
+    width: 80%;
+    margin: auto;
+    border-radius: 250px;
+    border: none;
+    font-size: 15px;
+    font-weight: bold;
+    height: 40px;
+    transition: 0.2s;
+    outline: none;
+    background-color: #252525;
+    color: white;
+    text-indent: 10px;
+    position: relative;
+}
+
+.creativeRcaInputContainer{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.creativeRcaInputStatus{
+    position: absolute;
+    height: 100%;
+    right: 12.5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #404040;
+}
+
+.creativeRcaInputStatusActive{
+    position: absolute;
+    height: 100%;
+    right: 12.5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.creativeRcaInputStatus i,.creativeRcaInputStatusActive i {
+    font-size: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.creativeMintButton{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    bottom: 20px;
+}
+
+
+.hitmakrRcaIdContainer img{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 10px;
+}
+
+.transparentLayer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to left, rgba(20, 20, 20, 0) 0%, rgba(20, 20, 20, 0.751) 100%);
+    border-radius: 10px;
+}
+
+.transparentLayer2 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to left, rgba(20, 20, 20, 0.751) 0%, rgba(20, 20, 20, 0) 100%);
+    border-radius: 10px;
+}
+
+.hitmakrRcaId{
+    width: 100%;
+    display: flex;
+    justify-content: left;
+}
+
+.hitmakrRcaIdData{
+    display: flex;
+    width: 90%;
+}
+
+.hitmakrRcaIdDataOption{
+    margin: 0px 10px;
+    background-color: #9D860B;
+    border-radius: 10px;
+    padding: 15px 50px 15px 15px;
+}
+
+.hitmakrRcaIdDataOption p{
+    font-size: 14px;
+}
+
+.hitmakrRcaIdDataOption span p{
+    font-family: "Rubik Mono One", monospace;
+    font-size: 22.5px;
+}
+
+.onboardBullet{
+    width: 800px;
+    margin: auto;
+    margin-top: 15px;
+}
+
+.onboardBullet p{
+    width: 75px;
+    display: flex;
+    padding: 10px 15px;
+    background-color: #252525;
+    color: #fff;
+    border-radius: 100px;
+    font-weight: bold;
+}
+
+.onboardBullet p span{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+}
+
+.onboardBullet p span i{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.subRegistry{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.subRegistryContainer{
+    width: 800px;
+    height: 200px;
+    margin-top: 15px;
+    border-radius: 10px;
+    position: relative;
+    background-image: linear-gradient(to bottom right, #92E62A, #538009);
+    display: flex;
+    align-items: center;
+}
+
+.subRegistryContainerLeft{
+    display: flex;
+    flex: 1;
+    justify-content: left;
+    align-items: center;
+    width: 100%;
+}
+
+.subRegistryContainerLeft p{
+    font-family: "Rubik Mono One", monospace;
+    padding: 20px;
+    font-size: 20px;
+}
+
+.subRegistryContainerRight{
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.subRegistryContainerFooter{
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    padding: 10px 20px;
+}
+
+.onboardSkip{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    
+}
+
+.onboardSkipContainer{
+    width: 900px;
+    height: 100px;
+    margin-top: 15px;
+    border-radius: 10px;
+    position: relative;
+    background-color: #151515;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.onboardSkipContainer p{
+    width: 90%;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.onboardPageLoader{
+    width: 100%;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.refreshButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    color: white;
+    border: none;
+    outline: none;
+    padding: 10px;
+}
+
+.refreshButton i{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.hitmakrRcaIdDataOptionCreationDate{
+    position: absolute;
+    bottom: 10px;
+    display: flex;
+    font-size: 14px;
+    font-weight: bold;
+    left: 20px;
+}
+
+.hitmakrRcaIdDataOptionCreationDate span{
+    margin-left: 10px;
+}
+
+@media (max-width: 1200px) {
+    .hitmakrCampContainer{
+        width: 95%;
+        height: 200px;
+    }
+
+    .subRegistryContainer{
+        width: 95%;
+    }
+
+    .onboardBullet{
+        width: 95%;
+    }
+
+    .hitmakrCampKnowmoreContainer{
+        width: 95%;
+    }
+
+    .hitmakrFormContainer{
+        width: 95%;
+    }
+
+    .onboardSkipContainer{
+        width: 95%;
+    }
+
+    .formDetailsRow {
+        flex-direction: column;
+    }
+
+    .formSubmittedContainer p{
+        width: 90%;
+    }
+    
+    .formSubmittedButtons{
+        width: 100%;
+    }
+
+    .hitmakrRcaIdContainer{
+        width: 95%;
+        height: 200px;
+    }
+
+    .hitmakrRcaIdData{
+        display: flex;
+        width: 95%;
+    }
+
+    .hitmakrRcaIdDataOption{
+        margin: 0px 10px;
+        border-radius: 10px;
+        padding: 10px 30px 10px 10px;
+    }
+    
+    .hitmakrRcaIdDataOption p{
+        font-size: 14px;
+    }
+    
+    .hitmakrRcaIdDataOption span p{
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 450px) {
+    .hitmakrCampContainer{
+        width: 95%;
+        height: 200px;
+    }
+
+    .subRegistryContainer{
+        width: 95%;
+    }
+
+
+    .hitmakrCampFooterDescription{
+        font-size: 12px;
+        margin-left: 10px;
+    }
+
+    .hitmakrCampFooterKnowmore{
+        margin-right: 10px;
+    }
+
+    .hitmakrCampFooterKnowmore p{
+        display: flex;
+        align-items: center;
+    }
+
+    .hitmakrCampAuthPartner{
+        margin-left: 0px;
+    }
+    
+    .hitmakrCampAuthButton{
+        margin-right: 15px;
+    }
+
+    .hitmakrRcaIdContainer{
+        width: 95%;
+        height: 350px;
+    }
+
+    .hitmakrRcaIdData{
+        display: flex;
+        width: 95%;
+        
+    }
+
+    .hitmakrRcaIdDataOption,.creativeCcInput,.creativeRcaInput,.creativeMintButton{
+        margin: 10px 0px;
+    }
+
+    .hitmakrRcaIdDataOption p{
+        font-size: 12px;
+    }
+    
+    .hitmakrRcaIdDataOption span p{
+        font-size: 18px;
+    }
+
+    .hitmakrRcaIdInputs{
+        flex-direction: column;
+    }
+
+    .hitmakrRcaIdData{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .subRegistryContainer{
+        display: flex;
+        flex-direction: column;
+        height: 350px;
+    }
+}
+
+
+
+@keyframes slideInTop {
+    0% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0%);
+      }
+}

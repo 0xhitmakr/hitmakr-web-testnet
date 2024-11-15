@@ -1,0 +1,308 @@
+.libraryContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0px 12px;
+  }
+  
+  .libraryHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .libraryTitle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-secondary, #b3b3b3);
+    letter-spacing: 0.1em;
+  }
+  
+  .libraryTitle i {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .createButton {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary, #b3b3b3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .createButton:hover {
+    color: var(--text-primary, #fff);
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .filterOptions {
+    margin: 8px 0;
+  }
+  
+  .filterPills {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .pillActive {
+    padding: 6px 12px;
+    border-radius: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary, #fff);
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+.controlsContainer {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    width: 100%;
+  }
+  
+  .searchAndSort {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .searchBar {
+    display: flex;
+    align-items: center;
+    position: relative;
+    min-width: 32px;
+    transition: all 0.3s ease;
+  }
+  
+  .searchBar.expanded {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+  
+  .searchButton {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary, #b3b3b3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    z-index: 2;
+  }
+  
+  .searchButton:hover {
+    color: var(--text-primary, #fff);
+  }
+  
+  .searchInput {
+    position: absolute;
+    left: 32px; 
+    background: transparent;
+    border: none;
+    color: var(--text-primary, #fff);
+    font-size: 14px;
+    width: calc(100% - 40px);
+    padding: 8px 8px 8px 0;
+    outline: none;
+  }
+  
+  .searchInput::placeholder {
+    color: var(--text-secondary, #b3b3b3);
+  }
+  
+  .sortDropdown {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+  }
+  
+  .sortButton {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #b3b3b3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  
+  .sortButton:hover {
+    color: var(--text-primary, #fff);
+  }
+  
+  .sortButton i {
+    font-size: 16px;
+  }
+  
+  .sortMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #282828;
+    border-radius: 4px;
+    padding: 4px;
+    min-width: 160px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+  
+  .sortMenu button {
+    width: 100%;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #b3b3b3);
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 2px;
+  }
+  
+  .sortMenu button:hover,
+  .sortMenu button.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary, #fff);
+  }
+  
+  /* Playlists Container */
+  .playlistsContainer {
+    align-items: center;
+    flex: 1;
+    overflow-y: auto;
+    width: 100%;
+  }
+  
+  .emptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    color: var(--text-secondary, #b3b3b3);
+    font-size: 14px;
+  }
+  
+  .playlistsList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .playlistItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .playlistItem:hover {
+    background: #202020;
+  }
+  
+  .playlistImageContainer {
+    flex-shrink: 0;
+  }
+  
+  .playlistImage {
+    border-radius: 4px;
+    object-fit: cover;
+    object-position: center;
+  }
+  
+  .playlistInfo {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .playlistName {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary, #fff);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .playlistMeta {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--text-secondary, #b3b3b3);
+  }
+  
+  /* Scrollbar */
+  .playlistsContainer::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  .playlistsContainer::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .playlistsContainer::-webkit-scrollbar-thumb {
+    background: #303030;
+    border-radius: 4px;
+  }
+  
+  .playlistsContainer::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  .loadingState {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+    width: 100%;
+  }
+  
+  .endMessage {
+    color: var(--text-secondary, #b3b3b3);
+    font-size: 13px;
+    text-align: center;
+    padding: 16px 0;
+  }
+  
+  .errorMessage {
+    color: var(--error-color, #ff4444);
+    font-size: 13px;
+    text-align: center;
+    padding: 16px 0;
+  }
+  
+  .playlistsContainer {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 8px;
+    padding-bottom: 16px; 
+  }
+  
+  .playlistsList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }

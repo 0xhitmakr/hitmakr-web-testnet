@@ -1,0 +1,272 @@
+.sidebar {
+    width: 350px;
+    position: fixed;
+    top: 55px; 
+    bottom: 65px; 
+    left: 0;
+    margin: 10px;
+}
+
+.sidebarContainer {
+    background-color: #151515;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+.sidebarHeader{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    width: 100%;
+}
+
+
+.sidebarHeaderTitle{
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding:15px;
+}
+
+.sidebarHeaderTitle span{
+    display: flex;
+    align-items: center;
+    margin: 5px;
+}
+
+.sidebarHeaderTitle span i{
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+}
+
+.sidebarHeader p{
+    font-family: "Rubik Mono One", monospace;
+}
+
+.sidebarHeaderOptions{
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    margin-right: 15px;
+}
+
+.sidebarHeaderOption{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding:10px;
+    background-color: #151515;
+    border-radius: 100px;
+}
+
+.sidebarHeaderOption:hover{
+    background-color: #252525;
+    cursor: pointer;
+}
+
+.sidebarHeaderOption span{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebarHeaderOption span i{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebarOptions{
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; 
+    flex-grow: 1;
+    height: calc(100vh - 130px - 75px);
+}
+
+.sidebarOptions::-webkit-scrollbar {
+    width: 7.5px;
+}
+
+.sidebarOptions::-webkit-scrollbar-thumb {
+    background-color: #303030;
+    border-radius: 10px;
+}
+
+.sidebarOption{
+    display: flex;
+    padding: 15px;
+    margin: 5px;
+    transition: background-color 0.3s ease;
+    border-radius: 10px;
+}
+
+.sidebarOption:hover{
+    background-color: #202020;
+    cursor: pointer;
+}
+
+.sidebarOptionActive{
+    background-color: #202020;
+    border-radius: 10px;
+}
+
+.sidebarOptionIcon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebarOption i{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+}
+
+.sidebarOptionName{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 5px;
+}
+
+
+.sidebarOption:active {
+  transform: scale(0.90); 
+  transition: transform 0.1s ease;
+}
+
+.sidebarProfile{
+    display: none;
+}
+
+.sidebarLibrary{
+  display: none;
+}
+
+@media (max-width: 750px) {
+    .sidebar {
+      display: none;
+    }
+  
+    .sidebarProfile,.sidebarLibrary {
+      display: block;
+      width: 100%;
+      position: fixed;
+      top: 65px;
+      bottom: 65px;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+      z-index: 10;
+    }
+  
+    .sidebarProfileContainer,.sidebarLibraryContainer {
+      background-color: #000000;
+      width: 100%;
+      height: 100%;
+      animation: slideInBottom 0.2s ease-in-out forwards; 
+    }
+
+    .sidebarOptions{
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto; 
+        flex-grow: 1;
+        height: calc(100vh - 75px);
+    }
+  }
+
+  .sidebarNoLogin{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+  }
+
+  .sidebarNoLoginDescription{
+    width: 90%;
+  }
+
+  .sidebarNoLoginDescription p{
+    color: #838383;
+    font-weight: 600;
+
+  }
+
+  .sidebarNoLoginDescription p span{
+    color:white;
+    margin: 0px 5px;
+  }
+
+  .sidebarNoLoginButton{
+    width: 100%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 20px;
+  }
+
+  .sidebarLoading{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+@keyframes slideIn {
+    0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(0);
+      }
+  }
+  
+  @keyframes slideInBottom {
+    0% {
+        transform: translateY(100%);
+      }
+      100% {
+        transform: translateY(0);
+      }
+  }
+  
+  @keyframes slideInTop {
+    0% {
+        transform: translateY(-10%);
+      }
+      100% {
+        transform: translateY(0%);
+      }
+  }
+  
+  @keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+  }
+  
+  @keyframes popIn90 {
+    90% {
+      transform: scale(0.90);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }

@@ -1,0 +1,52 @@
+.dsrcHeader {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 18px;
+}
+
+.dsrcHeading {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.dsrcHeading p {
+    color: #ffffff;
+    font-size: 18px;
+    margin: 0;
+    font-family: "Rubik Mono One", monospace;
+}
+
+.dsrcItem {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .dsrcItem {
+        padding: 8px;
+    }
+
+    .dsrcHeader {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dsrcItem {
+        padding: 4px;
+    }
+
+    .dsrcHeader {
+        padding: 8px;
+    }
+    
+    .dsrcHeading p {
+        font-size: 12px;
+    }
+}

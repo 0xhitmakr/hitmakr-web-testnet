@@ -1,0 +1,65 @@
+
+
+.partnersContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.partnersLogos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.partnerLogo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 15px;
+    transition: transform .2s;
+}
+
+.partnerLogo:hover {
+    cursor: pointer;
+    transform: scale(1.25);
+}
+
+.partnerLogo svg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+}
+
+.partnerLogo i {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+}
+
+.partnerX {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.35s;
+}
+
+.partnerX i {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+}
+
+.partnerX svg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.partnersLogos:hover .partnerX {
+    transform: rotate(135deg);
+}

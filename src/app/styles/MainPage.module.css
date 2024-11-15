@@ -1,0 +1,25 @@
+.mainPage{
+    width: 100%;
+}
+
+.mainPageLoading{
+    width: 100%;
+    height: 50vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mainPageHeader{
+    padding: 18px;
+}
+
+.mainPageHeading{
+    display: flex;
+    align-items: center;
+}
+
+.mainPageHeading p {
+    font-family: "Rubik Mono One", monospace;
+    font-size: 18px;
+}
