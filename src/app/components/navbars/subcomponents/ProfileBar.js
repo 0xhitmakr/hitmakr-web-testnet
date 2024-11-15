@@ -9,7 +9,7 @@ import { useAccount } from "wagmi";
 import { useHasCreativeIDRPC } from "@/app/config/hitmakrcreativeid/hitmakrCreativeIDRPC";
 import WalletDisconnectFunction from "@/app/helpers/WalletDisconnectFunction";
 import LoaderWhiteSmall from "../../animations/loaders/loaderWhiteSmall";
-import GenerateDp from "@/app/helpers/profile/GenerateDp";
+import GenerateDp from "@/app/helpers/profile/GenerateDP";
 
 const ProfileBar = ({ isOpen, profileBarRef, nameData }) => {
   const { routeTo } = RouterPushLink();

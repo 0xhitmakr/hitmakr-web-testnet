@@ -9,7 +9,7 @@ import RouterPushLink from "@/app/helpers/RouterPushLink";
 import { useAccount } from "wagmi";
 import { useSIWE } from "connectkit";
 import ProfileBar from "./subcomponents/ProfileBar";
-import GenerateDp from "@/app/helpers/profile/GenerateDp";
+import GenerateDp from "@/app/helpers/profile/GenerateDP";
 import { useHasProfile,useNameByAddress } from "@/app/config/hitmakrprofiles/hitmakrProfilesRPC";
 import LayoutStore from "@/app/config/store/LayoutStore";
 import { useRecoilState } from "recoil";
