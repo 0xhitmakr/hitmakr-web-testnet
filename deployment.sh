@@ -2,11 +2,22 @@
 
 echo "Starting deployment..."
 
+if ! command -v bun &> /dev/null; then
+    echo "Installing Bun..."
+    curl -fsSL https://bun.sh/install | bash
+    source /root/.bashrc
+fi
+
+if ! command -v pm2 &> /dev/null; then
+    echo "Installing PM2..."
+    bun install -g pm2
+fi
+
 echo "Installing dependencies..."
-npm install
+bun install
 
 echo "Building Next.js application..."
-NODE_ENV=production npm run build
+NODE_ENV=production bun run build
 
 echo "Configuring PM2..."
 pm2 delete hitmakr-web-testnet 2>/dev/null || true
