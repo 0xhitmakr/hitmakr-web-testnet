@@ -6,14 +6,13 @@ import styles from "./styles/ProfileAbout.module.css";
 import GetProfileDetails from "@/app/helpers/profile/GetProfileDetailsByAddress";
 import { useGetDSRCNonce } from '@/app/config/hitmakrdsrcfactory/hitmakrDSRCFactoryRPC';
 import { useGetUserStats } from '@/app/config/hitmakrpurchaseindexer/hitmakrPurchaseIndexerRPC';
-import LoaderWhiteSmall from '@/app/components/animations/loaders/loaderWhiteSmall';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_HITMAKR_SERVER;
-const INDEXER_ADDRESS = process.env.NEXT_PUBLIC_HITMAKR_INDEXER_ADDRESS_SKL; 
+const INDEXER_ADDRESS = process.env.NEXT_PUBLIC_HITMAKR_INDEXER_ADDRESS_SKL;
 
 const formatTokenAmount = (amount) => {
     if (!amount) return "0";
-    const num = Number(amount) / 1e6; 
+    const num = Number(amount) / 1e6;
     return new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
@@ -21,7 +20,7 @@ const formatTokenAmount = (amount) => {
 };
 
 const formatTimestamp = (timestamp) => {
-    if (!timestamp || timestamp === "0") return "N/A";
+    if (!timestamp || timestamp === "0") return null;
     return new Date(Number(timestamp) * 1000).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -29,12 +28,15 @@ const formatTimestamp = (timestamp) => {
     });
 };
 
-const STATS_CONFIG = [
+const BASE_STATS_CONFIG = [
     { id: 'releases', label: 'Releases' },
     { id: 'followers', label: 'Followers' },
     { id: 'hearts', label: 'Hearts' },
     { id: 'totalPurchases', label: 'Purchases' },
     { id: 'totalAmountSpent', label: 'Total Spent ($)', formatter: formatTokenAmount },
+];
+
+const PURCHASE_STATS_CONFIG = [
     { id: 'firstPurchase', label: 'First Purchase', formatter: formatTimestamp },
     { id: 'lastPurchase', label: 'Last Purchase', formatter: formatTimestamp }
 ];
@@ -157,8 +159,8 @@ const ProfileStats = ({ address }) => {
         fetchHeartsCount();
     }, [address]);
 
-    const statsData = useMemo(() => 
-        STATS_CONFIG.map(config => {
+    const statsData = useMemo(() => {
+        const baseStats = BASE_STATS_CONFIG.map(config => {
             let value;
             
             if (config.id === 'releases') {
@@ -179,12 +181,6 @@ const ProfileStats = ({ address }) => {
                     case 'totalAmountSpent':
                         value = config.formatter(userStats.totalAmountSpent);
                         break;
-                    case 'firstPurchase':
-                        value = config.formatter(userStats.firstPurchaseTime);
-                        break;
-                    case 'lastPurchase':
-                        value = config.formatter(userStats.lastPurchaseTime);
-                        break;
                     default:
                         value = "0";
                 }
@@ -194,10 +190,33 @@ const ProfileStats = ({ address }) => {
                 ...config,
                 value
             };
-        }),
-        [nonce, nonceLoading, nonceError, followersCount, isLoadingFollowers, 
-         heartsCount, isLoadingHearts, userStats, statsLoading]
-    );
+        });
+
+        const hasPurchases = userStats && Number(userStats.totalPurchases) > 0;
+        
+        if (hasPurchases) {
+            const purchaseStats = PURCHASE_STATS_CONFIG.map(config => {
+                const value = config.formatter(
+                    config.id === 'firstPurchase' 
+                        ? userStats.firstPurchaseTime 
+                        : userStats.lastPurchaseTime
+                );
+                
+                if (value) {
+                    return {
+                        ...config,
+                        value
+                    };
+                }
+                return null;
+            }).filter(Boolean);
+
+            return [...baseStats, ...purchaseStats];
+        }
+
+        return baseStats;
+    }, [nonce, nonceLoading, nonceError, followersCount, isLoadingFollowers, 
+        heartsCount, isLoadingHearts, userStats, statsLoading]);
 
     return (
         <div className={styles.profileAbout}>
@@ -223,7 +242,6 @@ const ProfileStats = ({ address }) => {
                     </div>
                 </div>
             </div>
-            
         </div>
     );
 };
