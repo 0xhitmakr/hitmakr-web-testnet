@@ -16,6 +16,7 @@ import { useRecoilState } from "recoil";
 import { useMintUSDC } from "@/app/config/TestUSDC/testUSDCWagmi";
 import LoaderWhiteSmall from "../animations/loaders/loaderWhiteSmall";
 import HitmakrMiniModal from "../modals/HitmakrMiniModal";
+import Link from "next/link";
 
 export default function HomeMainBar() {
   const [isProfileBarOpen, setProfileBarOpen] = useState(false);
@@ -163,7 +164,11 @@ const handleMint = async () => {
       <>
         <div className={styles.mainbar}>
           <div className={styles.mainbarLeft}>
-            <HitmakrLogoBW />
+            <Link
+              href={"/"}
+            >
+              <HitmakrLogoBW />
+            </Link>
           </div>
           <div className={styles.mainbarCenter}>
             <div className={styles.mainbarCenterOption}>
