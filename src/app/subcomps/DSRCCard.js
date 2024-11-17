@@ -137,15 +137,6 @@ export default function DSRCCard({
     };
 
     const handleAddToQueue = () => {
-        if (!address) {
-            showModal({
-                show: true,
-                title: "Connect Wallet",
-                description: "Please connect your wallet to add this DSRC to queue."
-            });
-            return;
-        }
-
         addToQueue(dsrcId);
         showModal({
             show: true,
