@@ -147,7 +147,7 @@ export default function DSRCCard({
     };
 
     const handleOptionClick = (option) => {
-        if (!address) {
+        if (!address && option==="playlist") {
             showModal({
                 show: true,
                 title: "Connect Wallet",
@@ -252,6 +252,12 @@ export default function DSRCCard({
                         )}
                     </div>
                     <div className={styles.actions}>
+                        <div 
+                            onClick={handlePlayPause}
+                            className={styles.actionButton}
+                        >
+                            <i className={`fi ${isThisTrackPlaying ? 'fi-sr-pause' : 'fi-sr-play'}`} />
+                        </div>
                         <HeartButton
                             dsrcId={dsrcId}
                             showModal={showModal}
