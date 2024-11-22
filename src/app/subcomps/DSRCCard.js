@@ -126,11 +126,11 @@ export default function DSRCCard({
             }
         } catch (err) {
             console.error('Error sharing:', err);
-            showModal({
-                show: true,
-                title: "Share Failed",
-                description: "Failed to share DSRC."
-            });
+            // showModal({
+            //     show: true,
+            //     title: "Share Failed",
+            //     description: "Failed to share DSRC."
+            // });
         } finally {
             setActiveDropdown(false);
         }

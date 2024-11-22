@@ -172,11 +172,11 @@ export default function DSRCView({dsrcid}) {
             }
         } catch (err) {
             console.error('Error sharing:', err);
-            setModalState({
-                show: true,
-                title: "Share Failed",
-                description: "Failed to share DSRC."
-            });
+            // setModalState({
+            //     show: true,
+            //     title: "Share Failed",
+            //     description: "Failed to share DSRC."
+            // });
         } finally {
             setShowDropdown(false);
         }
