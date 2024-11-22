@@ -8,6 +8,7 @@ import LoaderWhiteSmall from "../../animations/loaders/loaderWhiteSmall";
 import styles from "../styles/PlaylistDataOptions.module.css";
 import { useRecoilState } from "recoil";
 import LayoutStore from "@/app/config/store/LayoutStore";
+import RouterPushLink from "@/app/helpers/RouterPushLink";
 
 export default function PlaylistDataOptions() {
   const { address, chainId: wagmiChainId } = useAccount();
@@ -26,6 +27,7 @@ export default function PlaylistDataOptions() {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
+  const {routeTo} = RouterPushLink();
 
   const fetchPlaylists = async (pageNumber) => {
     if (!address || loading || (!hasMore && pageNumber > 1)) return;
@@ -182,10 +184,16 @@ export default function PlaylistDataOptions() {
           <div className={styles.sortDropdown}>
             <button 
               className={styles.sortButton} 
+              onClick={() => routeTo("/profile/playlist")}
+            >
+              <i className="fi fi-rr-add"></i>
+              <span>Create</span>
+            </button>
+            <button 
+              className={styles.sortButton} 
               onClick={() => setShowSortMenu(!showSortMenu)}
             >
               <i className="fi fi-rr-sort"></i>
-              <span>Sort</span>
             </button>
             {showSortMenu && (
               <div className={styles.sortMenu}>
