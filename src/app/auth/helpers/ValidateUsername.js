@@ -54,7 +54,7 @@ export default function ValidateUsername() {
                     isHitmakrUser: true,
                     mintName: `${hitmakrProfileMintState.mintName}`,
                 }));
-                routeTo("/")
+                window.location.replace("/");
             }
         }
     }, [hitmakrProfileMintTxHash, setHitmakrProfileMintState, setHitmakrProfileState, txReceiptData?.status, hitmakrProfileMintState.mintName]);
