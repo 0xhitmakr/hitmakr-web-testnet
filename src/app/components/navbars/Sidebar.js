@@ -75,13 +75,13 @@ export default function Sidebar() {
                 </span>
               </div>
               <div className={styles.sidebarHeaderOptions}>
-                {!isActive("/profile") && (
+                {/* {!isActive("/profile") && (
                   <div onClick={() => routeTo("/profile/playlist")} className={styles.sidebarHeaderOption}>
                     <span>
                       <i className={`fi ${isActive("/playlist") ? `fi-sr-plus` : `fi-rr-plus`}`}></i>
                     </span>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
             {isActive("/profile") ? (
