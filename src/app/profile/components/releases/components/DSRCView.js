@@ -150,7 +150,7 @@ export default function DSRCView({dsrcid}) {
         const shareUrl = `${window.location.origin}/dsrc/${dsrcid}`;
         const shareData = {
             title: metadata.name,
-            text: `Check out "${metadata.name}" on Hitmakr\nDSRC ID: ${dsrcid}\nDuration: ${metadata.duration || 'N/A'}\n`,
+            text: `Check out "${metadata.name}" on Hitmakr\nDSRC ID: ${dsrcid}\nDuration: ${metadata.attributes.find(attr => attr.trait_type === 'Duration').value || 'N/A'}\n`,
             url: shareUrl
         };
     
@@ -385,6 +385,12 @@ export default function DSRCView({dsrcid}) {
                 <div className={styles.dsrcMetadata}>
                     <div className={styles.dsrcMetadataLeft}>
                         <div className={styles.dsrcMetadataLeftOptions}>
+                            <div 
+                                onClick={handlePlayPause}
+                                className={styles.dsrcMetadataLeftOption}
+                            >
+                                <i className={`fi ${isThisTrackPlaying ? 'fi-sr-pause' : 'fi-sr-play'}`} />
+                            </div>
                             <div className={styles.dsrcMetadataLeftOption}>
                                 <HeartButton 
                                     dsrcId={dsrcid} 
