@@ -13,7 +13,7 @@ const baseMetadata = {
     robots: 'index, follow',
     twitter: {
         card: 'summary_large_image',
-        creator: '@hitmakr',
+        creator: '@hitmakrr',
     },
 };
 
