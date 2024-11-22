@@ -123,7 +123,7 @@ export default function AuthMain() {
                                     }
                                     {balanceData?.value===0n && currentChainId === skaleChainId && 
                                         <>
-                                            <HitmakrMiniModal title={tandds.zeroBalanceSkaleNetworkTitle} learnMoreLink={authLinks.sFuelStation} description={tandds.zeroBalanceSkaleNetworkDescription} closeFunction={() => handleWalletDisconnect()} closeButton={<i className="fi fi-br-power"></i>} isAction={true} actionButton={<HitmakrButton buttonFunction={() => handleThirdPartyLink(authLinks.sFuelStation)} isLoading={isLinkOpening} isDark={false} buttonName={"Get Free Gas"} buttonWidth={"75%"}/>} />
+                                            <HitmakrMiniModal title={tandds.zeroBalanceSkaleNetworkTitle} learnMoreLink={`https://www.sfuelstation.com/claim-sfuel/${address}?testnet=true`} description={tandds.zeroBalanceSkaleNetworkDescription} closeFunction={() => handleWalletDisconnect()} closeButton={<i className="fi fi-br-power"></i>} isAction={true} actionButton={<HitmakrButton buttonFunction={() => handleThirdPartyLink(`https://www.sfuelstation.com/claim-sfuel/${address}?testnet=true`)} isLoading={isLinkOpening} isDark={false} buttonName={"Get Free Gas"} buttonWidth={"75%"}/>} />
                                         </>
                                     }
                                 </>
