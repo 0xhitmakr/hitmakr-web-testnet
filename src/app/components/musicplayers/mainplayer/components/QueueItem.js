@@ -52,14 +52,14 @@ export default function QueueItem({ dsrcId, index, playTrack }) {
             className={`${styles.queueItem} ${currentTrack === dsrcId ? styles.currentTrack : ''}`} 
             onClick={() => playTrack(dsrcId)}
         >
-            <Image
-                src={displayData.image}
-                alt={displayData.name || "Track"}
-                width={40}
-                height={40}
-                className={styles.queueItemCover}
-                unoptimized={true}
-            />
+              <Image
+                  src={displayData.image.includes('undefined') ? `https://api.dicebear.com/9.x/shapes/svg?seed=${dsrcId}` : displayData.image}
+                  alt={displayData.name || "Track"}
+                  width={40}
+                  height={40}
+                  className={styles.queueItemCover}
+                  unoptimized={true}
+              />
             <div className={styles.queueItemInfo}>
                 <div className={styles.queueItemTitle}>{displayData.name}</div>
                 <div className={styles.queueItemArtist}><GetUsernameByAddress address={displayData.creator}/></div>

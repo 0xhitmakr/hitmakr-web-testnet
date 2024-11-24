@@ -210,7 +210,7 @@ export default function DSRCCard({
                 
                 <div className={styles.imageContainer}>
                     <Image
-                        src={metadata.image}
+                        src={metadata.image.includes('undefined') ? `https://api.dicebear.com/9.x/shapes/svg?seed=${dsrcId}` : metadata.image}
                         alt={metadata.name}
                         width={180}
                         height={180}

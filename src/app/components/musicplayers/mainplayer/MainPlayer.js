@@ -798,7 +798,7 @@ export default function MainPlayer() {
                     <div className={styles.desktopPlayer}>
                         <div className={styles.nowPlaying}>
                             <Image 
-                                src={displayValues.image} 
+                                src={displayValues.image.includes('undefined') ? `https://api.dicebear.com/9.x/shapes/svg?seed=${currentTrack}` : displayValues.image}
                                 alt={displayValues.name || "Now Playing"} 
                                 width={56} 
                                 height={56} 
@@ -1072,10 +1072,10 @@ export default function MainPlayer() {
                                 </div>
                             </div>
                             <div className={styles.queueContent}>
-                                {queue.map((dsrcId, index) => (
-                                    <div key={dsrcId}>
+                                {queue.map((I, index) => (
+                                    <div key={I}>
                                     <QueueItem
-                                        dsrcId={dsrcId}
+                                        I={I}
                                         index={index}
                                         playTrack={playTrack}
                                     />

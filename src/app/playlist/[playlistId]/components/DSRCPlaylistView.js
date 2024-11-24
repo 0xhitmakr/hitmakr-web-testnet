@@ -196,7 +196,7 @@ export default function DSRCPlaylistView({ dsrcId, playlistId, onRemoveSuccess }
                 <div className={styles.dsrcContent}>
                     <div className={styles.imageContainer}>
                         <Image 
-                            src={metadata.image} 
+                            src={metadata.image.includes('undefined') ? `https://api.dicebear.com/9.x/shapes/svg?seed=${dsrcid}` : metadata.image}
                             width={48} 
                             height={48} 
                             alt={`${metadata.name} only on Hitmakr`}

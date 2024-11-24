@@ -334,7 +334,7 @@ export default function DSRCView({dsrcid}) {
                     <div className={styles.imageWrapper}>
                         <div className={styles.imageContainer}>
                             <Image 
-                                src={metadata.image} 
+                                src={metadata.image.includes('undefined') ? `https://api.dicebear.com/9.x/shapes/svg?seed=${dsrcid}` : metadata.image}
                                 width={180} 
                                 height={180} 
                                 alt={`${metadata.name} only on Hitmakr`}

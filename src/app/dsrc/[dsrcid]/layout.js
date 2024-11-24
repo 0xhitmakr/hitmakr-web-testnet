@@ -33,7 +33,7 @@ export async function generateMetadata({ params }) {
                 siteName: 'Hitmakr',
                 images: [
                     {
-                        url: metadata.image,
+                        url: metadata.image.includes('undefined') ? `https://api.dicebear.com/9.x/shapes/svg?seed=${dsrcid}` : metadata.image,
                         width: 1200,
                         height: 1200,
                         alt: `${metadata.name} on Hitmakr`
