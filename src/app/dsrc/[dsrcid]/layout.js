@@ -53,7 +53,7 @@ export async function generateMetadata({ params }) {
                 title: metadata.name,
                 description: metadata.description,
                 site: '@hitmakrr',
-                images: [metadata.image],
+                images: [metadata.image.includes('undefined') ? `https://api.dicebear.com/9.x/shapes/svg?seed=${dsrcid}` : metadata.image], // Updated this line
                 creator: '@hitmakrr'
             },
             keywords: [
