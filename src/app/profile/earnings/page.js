@@ -17,20 +17,72 @@ const EarningsPage = () => {
     const { address } = useAccount();
     const { yearCount: currentYearData, isLoading: isLoadingYearCount } = useGetCurrentYearCount(address);
     const { creativeIDInfo, loading: isLoadingCreativeId } = useCreativeIDRPC(address);
-    const {routeTo} = RouterPushLink();
-
-    useEffect(()=>{
-        if(!isLoadingCreativeId && !creativeIDInfo.exists){
-            routeTo("/profile/onboard")
-        }
-    },[creativeIDInfo,isLoadingCreativeId])
+    const { routeTo } = RouterPushLink();
 
     const [dsrcs, setDsrcs] = useState([]);
     const [page, setPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [earningsMap, setEarningsMap] = useState(new Map());
 
-    
+    // Calculate year range
+    const yearRange = useMemo(() => {
+        if (!currentYearData?.year || !creativeIDInfo?.exists) return [];
+        const years = [];
+        for (let year = currentYearData.year; year >= DEPLOYMENT_YEAR; year--) {
+            years.push(year);
+        }
+        return years;
+    }, [currentYearData?.year, creativeIDInfo?.exists]);
+
+    const year0Count = useGetYearCount(address, yearRange[0] || 0);
+    const year1Count = useGetYearCount(address, yearRange[1] || 0);
+    const year2Count = useGetYearCount(address, yearRange[2] || 0);
+    const year3Count = useGetYearCount(address, yearRange[3] || 0);
+    const year4Count = useGetYearCount(address, yearRange[4] || 0);
+
+
+    const yearCounts = useMemo(() => [
+        year0Count,
+        year1Count,
+        year2Count,
+        year3Count,
+        year4Count
+    ], [year0Count, year1Count, year2Count, year3Count, year4Count]);
+
+    const years = useMemo(() => {
+        if (!currentYearData?.year || !creativeIDInfo?.exists) return [];
+        
+        const yearData = [];
+        
+        if (currentYearData.count > 0) {
+            yearData.push({
+                year: currentYearData.year,
+                count: currentYearData.count,
+                startIndex: currentYearData.count,
+                endIndex: 1
+            });
+        }
+        
+        yearRange.slice(1).forEach((year, index) => {
+            const { count } = yearCounts[index + 1] || { count: 0 };
+            if (count > 0) {
+                yearData.push({
+                    year,
+                    count,
+                    startIndex: count,
+                    endIndex: 1
+                });
+            }
+        });
+        
+        return yearData;
+    }, [currentYearData, yearCounts, yearRange, creativeIDInfo?.exists]);
+
+    useEffect(() => {
+        if (!isLoadingCreativeId && !creativeIDInfo?.exists) {
+            routeTo("/profile/onboard");
+        }
+    }, [creativeIDInfo, isLoadingCreativeId, routeTo]);
 
     const totalEarnings = useMemo(() => {
         const totals = {
@@ -47,35 +99,6 @@ const EarningsPage = () => {
 
         return totals;
     }, [earningsMap]);
-
-    const years = useMemo(() => {
-        if (!currentYearData?.year || !creativeIDInfo?.exists) return [];
-        
-        const yearCounts = [];
-        
-        if (currentYearData.count > 0) {
-            yearCounts.push({
-                year: currentYearData.year,
-                count: currentYearData.count,
-                startIndex: currentYearData.count,
-                endIndex: 1
-            });
-        }
-        
-        for (let year = currentYearData.year - 1; year >= DEPLOYMENT_YEAR; year--) {
-            const { count, isLoading } = useGetYearCount(address, year);
-            if (!isLoading && count > 0) {
-                yearCounts.push({
-                    year,
-                    count,
-                    startIndex: count,
-                    endIndex: 1
-                });
-            }
-        }
-        
-        return yearCounts;
-    }, [currentYearData?.year, currentYearData?.count, address, creativeIDInfo?.exists]);
 
     const totalDSRCs = useMemo(() => {
         return years.reduce((sum, year) => sum + year.count, 0);
@@ -147,7 +170,7 @@ const EarningsPage = () => {
         }
     }, [years.length, dsrcs.length]);
 
-    if (isLoadingCreativeId || isLoadingYearCount) {
+    if (isLoadingCreativeId || isLoadingYearCount || yearCounts.some(yc => yc?.isLoading)) {
         return <div className={styles.loading}><LoaderWhiteSmall /></div>;
     }
 
