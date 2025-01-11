@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
-import { join } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = join(__filename, '../');
+const __dirname = join(__filename, "../");
 
 const nextConfig = {
   eslint: {
@@ -13,19 +13,21 @@ const nextConfig = {
     config.module.rules.push({
       test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)$/,
       use: {
-        loader: 'file-loader',
+        loader: "file-loader",
         options: {
-          name: '[name].[hash:8].[ext]',
-          outputPath: 'static/media/',
-          publicPath: '/_next/static/media/',
+          name: "[name].[hash:8].[ext]",
+          outputPath: "static/media/",
+          publicPath: "/_next/static/media/",
         },
       },
     });
 
     config.module.rules.push({
       test: /\.svg$/,
-      use: ['@svgr/webpack'],
+      use: ["@svgr/webpack"],
     });
+
+    config.externals.push("pino-pretty", "lokijs", "encoding");
 
     return config;
   },
@@ -33,9 +35,9 @@ const nextConfig = {
   experimental: {
     turbo: {
       rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
+        "*.svg": {
+          loaders: ["@svgr/webpack"],
+          as: "*.js",
         },
       },
     },
@@ -45,13 +47,13 @@ const nextConfig = {
     unoptimized: true,
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**',
+        protocol: "https",
+        hostname: "**",
       },
     ],
   },
 
-  transpilePackages: ['trianglify', 'fast-average-color'],
+  transpilePackages: ["trianglify", "fast-average-color"],
 };
 
 export default nextConfig;

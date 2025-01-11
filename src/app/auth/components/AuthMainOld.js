@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "../styles/Auth.module.css";
 import '@flaticon/flaticon-uicons/css/all/all.css';
-import { useAccount, useSwitchChain } from "wagmi";
+import { useAccount, useSwitchChain,  } from "wagmi";
 import AuthDetails from "./AuthDetails";
 import AuthAction from "./AuthAction";
 import { ConnectKitButton, useSIWE } from "connectkit";
@@ -23,11 +23,13 @@ import { useHasProfile } from "@/app/config/hitmakrprofiles/hitmakrProfilesRPC";
 import HitmakrMiniModal from "@/app/components/modals/HitmakrMiniModal";
 import tandds from "@/lib/helpers/TandD";
 
+import { useAppKit } from '@reown/appkit/react'
 
 export default function AuthMain() {
     const [isDeAuthLoading, setIsDeAuthLoading] = useState(true);
     const { isConnected, address, isDisconnected, status: accountStatus,chainId:currentChainId  } = useAccount();
     const { isSignedIn, isLoading: siweConnecting, signIn, signOut } = useSIWE();
+    const { open, close } = useAppKit()
     const { routeTo, isRouterLinkOpening } = RouterPushLink();
     const { handleWalletDisconnect, isDisconnecting } = WalletDisconnectFunction();
     const { chains, switchChain, isPending: networkSwitching } = useSwitchChain();
@@ -98,10 +100,25 @@ export default function AuthMain() {
                                             );
                                         }}
                                     </ConnectKitButton.Custom> */}
-                                    <appkit-button />
+                                    {({ isConnected, isConnecting: accountConnecting, show }) => {
+                                            return (
+                                                <>
+                                                    {!isConnected && show && (
+                                                        <AuthAction action={<HitmakrButton buttonFunction={show} isLoading={accountConnecting} isDark={false} buttonName={"Authenticate"} buttonWidth={"75%"} />} />
+                                                    )}
+                                                </>
+                                            );
+                                        }}
+                                        {!isConnected && (
+                                <>
+                                    <AuthDetails title={"Connect"} description={"your web3 wallet and continue"} />
+                                    <AuthAction action={<HitmakrButton buttonFunction={connect} isLoading={false} isDark={false} buttonName={"Authenticate"} buttonWidth={"75%"} />} />
                                 </>
                             )}
-                            {isConnected && !isSignedIn && (
+                                        
+                                </>
+                            )}
+                            {isConnected && (
                                 <>
                                     <AuthDetails title={"SIWE"} description={"Signature based Authentication"} />
                                     <AuthAction action={<HitmakrButton buttonFunction={signIn} isLoading={siweConnecting} isDark={false} buttonName={"Sign In"} buttonWidth={"75%"} />} />
@@ -112,7 +129,7 @@ export default function AuthMain() {
                                     }
                                 </>
                             )}
-                            {isConnected && isSignedIn && !hasProfile && (
+                            {isConnected && !hasProfile && (
                                 <>
                                     <AuthDetails title={"Profile"} description={"Mint your decentralized profile identity"} />
                                     <AuthActionTextInput isUsername={true} inputStatusIcon={<i className="fi fi-sr-check-circle"></i>} />
