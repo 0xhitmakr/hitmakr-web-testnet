@@ -1,13 +1,12 @@
 "use client"
 
-import { useSIWE } from "connectkit";
 import { useDisconnect } from "wagmi";
 import { useSetRecoilState, useResetRecoilState } from 'recoil';
 import PlayerStore from "../config/store/PlayerStore";
 
 
+
 export default function WalletDisconnectFunction() {
-    const { signOut } = useSIWE();
     const { disconnect, isPending: isDisconnecting } = useDisconnect();
     const setPlayerState = useSetRecoilState(PlayerStore.PlayerState);
     const resetPlayerState = useResetRecoilState(PlayerStore.PlayerState);
@@ -26,7 +25,7 @@ export default function WalletDisconnectFunction() {
         resetPlayerState();  
         setPlayerState(defaultPlayerState);
 
-        signOut();
+        
         disconnect();
 
         if (typeof window !== 'undefined') {

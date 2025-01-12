@@ -18,7 +18,6 @@ import LoaderWhiteSmall from "../components/animations/loaders/loaderWhiteSmall"
 import UserFollow from "../helpers/profile/UserFollow";
 import ProfilePurchases from "./components/purchases/ProfilePurchases";
 import ProfileFans from "./components/fans/ProfileFans";
-import { useSIWE } from "connectkit";
 import ProfileHearts from "./components/hearts/ProfileHearts";
 
 const indexerContractAddress = process.env.NEXT_PUBLIC_HITMAKR_INDEXER_ADDRESS_SKL;
@@ -26,8 +25,7 @@ const indexerContractAddress = process.env.NEXT_PUBLIC_HITMAKR_INDEXER_ADDRESS_S
 export default function ProfilePage() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const { address: connectedAddress,isConnected } = useAccount();
-    const {isSignedIn} = useSIWE();
+    const { address: connectedAddress,isConnected} = useAccount();
     const [imageUrl, setImageUrl] = useState(null);
     const [isCopied, setIsCopied] = useState(false);
     
@@ -193,7 +191,7 @@ export default function ProfilePage() {
                     >
                         <p>Purchases</p>
                     </div>
-                    {isConnected && isSignedIn &&
+                    {isConnected &&
                         <>
                             <div 
                                 className={getNavOptionClassName('fan')}

@@ -1,6 +1,6 @@
 
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
-import { walletConnectID as projectId } from "@/lib/secure/Config";
+import { walletConnectProjectId as projectId } from "@/lib/secure/Config";
 import { skaleCalypsoTestnet } from "viem/chains";
 
 

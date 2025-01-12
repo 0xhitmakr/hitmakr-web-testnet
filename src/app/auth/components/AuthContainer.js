@@ -14,7 +14,6 @@ import Link from "next/link";
 import { legalLinks } from "@/lib/helpers/Links";
 import AuthMain from "./AuthMain";
 import { useAccount } from "wagmi";
-import { useSIWE } from "connectkit";
 import { useHasProfile } from "@/app/config/hitmakrprofiles/hitmakrProfilesRPC";
 
 
@@ -22,7 +21,6 @@ export default function AuthContainer() {
     const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const {isConnected,address} = useAccount();
-  const {isSignedIn} = useSIWE();
   const { hasProfile, loading:hasProfileLoading, error:hasProfileError } = useHasProfile(address)
 
   useEffect(() => {
@@ -58,11 +56,11 @@ export default function AuthContainer() {
   const getImage = () => {
     if(!isConnected){
       return AuthImage;
-    }else if(isConnected && !isSignedIn){
+    }else if(isConnected){
       return SIWEImage;
-    }else if(isConnected && isSignedIn && !hasProfile){
+    }else if(isConnected && !hasProfile){
       return ProfileImage;
-    }else if(isConnected && isSignedIn && hasProfile){
+    }else if(isConnected && hasProfile){
       return SkipImage;
     }
   };

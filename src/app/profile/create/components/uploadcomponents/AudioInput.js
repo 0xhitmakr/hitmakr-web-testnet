@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useRecoilState } from "recoil";
 import { useAccount } from 'wagmi';
-import { useSIWE } from 'connectkit';
 import HitmakrCreativesStore from "@/app/config/store/HitmakrCreativesStore";
 import styles from "../../styles/Create.module.css";
 import HitmakrMiniAudioPlayer from "@/app/components/musicplayers/miniplayer/HitmakrMiniAudioPlayer";
@@ -15,7 +14,6 @@ const AudioInput = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
   const { address, chainId } = useAccount();
-  const { isSignedIn } = useSIWE();
   const allowedFileTypes = ["audio/mpeg", "audio/wav", "audio/flac"];
   const [uploadState, setUploadState] = useRecoilState(
     HitmakrCreativesStore.CreativesUpload
@@ -42,7 +40,7 @@ const AudioInput = () => {
       return;
     }
 
-    if (!address || !isSignedIn || !chainId) {
+    if (!address || !chainId) {
       setModalContent({
         title: "Wallet Not Connected",
         description: "Please connect your wallet and sign in."

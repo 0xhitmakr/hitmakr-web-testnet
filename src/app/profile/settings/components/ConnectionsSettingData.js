@@ -4,23 +4,21 @@ import React, { useState, useEffect } from "react";
 import styles from "../styles/Settings.module.css";
 import "@flaticon/flaticon-uicons/css/all/all.css";
 import { useAccount } from "wagmi";
-import { useSIWE } from "connectkit";
 import ThirdPartyLinkFunction from "@/app/helpers/ThirdPartyLinkFunction";
 import { creativesLinks } from "@/lib/helpers/Links";
 import LoaderWhiteSmall from "@/app/components/animations/loaders/loaderWhiteSmall";
 
 export default function ConnectionSettingData() {
   const { address, chainId } = useAccount();
-  const { isSignedIn } = useSIWE();
   const [spotifyData, setSpotifyData] = useState(null);
   const [isFetchingSpotifyData, setIsFetchingSpotifyData] = useState(false);
   const { handleThirdPartyLink, isLinkOpening } = ThirdPartyLinkFunction();
   useEffect(() => {
     fetchSpotifyData();
-  }, [address, isSignedIn, chainId]);
+  }, [address, chainId]);
 
   const fetchSpotifyData = async () => {
-    if (!address || !isSignedIn || !chainId) return;
+    if (!address || !chainId) return;
 
     setIsFetchingSpotifyData(true);
 

@@ -1,15 +1,16 @@
 "use client";
 
-import React from "react";
+import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit/react";
-import { cookieToInitialState, WagmiProvider } from "wagmi";
-import { walletConnectID as projectId } from "@/lib/secure/Config";
-import { metadata, networks, wagmiAdapter } from "./AppKitConfig";
-import { siweConfig } from "./SiweConfigLegacy";
+import { walletConnectProjectId as projectId } from "@/lib/secure/Config";
+import {
+  metadata,
+  networks,
+  wagmiAdapter,
+} from "@/app/config/appkit/AppKitConfig";
+import { CloudAuthSIWX } from '@reown/appkit-siwx'
 
-
-// Set up queryClient
 const queryClient = new QueryClient();
 
 export const appKitModal = createAppKit({
@@ -17,7 +18,7 @@ export const appKitModal = createAppKit({
   networks,
   metadata,
   projectId,
-  siweConfig: siweConfig,
+  // siweConfig: siweConfig,
   features: {
     email: true,
     socials: ["google", "discord", "github"],
@@ -29,17 +30,15 @@ export const appKitModal = createAppKit({
   themeVariables: {
     "--w3m-font-family": '"Nunito", sans-serif',
   },
+  siwx: new CloudAuthSIWX()
 });
 
-function AppKitProvider({ children }) {
-  const initialState = cookieToInitialState(wagmiAdapter.wagmiConfig);
-
+export function AppKitProvider({ children }) {
   return (
-    <WagmiProvider
-      config={wagmiAdapter.wagmiConfig}
-      initialState={initialState}
-    >
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+          {children}
+      </QueryClientProvider>
     </WagmiProvider>
   );
 }

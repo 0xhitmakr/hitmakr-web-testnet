@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react";
-// import { HitmakrConnectKitProvider } from "./connectkit/HitmakrConnectKitProvider";
 import { RecoilRoot } from "recoil";
 import { MusicPlayerProvider } from "./audio/MusicPlayerProvider";
 import AppKitProvider from "./appkit/AppKitProvider";

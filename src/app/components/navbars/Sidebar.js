@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./styles/Sidebar.module.css";
 import { useAccount } from "wagmi";
-import { useSIWE } from "connectkit";
 import { usePathname } from "next/navigation";
 import RouterPushLink from "@/app/helpers/RouterPushLink";
 import "@flaticon/flaticon-uicons/css/all/all.css";
@@ -19,7 +18,6 @@ import LoaderWhiteSmall from "../animations/loaders/loaderWhiteSmall";
 export default function Sidebar() {
   const pathname = usePathname();
   const { address, isConnected, status: accountStatus } = useAccount();
-  const { isSignedIn, status: siweStatus } = useSIWE();
   const isActive = (path) => pathname.startsWith(path);
   const isActiveHome = (path) => pathname === path;
   const { routeTo, isRouterLinkOpening } = RouterPushLink();
@@ -33,8 +31,8 @@ export default function Sidebar() {
   } = useHasCreativeIDRPC(address);
 
   const dataAvailable = !creativeIDLoading && hasCreativeID && !isCreativeIDPaused;
-  const loginCheck = isConnected && isSignedIn && username;
-  const isLoading = accountStatus === "loading" || siweStatus === "disconnected" || (accountStatus==="loading" && nameLoading && username!==null);
+  const loginCheck = isConnected && username;
+  const isLoading = accountStatus === "loading" || (accountStatus==="loading" && nameLoading && username!==null);
 
   if (isActiveHome("/auth")) {
     return null;
@@ -127,7 +125,7 @@ export default function Sidebar() {
         <div className={styles.sidebarNoLogin}>
           <div className={styles.sidebarNoLoginDescription}>
             <p>
-              Hey there, secret listener! 🎧 You're so close to the beat, but without logging in, it's like listening through a locked door. Ready to drop the bass and unlock the whole tracklist? Hit that <span>Join Now</span> button and let the Web3 music experience play loud and clear. Your front-row seat awaits! 🎶
+              Hey there, secret listener! 🎧 You&apos;re so close to the beat, but without logging in, it&apos;s like listening through a locked door. Ready to drop the bass and unlock the whole tracklist? Hit that <span>Join Now</span> button and let the Web3 music experience play loud and clear. Your front-row seat awaits! 🎶
             </p>
           </div>
           <div className={styles.sidebarNoLoginButton}>
