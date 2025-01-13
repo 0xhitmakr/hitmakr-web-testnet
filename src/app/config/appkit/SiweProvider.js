@@ -90,9 +90,6 @@ export function SIWEProvider({ children }) {
         throw new Error(verifyData.error || "Failed to verify signature");
       }
 
-      console.log("\n\n\nVerify Data In Provider:");
-      console.log(verifyData);
-      console.log("\n\n\n");
 
       if (verifyData.success) {
         localStorage.setItem("authToken", verifyData.token);
@@ -139,14 +136,6 @@ export function SIWEProvider({ children }) {
   };
 
 
-  console.log("\n\n\States In Provider:");
-  console.log({
-    isAuthenticated,
-    isAuthenticating,
-    error,
-    user,
-  });
-  console.log("\n\n\n");
 
   return (
     <SIWEContext.Provider

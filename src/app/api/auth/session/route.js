@@ -7,7 +7,6 @@ export async function GET(request) {
 
   try {
     const session = await Session.fromRequest(request);
-  
 
     return NextResponse.json(session.toJSON());
   } catch (error) {
