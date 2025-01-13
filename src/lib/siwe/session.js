@@ -1,5 +1,5 @@
-import { COOKIE_NAME } from './consts';
 import { sealData, unsealData } from 'iron-session';
+import { COOKIE_NAME } from './consts';
 import { NextRequest, NextResponse } from 'next/server';
 
 if (!process.env.SESSION_SECRET) {
@@ -23,11 +23,13 @@ export class Session {
      * @param {string} session.nonce - A unique identifier for the session.
      * @param {number} session.chainId - The blockchain network identifier.
      * @param {string} session.address - The address associated with the session.
+     * @param {boolean} session.isAuthenticated - A boolean indicating if the session is authenticated.
      */
     constructor(session) {
         this.nonce = session?.nonce;
         this.chainId = session?.chainId;
         this.address = session?.address;
+        this.isAuthenticated = session?.isAuthenticated || false;
     }
 
     /**
@@ -55,6 +57,7 @@ export class Session {
         this.nonce = undefined;
         this.chainId = undefined;
         this.address = undefined;
+        this.isAuthenticated = false;
 
         return this.persist(res);
     }
@@ -65,7 +68,7 @@ export class Session {
      * @returns {Object} A JSON object containing the nonce, address, and chainId properties.
      */
     toJSON() {
-        return { nonce: this.nonce, address: this.address, chainId: this.chainId };
+        return { nonce: this.nonce, address: this.address, chainId: this.chainId, isAuthenticated: this.isAuthenticated };
     }
 
     /**

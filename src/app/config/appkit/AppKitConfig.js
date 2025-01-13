@@ -1,4 +1,4 @@
-
+// app/config/appkit/AppKitConfig.js
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { walletConnectProjectId as projectId } from "@/lib/secure/Config";
 import { skaleCalypsoTestnet } from "viem/chains";

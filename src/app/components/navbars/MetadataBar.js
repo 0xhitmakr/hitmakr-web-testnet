@@ -10,7 +10,7 @@ import RouterPushLink from "@/app/helpers/RouterPushLink";
 
 export default function MetadataBar(){
     const pathname = usePathname();
-  const { address, isConnected,status:accountStatus, isDisconnected } = useAccount();
+  const { address, isConnected, } = useAccount();
   const isActive = (path) => pathname.startsWith(path);
   const isActiveHome = (path) => pathname === path;
   const { routeTo, isRouterLinkOpening } = RouterPushLink();

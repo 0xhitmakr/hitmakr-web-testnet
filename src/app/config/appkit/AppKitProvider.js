@@ -1,3 +1,4 @@
+// app/config/appkit/AppKitProvider.js
 "use client";
 
 import { WagmiProvider } from "wagmi";
@@ -9,16 +10,37 @@ import {
   networks,
   wagmiAdapter,
 } from "@/app/config/appkit/AppKitConfig";
-import { CloudAuthSIWX } from '@reown/appkit-siwx'
+import { siweConfig } from "./SiweConfig";
+import SIWEProvider from "./SIWEProvider";
 
 const queryClient = new QueryClient();
+
+const siwxConfig = {
+  createMessage: async (input) => {
+    // Implement your logic to create a message
+    return "my message";
+  },
+  addSession: async (session) => {
+    // Implement your logic to add a session
+  },
+  revokeSession: async (chainId, address) => {
+    // Implement your logic to revoke a session
+  },
+  setSessions: async (sessions) => {
+    // Implement your logic to set sessions
+  },
+  getSessions: async (chainId, address) => {
+    // Implement your logic to get sessions
+    return [];
+  },
+};
 
 export const appKitModal = createAppKit({
   adapters: [wagmiAdapter],
   networks,
   metadata,
   projectId,
-  // siweConfig: siweConfig,
+  siweConfig: siweConfig,
   features: {
     email: true,
     socials: ["google", "discord", "github"],
@@ -30,14 +52,13 @@ export const appKitModal = createAppKit({
   themeVariables: {
     "--w3m-font-family": '"Nunito", sans-serif',
   },
-  siwx: new CloudAuthSIWX()
 });
 
 export function AppKitProvider({ children }) {
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-          {children}
+        <SIWEProvider>{children}</SIWEProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

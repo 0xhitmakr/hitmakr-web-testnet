@@ -28,7 +28,6 @@ export default function HomeMainBar() {
     address,
     isConnected,
     status: accountStatus,
-    isDisconnected,
   } = useAccount();
   const { hasProfile, loading: profileLoading } = useHasProfile(address);
   const { name: username, loading: nameLoading } = useNameByAddress(address);
