@@ -6,7 +6,6 @@ import abi from './abi/abi';
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_HITMAKR_PROFILES_ADDRESS;
 const RPC_URL = process.env.NEXT_PUBLIC_SKALE_TESTNET_RPC_URL;
 
-
 export const useHasProfile = (address) => {
     const [hasProfile, setHasProfile] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -21,7 +20,7 @@ export const useHasProfile = (address) => {
                     abi,
                     provider
                 );
-                const data = await contract.hasProfile(address);
+                const data = await contract._hasProfile(address);
                 setHasProfile(data);
             } catch (err) {
                 setError(err);
@@ -38,8 +37,7 @@ export const useHasProfile = (address) => {
     return { hasProfile, loading, error };
 };
 
-
-export const useProfileAddressByName = (name) => {
+export const useProfileByNameHash = (nameHash) => {
     const [address, setAddress] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -53,7 +51,7 @@ export const useProfileAddressByName = (name) => {
                     abi,
                     provider
                 );
-                const data = await contract.profileAddressByName(name);
+                const data = await contract._profileByNameHash(nameHash);
                 setAddress(data);
             } catch (err) {
                 setError(err);
@@ -62,14 +60,13 @@ export const useProfileAddressByName = (name) => {
             }
         };
 
-        if (name) {
+        if (nameHash) {
             fetchAddress();
         }
-    }, [name]);
+    }, [nameHash]);
 
     return { address, loading, error };
 };
-
 
 export const useNameByAddress = (address) => {
     const [name, setName] = useState(null);
@@ -85,7 +82,7 @@ export const useNameByAddress = (address) => {
                     abi,
                     provider
                 );
-                const data = await contract.nameByAddress(address);
+                const data = await contract._nameByAddress(address);
                 setName(data);
             } catch (err) {
                 setError(err);
@@ -102,7 +99,6 @@ export const useNameByAddress = (address) => {
     return { name, loading, error };
 };
 
-
 export const useProfileCount = () => {
     const [count, setCount] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -117,7 +113,7 @@ export const useProfileCount = () => {
                     abi,
                     provider
                 );
-                const data = await contract.profileCount();
+                const data = await contract._profileCount();
                 setCount(Number(data));
             } catch (err) {
                 setError(err);
@@ -131,7 +127,6 @@ export const useProfileCount = () => {
 
     return { count, loading, error };
 };
-
 
 export const useTokenURI = (tokenId) => {
     const [tokenURI, setTokenURI] = useState(null);
@@ -164,7 +159,6 @@ export const useTokenURI = (tokenId) => {
     return { tokenURI, loading, error };
 };
 
-
 export const useOwnerOf = (tokenId) => {
     const [owner, setOwner] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -195,7 +189,6 @@ export const useOwnerOf = (tokenId) => {
 
     return { owner, loading, error };
 };
-
 
 export const useBalanceOf = (address) => {
     const [balance, setBalance] = useState(0);

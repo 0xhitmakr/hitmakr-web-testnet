@@ -9,7 +9,6 @@ import abi from "./abi/abi"
 
 const PROFILES_ADDRESS = process.env.NEXT_PUBLIC_HITMAKR_PROFILES_ADDRESS
 
-
 export const useRegister = () => {
   const { writeContract, isPending, data } = useWriteContract()
   const { isConnected } = useAccount()
@@ -34,32 +33,29 @@ export const useRegister = () => {
   return { register, isPending, data }
 }
 
-
 export const useHasProfile = (address) => {
   const { isConnected } = useAccount()
   
   return useReadContract({
     address: PROFILES_ADDRESS,
     abi,
-    functionName: 'hasProfile',
+    functionName: '_hasProfile',
     args: [address],
     enabled: isConnected && Boolean(address),
   })
 }
 
-
-export const useProfileAddressByName = (name) => {
+export const useProfileByNameHash = (nameHash) => {
   const { isConnected } = useAccount()
 
   return useReadContract({
     address: PROFILES_ADDRESS,
     abi,
-    functionName: 'profileAddressByName',
-    args: [name],
-    enabled: isConnected && Boolean(name),
+    functionName: '_profileByNameHash',
+    args: [nameHash],
+    enabled: isConnected && Boolean(nameHash),
   })
 }
-
 
 export const useNameByAddress = (address) => {
   const { isConnected } = useAccount()
@@ -67,12 +63,11 @@ export const useNameByAddress = (address) => {
   return useReadContract({
     address: PROFILES_ADDRESS,
     abi,
-    functionName: 'nameByAddress',
+    functionName: '_nameByAddress',
     args: [address],
     enabled: isConnected && Boolean(address),
   })
 }
-
 
 export const useProfileCount = () => {
   const { isConnected } = useAccount()
@@ -80,11 +75,10 @@ export const useProfileCount = () => {
   return useReadContract({
     address: PROFILES_ADDRESS,
     abi,
-    functionName: 'profileCount',
+    functionName: '_profileCount',
     enabled: isConnected,
   })
 }
-
 
 export const useTokenURI = (tokenId) => {
   const { isConnected } = useAccount()
@@ -98,7 +92,6 @@ export const useTokenURI = (tokenId) => {
   })
 }
 
-
 export const useOwnerOf = (tokenId) => {
   const { isConnected } = useAccount()
 
@@ -110,7 +103,6 @@ export const useOwnerOf = (tokenId) => {
     enabled: isConnected && tokenId !== undefined,
   })
 }
-
 
 export const useBalanceOf = (address) => {
   const { isConnected } = useAccount()
