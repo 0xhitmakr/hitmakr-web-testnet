@@ -33,12 +33,17 @@ const Genre = () => {
                 src={item.image}
                 alt={item.name}
                 fill
-                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                priority={idx < 6}
+                sizes="(max-width: 768px) 300px, (max-width: 1200px) 250px, 200px" // Specify exact sizes
+                loading={idx < 6 ? "eager" : "lazy"} // Load first 6 eagerly, lazy load rest
+                placeholder="blur" // Add blur placeholder
+                blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+                  `<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="400" fill="${GenreColor[idx]}"/></svg>`
+                ).toString('base64')}`}
                 style={{
                   objectFit: 'cover',
                   objectPosition: 'center',
                 }}
+                unoptimized={true}
               />
             </div>
           </div>
