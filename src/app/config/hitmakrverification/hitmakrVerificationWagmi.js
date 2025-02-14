@@ -8,7 +8,6 @@ import abi from "./abi/abi"
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_HITMAKR_VERIFICATION_ADDRESS
 
-
 export const useSetVerification = () => {
     const { writeContract, isPending, data } = useWriteContract()
     const { isConnected } = useAccount()
@@ -41,7 +40,6 @@ export const useSetVerification = () => {
         isValidChain 
     }
 }
-
 
 export const useBatchSetVerification = () => {
     const { writeContract, isPending, data } = useWriteContract()
@@ -77,7 +75,6 @@ export const useBatchSetVerification = () => {
     }
 }
 
-
 export const useToggleEmergencyPause = () => {
     const { writeContract, isPending, data } = useWriteContract()
     const { isConnected } = useAccount()
@@ -108,8 +105,7 @@ export const useToggleEmergencyPause = () => {
     }
 }
 
-
-export const useIsVerified = (address) => {
+export const useVerificationStatus = (address) => {
     const { isConnected } = useAccount()
     const { isValidChain } = useSkaleChainValidation()
 
@@ -117,14 +113,13 @@ export const useIsVerified = (address) => {
         ...useReadContract({
             address: CONTRACT_ADDRESS,
             abi,
-            functionName: 'isVerified',
+            functionName: 'verificationStatus',
             args: [address],
             enabled: isConnected && Boolean(address),
         }),
         isValidChain
     }
 }
-
 
 export const useHitmakrControlCenter = () => {
     const { isConnected } = useAccount()
@@ -155,7 +150,6 @@ export const useHitmakrProfiles = () => {
         isValidChain
     }
 }
-
 
 export const useIsPaused = () => {
     const { isConnected } = useAccount()

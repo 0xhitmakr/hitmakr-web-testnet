@@ -22,9 +22,14 @@
 				"type": "address"
 			},
 			{
-				"internalType": "uint256",
-				"name": "_price",
-				"type": "uint256"
+				"internalType": "enum HitmakrDSRC.Edition[]",
+				"name": "initialEditions",
+				"type": "uint8[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "editionPrices",
+				"type": "uint256[]"
 			},
 			{
 				"internalType": "address[]",
@@ -38,7 +43,7 @@
 			},
 			{
 				"internalType": "string",
-				"name": "selectedChain",
+				"name": "_selectedChain",
 				"type": "string"
 			},
 			{
@@ -160,7 +165,32 @@
 	},
 	{
 		"inputs": [],
+		"name": "EditionAlreadyCreated",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "EditionNotCreated",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "EditionNotEnabled",
+		"type": "error"
+	},
+	{
+		"inputs": [],
 		"name": "InvalidChainParam",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "InvalidEdition",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "InvalidParams",
 		"type": "error"
 	},
 	{
@@ -191,12 +221,12 @@
 	},
 	{
 		"inputs": [],
-		"name": "TransferFailed",
+		"name": "StreamingMustBeFree",
 		"type": "error"
 	},
 	{
 		"inputs": [],
-		"name": "TransferNotAllowed",
+		"name": "TransferFailed",
 		"type": "error"
 	},
 	{
@@ -263,13 +293,76 @@
 		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": true,
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "edition",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"name": "EditionCreated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "edition",
+				"type": "uint8"
+			},
+			{
 				"indexed": false,
 				"internalType": "uint256",
 				"name": "newPrice",
 				"type": "uint256"
 			}
 		],
-		"name": "PriceUpdated",
+		"name": "EditionPriceUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "edition",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "isEnabled",
+				"type": "bool"
+			}
+		],
+		"name": "EditionStatusUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "_locker",
+				"type": "address"
+			}
+		],
+		"name": "Lock",
 		"type": "event"
 	},
 	{
@@ -292,6 +385,12 @@
 				"internalType": "string",
 				"name": "selectedChain",
 				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "edition",
+				"type": "uint8"
 			}
 		],
 		"name": "Purchased",
@@ -380,15 +479,93 @@
 		"type": "event"
 	},
 	{
+		"anonymous": false,
 		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "Unlock",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "BASIS_POINTS",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "PLATFORM_FEE",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "PRIMARY_CHAIN",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "PRIMARY_CHAIN_ID",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "TREASURY",
+		"outputs": [
 			{
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
 			},
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "tokenId",
 				"type": "uint256"
 			}
 		],
@@ -414,6 +591,24 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "edition",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"name": "createEdition",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -481,6 +676,59 @@
 	{
 		"inputs": [
 			{
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"name": "editionConfigs",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isEnabled",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "isCreated",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"name": "editionPurchased",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "uint256",
 				"name": "tokenId",
 				"type": "uint256"
@@ -526,51 +774,29 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "getPrimaryChain",
-		"outputs": [
+		"inputs": [
 			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "edition",
+				"type": "uint8"
 			}
 		],
-		"stateMutability": "pure",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getRoyaltySplits",
+		"name": "getEditionConfig",
 		"outputs": [
 			{
-				"components": [
-					{
-						"internalType": "address",
-						"name": "recipient",
-						"type": "address"
-					},
-					{
-						"internalType": "uint16",
-						"name": "percentage",
-						"type": "uint16"
-					}
-				],
-				"internalType": "struct HitmakrDSRC.RoyaltySplit[]",
-				"name": "",
-				"type": "tuple[]"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getSelectedChain",
-		"outputs": [
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
 			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
+				"internalType": "bool",
+				"name": "isEnabled",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "isCreated",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -579,17 +805,17 @@
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
 			}
 		],
-		"name": "hasPurchased",
+		"name": "getTokenEdition",
 		"outputs": [
 			{
-				"internalType": "bool",
+				"internalType": "enum HitmakrDSRC.Edition",
 				"name": "",
-				"type": "bool"
+				"type": "uint8"
 			}
 		],
 		"stateMutability": "view",
@@ -614,6 +840,56 @@
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_locker",
+				"type": "address"
+			}
+		],
+		"name": "lock",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "lock",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "lockerOf",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -672,20 +948,13 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "price",
-		"outputs": [
+		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "edition",
+				"type": "uint8"
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "purchase",
 		"outputs": [],
 		"stateMutability": "nonpayable",
@@ -736,6 +1005,30 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "royaltySplits",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "recipient",
+				"type": "address"
+			},
+			{
+				"internalType": "uint16",
+				"name": "percentage",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "from",
 				"type": "address"
@@ -760,22 +1053,22 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "",
+				"name": "from",
 				"type": "address"
 			},
 			{
 				"internalType": "address",
-				"name": "",
+				"name": "to",
 				"type": "address"
 			},
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "tokenId",
 				"type": "uint256"
 			},
 			{
 				"internalType": "bytes",
-				"name": "",
+				"name": "data",
 				"type": "bytes"
 			}
 		],
@@ -785,15 +1078,28 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "selectedChain",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "",
+				"name": "operator",
 				"type": "address"
 			},
 			{
 				"internalType": "bool",
-				"name": "",
+				"name": "approved",
 				"type": "bool"
 			}
 		],
@@ -842,6 +1148,25 @@
 				"type": "uint256"
 			}
 		],
+		"name": "tokenEditions",
+		"outputs": [
+			{
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
 		"name": "tokenURI",
 		"outputs": [
 			{
@@ -854,20 +1179,102 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "tokenURI_",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalSupply_",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "",
+				"name": "from",
 				"type": "address"
 			},
 			{
 				"internalType": "address",
-				"name": "",
+				"name": "to",
 				"type": "address"
 			},
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "setApprove",
+				"type": "bool"
+			}
+		],
+		"name": "transferAndLock",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "setApprove",
+				"type": "bool"
+			}
+		],
+		"name": "transferAndLock",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
 				"type": "uint256"
 			}
 		],
@@ -880,11 +1287,47 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "unlock",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "edition",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
 				"name": "newPrice",
 				"type": "uint256"
 			}
 		],
-		"name": "updatePrice",
+		"name": "updateEditionPrice",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "enum HitmakrDSRC.Edition",
+				"name": "edition",
+				"type": "uint8"
+			},
+			{
+				"internalType": "bool",
+				"name": "isEnabled",
+				"type": "bool"
+			}
+		],
+		"name": "updateEditionStatus",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

@@ -51,7 +51,7 @@ const nextConfig = {
     ],
   },
 
-  transpilePackages: ['trianglify', 'fast-average-color'],
+  transpilePackages: [ 'fast-average-color'],
 };
 
 export default nextConfig;

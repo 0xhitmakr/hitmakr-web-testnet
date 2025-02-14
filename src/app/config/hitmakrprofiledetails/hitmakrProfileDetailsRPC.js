@@ -1,151 +1,168 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
 import abi from './abi/abi';
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_HITMAKR_PROFILE_DETAILS_ADDRESS;
 const RPC_URL = process.env.NEXT_PUBLIC_SKALE_TESTNET_RPC_URL;
 
-
-export const useProfileDetailsRPC = (address) => {
+export const useProfileDetailsRPC = (address, signer = null) => {
     const [details, setDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [updating, setUpdating] = useState(false);
 
-    useEffect(() => {
-        const fetchDetails = async () => {
-            try {
-                const provider = new ethers.JsonRpcProvider(RPC_URL);
-                const contract = new ethers.Contract(
-                    CONTRACT_ADDRESS,
-                    abi,
-                    provider
-                );
-                const data = await contract.getProfileDetails(address);
-                setDetails({
-                    fullName: data[0],
-                    imageURI: data[1],
-                    bio: data[2],
-                    dateOfBirth: Number(data[3]),
-                    country: data[4],
-                    lastUpdated: Number(data[5]),
-                    initialized: data[6]
-                });
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchDetails = useCallback(async () => {
+        if (!address) {
+            setLoading(false);
+            return;
+        }
 
-        if (address) {
-            fetchDetails();
+        try {
+            const provider = new ethers.JsonRpcProvider(RPC_URL);
+            const contract = new ethers.Contract(
+                CONTRACT_ADDRESS,
+                abi,
+                provider
+            );
+            const data = await contract.profileDetails(address);
+            
+            setDetails({
+                fullName: data.fullName,
+                imageURI: data.imageURI,
+                bio: data.bio,
+                dateOfBirth: Number(data.dateOfBirth),
+                country: data.country,
+                lastUpdated: Number(data.lastUpdated),
+                initialized: data.initialized
+            });
+            setError(null);
+        } catch (err) {
+            console.error("Error fetching profile details:", err);
+            setError(err);
+            setDetails(null);
+        } finally {
+            setLoading(false);
         }
     }, [address]);
 
-    return { details, loading, error };
-};
+    const setProfileDetails = async (fullName, imageURI, bio, dateOfBirth, country) => {
+        if (!signer) {
+            throw new Error("Signer is required for this operation");
+        }
 
+        setUpdating(true);
+        try {
+            const contract = new ethers.Contract(
+                CONTRACT_ADDRESS,
+                abi,
+                signer
+            );
 
-export const useCompleteProfileRPC = (address) => {
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+            const tx = await contract.setProfileDetails(
+                fullName,
+                imageURI,
+                bio,
+                dateOfBirth,
+                country
+            );
+            await tx.wait();
+            
+            // Refresh the details after successful update
+            await fetchDetails();
+            setError(null);
+            return true;
+        } catch (err) {
+            console.error("Error setting profile details:", err);
+            setError(err);
+            return false;
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const updateProfileDetails = async (fullName = "", imageURI = "", bio = "", country = "") => {
+        if (!signer) {
+            throw new Error("Signer is required for this operation");
+        }
+
+        setUpdating(true);
+        try {
+            const contract = new ethers.Contract(
+                CONTRACT_ADDRESS,
+                abi,
+                signer
+            );
+
+            const tx = await contract.updateProfileDetails(
+                fullName,
+                imageURI,
+                bio,
+                country
+            );
+            await tx.wait();
+            
+            // Refresh the details after successful update
+            await fetchDetails();
+            setError(null);
+            return true;
+        } catch (err) {
+            console.error("Error updating profile details:", err);
+            setError(err);
+            return false;
+        } finally {
+            setUpdating(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const provider = new ethers.JsonRpcProvider(RPC_URL);
-                const contract = new ethers.Contract(
-                    CONTRACT_ADDRESS,
-                    abi,
-                    provider
-                );
-                const data = await contract.getCompleteProfile(address);
-                setProfile({
-                    username: data[0],
-                    fullName: data[1],
-                    imageURI: data[2],
-                    bio: data[3],
-                    dateOfBirth: Number(data[4]),
-                    country: data[5],
-                    lastUpdated: Number(data[6]),
-                    initialized: data[7]
-                });
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+        fetchDetails();
+    }, [address, fetchDetails]);
 
-        if (address) {
-            fetchProfile();
-        }
-    }, [address]);
-
-    return { profile, loading, error };
+    return {
+        details,
+        loading,
+        error,
+        updating,
+        setProfileDetails,
+        updateProfileDetails,
+        refetch: fetchDetails
+    };
 };
 
-
-export const useHasProfileDetailsRPC = (address) => {
-    const [hasDetails, setHasDetails] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const checkDetails = async () => {
-            try {
-                const provider = new ethers.JsonRpcProvider(RPC_URL);
-                const contract = new ethers.Contract(
-                    CONTRACT_ADDRESS,
-                    abi,
-                    provider
-                );
-                const data = await contract.hasProfileDetails(address);
-                setHasDetails(data);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (address) {
-            checkDetails();
-        }
-    }, [address]);
-
-    return { hasDetails, loading, error };
-};
-
-
-export const useDetailsCountRPC = () => {
+export const useDetailsCount = () => {
     const [count, setCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchCount = async () => {
-            try {
-                const provider = new ethers.JsonRpcProvider(RPC_URL);
-                const contract = new ethers.Contract(
-                    CONTRACT_ADDRESS,
-                    abi,
-                    provider
-                );
-                const data = await contract.getDetailsCount();
-                setCount(Number(data));
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchCount = async () => {
+        try {
+            const provider = new ethers.JsonRpcProvider(RPC_URL);
+            const contract = new ethers.Contract(
+                CONTRACT_ADDRESS,
+                abi,
+                provider
+            );
+            const data = await contract.detailsCount();
+            setCount(Number(data));
+            setError(null);
+        } catch (err) {
+            console.error("Error fetching details count:", err);
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchCount();
     }, []);
 
-    return { count, loading, error };
+    return {
+        count,
+        loading,
+        error,
+        refetch: fetchCount
+    };
 };

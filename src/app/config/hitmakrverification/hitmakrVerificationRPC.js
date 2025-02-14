@@ -1,130 +1,91 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
-import abi from './abi/abi';
+import { useState, useEffect } from "react";
+import { ethers } from "ethers";
+import abi from "./abi/abi";
+import { useQuery } from "@tanstack/react-query";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_HITMAKR_VERIFICATION_ADDRESS;
 const RPC_URL = process.env.NEXT_PUBLIC_SKALE_TESTNET_RPC_URL;
 
+export const useVerificationStatusRPC = (address) => {
+  const checkVerification = async () => {
+    if (!address) return false;
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
+    const data = await contract.verificationStatus(address);
+    return data;
+  };
 
-export const useIsVerifiedRPC = (address) => {
-    const [isVerified, setIsVerified] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const {
+    data: isVerified,
+    isPending: loading,
+    error,
+  } = useQuery({
+    queryKey: ["verificationStatus", address],
+    queryFn: checkVerification,
+    enabled: !!address,
+  });
 
-    useEffect(() => {
-        const checkVerification = async () => {
-            try {
-                const provider = new ethers.JsonRpcProvider(RPC_URL);
-                const contract = new ethers.Contract(
-                    CONTRACT_ADDRESS,
-                    abi,
-                    provider
-                );
-                const data = await contract.isVerified(address);
-                setIsVerified(data);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (address) {
-            checkVerification();
-        }
-    }, [address]);
-
-    return { isVerified, loading, error };
+  return { isVerified, loading, error };
 };
-
 
 export const useHitmakrControlCenterRPC = () => {
-    const [controlCenterAddress, setControlCenterAddress] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const getControlCenter = async () => {
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
+    const data = await contract.HITMAKR_CONTROL_CENTER();
+    return data;
+  };
 
-    useEffect(() => {
-        const getControlCenter = async () => {
-            try {
-                const provider = new ethers.JsonRpcProvider(RPC_URL);
-                const contract = new ethers.Contract(
-                    CONTRACT_ADDRESS,
-                    abi,
-                    provider
-                );
-                const data = await contract.HITMAKR_CONTROL_CENTER();
-                setControlCenterAddress(data);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+  const {
+    data: controlCenterAddress,
+    isPending: loading,
+    error,
+  } = useQuery({
+    queryKey: ["controlCenter"],
+    queryFn: getControlCenter,
+  });
 
-        getControlCenter();
-    }, []);
-
-    return { controlCenterAddress, loading, error };
+  return { controlCenterAddress, loading, error };
 };
-
 
 export const useHitmakrProfilesRPC = () => {
-    const [profilesAddress, setProfilesAddress] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const getProfilesAddress = async () => {
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
+    const data = await contract.HITMAKR_PROFILES();
+    return data;
+  };
 
-    useEffect(() => {
-        const getProfilesAddress = async () => {
-            try {
-                const provider = new ethers.JsonRpcProvider(RPC_URL);
-                const contract = new ethers.Contract(
-                    CONTRACT_ADDRESS,
-                    abi,
-                    provider
-                );
-                const data = await contract.HITMAKR_PROFILES();
-                setProfilesAddress(data);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+  const {
+    data: profilesAddress,
+    isPending: loading,
+    error,
+  } = useQuery({
+    queryKey: ["profiles"],
+    queryFn: getProfilesAddress,
+  });
 
-        getProfilesAddress();
-    }, []);
-
-    return { profilesAddress, loading, error };
+  return { profilesAddress, loading, error };
 };
 
-
 export const useIsContractPausedRPC = () => {
-    const [isPaused, setIsPaused] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const checkPauseStatus = async () => {
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
+    const data = await contract.paused();
+    return data;
+  };
 
-    useEffect(() => {
-        const checkPauseStatus = async () => {
-            try {
-                const provider = new ethers.JsonRpcProvider(RPC_URL);
-                const contract = new ethers.Contract(
-                    CONTRACT_ADDRESS,
-                    abi,
-                    provider
-                );
-                const data = await contract.paused();
-                setIsPaused(data);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+  const {
+    data: isPaused,
+    isPending: loading,
+    error,
+  } = useQuery({
+    queryKey: ["pauseStatus"],
+    queryFn: checkPauseStatus,
+  });
 
-        checkPauseStatus();
-    }, []);
-
-    return { isPaused, loading, error };
+  return { isPaused, loading, error };
 };

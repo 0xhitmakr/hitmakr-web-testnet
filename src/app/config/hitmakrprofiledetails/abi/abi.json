@@ -68,9 +68,9 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
+				"internalType": "uint64",
 				"name": "dateOfBirth",
-				"type": "uint256"
+				"type": "uint64"
 			},
 			{
 				"indexed": false,
@@ -80,9 +80,9 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
+				"internalType": "uint64",
 				"name": "timestamp",
-				"type": "uint256"
+				"type": "uint64"
 			}
 		],
 		"name": "ProfileDetailsCreated",
@@ -105,75 +105,21 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
+				"internalType": "uint64",
 				"name": "timestamp",
-				"type": "uint256"
+				"type": "uint64"
 			}
 		],
 		"name": "ProfileDetailsUpdated",
 		"type": "event"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "getCompleteProfile",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "username",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "fullName",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "imageURI",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "bio",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "dateOfBirth",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "country",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "lastUpdated",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "initialized",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [],
-		"name": "getDetailsCount",
+		"name": "detailsCount",
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "count",
+				"name": "",
 				"type": "uint256"
 			}
 		],
@@ -184,11 +130,11 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "user",
+				"name": "",
 				"type": "address"
 			}
 		],
-		"name": "getProfileDetails",
+		"name": "profileDetails",
 		"outputs": [
 			{
 				"internalType": "string",
@@ -206,9 +152,9 @@
 				"type": "string"
 			},
 			{
-				"internalType": "uint256",
+				"internalType": "uint64",
 				"name": "dateOfBirth",
-				"type": "uint256"
+				"type": "uint64"
 			},
 			{
 				"internalType": "string",
@@ -216,29 +162,10 @@
 				"type": "string"
 			},
 			{
-				"internalType": "uint256",
+				"internalType": "uint64",
 				"name": "lastUpdated",
-				"type": "uint256"
+				"type": "uint64"
 			},
-			{
-				"internalType": "bool",
-				"name": "initialized",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "hasProfileDetails",
-		"outputs": [
 			{
 				"internalType": "bool",
 				"name": "initialized",
@@ -279,9 +206,9 @@
 				"type": "string"
 			},
 			{
-				"internalType": "uint256",
+				"internalType": "uint64",
 				"name": "dateOfBirth",
-				"type": "uint256"
+				"type": "uint64"
 			},
 			{
 				"internalType": "string",

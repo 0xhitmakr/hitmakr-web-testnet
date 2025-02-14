@@ -6,47 +6,59 @@ import abi from './abi/abi.json';
 
 const RPC_URL = process.env.NEXT_PUBLIC_SKALE_RPC_URL;
 
+export const EDITIONS = {
+    STREAMING: 0,
+    COLLECTORS: 1,
+    LICENSING: 2
+};
+
 export const useGetUserStats = (indexerAddress, userAddress) => {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const fetchStats = async () => {
+        if (!indexerAddress || !userAddress) {
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const provider = new ethers.JsonRpcProvider(RPC_URL);
+            const contract = new ethers.Contract(
+                indexerAddress,
+                abi,
+                provider
+            );
+
+            const userStats = await contract.userStats(userAddress);
+            
+            setStats({
+                totalPurchases: userStats.totalPurchases.toString(),
+                totalAmountSpent: userStats.totalAmountSpent.toString(),
+                firstPurchaseTime: userStats.firstPurchaseTime.toString(),
+                lastPurchaseTime: userStats.lastPurchaseTime.toString()
+            });
+            setError(null);
+        } catch (err) {
+            console.error("Error fetching user stats:", err);
+            setError(err);
+            setStats(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchStats = async () => {
-            if (!indexerAddress || !userAddress) {
-                setLoading(false);
-                return;
-            }
-
-            try {
-                const provider = new ethers.JsonRpcProvider(RPC_URL);
-                const contract = new ethers.Contract(
-                    indexerAddress,
-                    abi,
-                    provider
-                );
-
-                const userStats = await contract.getUserStats(userAddress);
-                setStats({
-                    totalPurchases: userStats.totalPurchases.toString(),
-                    totalAmountSpent: userStats.totalAmountSpent.toString(),
-                    firstPurchaseTime: userStats.firstPurchaseTime.toString(),
-                    lastPurchaseTime: userStats.lastPurchaseTime.toString()
-                });
-                setError(null);
-            } catch (err) {
-                console.error("Error fetching user stats:", err);
-                setError(err);
-                setStats(null);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchStats();
     }, [indexerAddress, userAddress]);
 
-    return { stats, loading, error };
+    return {
+        stats,
+        loading,
+        error,
+        refetch: fetchStats
+    };
 };
 
 export const useGetUserPurchases = (indexerAddress, userAddress, offset = 0, limit = 10) => {
@@ -80,7 +92,8 @@ export const useGetUserPurchases = (indexerAddress, userAddress, offset = 0, lim
                 dsrcAddress: purchase.dsrcAddress,
                 dsrcId: purchase.dsrcId,
                 timestamp: purchase.timestamp.toString(),
-                price: purchase.price.toString()
+                price: purchase.price.toString(),
+                edition: purchase.edition // Added edition field
             })));
             setTotal(totalPurchases.toString());
             setStats({
@@ -115,14 +128,13 @@ export const useGetUserPurchases = (indexerAddress, userAddress, offset = 0, lim
     };
 };
 
-
-export const useCheckUserPurchase = (indexerAddress, userAddress, dsrcAddress) => {
+export const useHasUserPurchasedEdition = (indexerAddress, userAddress, dsrcAddress, edition) => {
     const [hasPurchased, setHasPurchased] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const checkPurchase = async () => {
-        if (!indexerAddress || !userAddress || !dsrcAddress) {
+        if (!indexerAddress || !userAddress || !dsrcAddress || edition === undefined) {
             setLoading(false);
             return;
         }
@@ -135,11 +147,11 @@ export const useCheckUserPurchase = (indexerAddress, userAddress, dsrcAddress) =
                 provider
             );
 
-            const purchased = await contract.checkUserPurchase(userAddress, dsrcAddress);
+            const purchased = await contract.hasUserPurchasedEdition(userAddress, dsrcAddress, edition);
             setHasPurchased(purchased);
             setError(null);
         } catch (err) {
-            console.error("Error checking user purchase:", err);
+            console.error("Error checking purchase status:", err);
             setError(err);
             setHasPurchased(false);
         } finally {
@@ -149,7 +161,7 @@ export const useCheckUserPurchase = (indexerAddress, userAddress, dsrcAddress) =
 
     useEffect(() => {
         checkPurchase();
-    }, [indexerAddress, userAddress, dsrcAddress]);
+    }, [indexerAddress, userAddress, dsrcAddress, edition]);
 
     return {
         hasPurchased,
@@ -158,7 +170,6 @@ export const useCheckUserPurchase = (indexerAddress, userAddress, dsrcAddress) =
         refetch: checkPurchase
     };
 };
-
 
 export const useIsValidDSRC = (indexerAddress, dsrcAddress) => {
     const [isValid, setIsValid] = useState(false);
@@ -197,7 +208,6 @@ export const useIsValidDSRC = (indexerAddress, dsrcAddress) => {
 
     return { isValid, loading, error };
 };
-
 
 export const useGetGlobalStats = (indexerAddress) => {
     const [stats, setStats] = useState(null);
@@ -245,8 +255,7 @@ export const useGetGlobalStats = (indexerAddress) => {
     };
 };
 
-
-export const useIsUserActiveBuyer = (indexerAddress, userAddress) => {
+export const useIsActiveBuyer = (indexerAddress, userAddress) => {
     const [isActiveBuyer, setIsActiveBuyer] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -266,7 +275,7 @@ export const useIsUserActiveBuyer = (indexerAddress, userAddress) => {
                     provider
                 );
 
-                const isActive = await contract.isUserActiveBuyer(userAddress);
+                const isActive = await contract.isActiveBuyer(userAddress);
                 setIsActiveBuyer(isActive);
                 setError(null);
             } catch (err) {

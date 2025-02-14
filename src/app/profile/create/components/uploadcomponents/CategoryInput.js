@@ -1,56 +1,73 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import styles from "../../styles/Create.module.css";
 import HitmakrCreativesStore from "@/app/config/store/HitmakrCreativesStore";
 import { useRecoilState } from "recoil";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const CategoryInput = () => {
   const [uploadState, setUploadState] = useRecoilState(
     HitmakrCreativesStore.CreativesUpload
   );
-  const selectedCategory = uploadState?.selectedCategory || "music";
+  const categories = [
+    { id: "music", label: "Music" },
+    { id: "sound", label: "Sound" },
+    { id: "loop", label: "Loop" },
+    { id: "instrumentals", label: "Instrumentals" },
+    { id: "sfx", label: "SFX" }
+  ];
+  
+  const [currentIndex, setCurrentIndex] = useState(
+    categories.findIndex(cat => cat.id === (uploadState?.selectedCategory || "music"))
+  );
 
-  const handleCategoryChange = (newCategory) => {
+  const handleNavigation = (direction) => {
+    let newIndex;
+    if (direction === 'left') {
+      newIndex = currentIndex > 0 ? currentIndex - 1 : categories.length - 1;
+    } else {
+      newIndex = currentIndex < categories.length - 1 ? currentIndex + 1 : 0;
+    }
+    setCurrentIndex(newIndex);
     setUploadState({
       ...uploadState,
-      selectedCategory: newCategory,
+      selectedCategory: categories[newIndex].id,
     });
   };
 
   return (
     <div className={styles.createUploadContainerInput}>
-      <div className={styles.createUploadContainerInputCategory}>
-        <div className={styles.createUploadContainerInputCategory}>
-          <input
-            type="radio"
-            id="music"
-            name="category"
-            value="music"
-            checked={selectedCategory === "music"}
-            onChange={() => handleCategoryChange("music")}
-          />
-          <label htmlFor="music">Music</label>
+      <div className={styles.categoryNavigationContainer}>
+        <button 
+          className={styles.navigationButton}
+          onClick={() => handleNavigation('left')}
+        >
+          <ChevronLeft size={20} />
+        </button>
 
-          <input
-            type="radio"
-            id="sound"
-            name="category"
-            value="sound"
-            checked={selectedCategory === "sound"}
-            onChange={() => handleCategoryChange("sound")}
-          />
-          <label htmlFor="sound">Sound</label>
-          <input
-            type="radio"
-            id="loop"
-            name="category"
-            value="loop"
-            checked={selectedCategory === "loop"}
-            onChange={() => handleCategoryChange("loop")}
-          />
-          <label htmlFor="loop">Loop</label>
+        <div className={styles.categorySlider}>
+          <div className={styles.categoryOption}>
+            <input
+              type="radio"
+              id={categories[currentIndex].id}
+              name="category"
+              value={categories[currentIndex].id}
+              checked={true}
+              readOnly
+            />
+            <label htmlFor={categories[currentIndex].id}>
+              {categories[currentIndex].label}
+            </label>
+          </div>
         </div>
+
+        <button 
+          className={styles.navigationButton}
+          onClick={() => handleNavigation('right')}
+        >
+          <ChevronRight size={20} />
+        </button>
       </div>
     </div>
   );

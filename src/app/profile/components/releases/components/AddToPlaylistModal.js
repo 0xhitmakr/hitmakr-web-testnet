@@ -28,36 +28,44 @@ export default function AddToPlaylistModal({
         if (!address) return;
         
         setLoading(true);
-        const authToken = localStorage.getItem("authToken");
-
+        const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+        const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+     
         try {
+            if (!authToken || !nonceToken) {
+                throw new Error("Authentication required. Please reconnect your wallet.");
+            }
+     
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/playlist/playlists`,
                 {
                     headers: {
-                        Authorization: `Bearer ${authToken}`,
-                        "x-user-address": address,
-                        "x-chain-id": wagmiChainId.toString(),
-                    },
+                        'Authorization': `Bearer ${authToken}`,
+                        'x-nonce-token': nonceToken,
+                        'x-user-address': address,
+                        'x-chain-id': wagmiChainId.toString(),
+                    }
                 }
             );
-
-            if (!response.ok) throw new Error("Failed to fetch playlists");
-
+     
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to fetch playlists");
+            }
+     
             const data = await response.json();
             setPlaylists(data.playlists);
             setOriginalPlaylists(data.playlists);
             setError(null);
         } catch (error) {
             console.error("Error fetching playlists:", error);
-            setError("Failed to load playlists");
+            setError(error.message || "Failed to load playlists");
         } finally {
             setLoading(false);
         }
-    };
-
-
-    const addToPlaylist = async (playlistId) => {
+     };
+     
+     const addToPlaylist = async (playlistId) => {
         if (!address || !dsrcId || !playlistId) {
             showSuccessMessage(
                 "Error",
@@ -65,61 +73,72 @@ export default function AddToPlaylistModal({
             );
             return;
         }
-
+     
         setAddingToPlaylist(true);
-        const authToken = localStorage.getItem("authToken");
-
+        const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+        const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+     
         try {
+            if (!authToken || !nonceToken) {
+                throw new Error("Authentication required. Please reconnect your wallet.");
+            }
+     
+            // Check if DSRC is already in playlist
             const checkResponse = await fetch(
                 `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/playlist/playlists/${playlistId}`,
                 {
                     headers: {
-                        Authorization: `Bearer ${authToken}`,
-                        "x-user-address": address,
-                        "x-chain-id": wagmiChainId.toString(),
-                    },
+                        'Authorization': `Bearer ${authToken}`,
+                        'x-nonce-token': nonceToken,
+                        'x-user-address': address,
+                        'x-chain-id': wagmiChainId.toString(),
+                    }
                 }
             );
-
-            if (!checkResponse.ok) throw new Error("Failed to check playlist");
-
+     
+            if (!checkResponse.ok) {
+                const errorData = await checkResponse.json();
+                throw new Error(errorData.message || "Failed to check playlist");
+            }
+     
             const playlistData = await checkResponse.json();
             const isDSRCInPlaylist = playlistData.playlist.tracks?.some(
                 track => track.dsrcId === dsrcId
             );
-
+     
             if (isDSRCInPlaylist) {
                 showSuccessMessage(
                     "Already Added",
                     "This DSRC is already in the playlist."
                 );
-                setAddingToPlaylist(false);
                 return;
             }
-
+     
+            // Add DSRC to playlist
             const addResponse = await fetch(
                 `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/playlist/playlists/${playlistId}/tracks`,
                 {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${authToken}`,
-                        "x-user-address": address,
-                        "x-chain-id": wagmiChainId.toString(),
+                        'Authorization': `Bearer ${authToken}`,
+                        'x-nonce-token': nonceToken,
+                        'x-user-address': address,
+                        'x-chain-id': wagmiChainId.toString(),
                     },
                     body: JSON.stringify({
                         dsrcIds: [dsrcId] 
                     })
                 }
             );
-
+     
             if (!addResponse.ok) {
                 const errorData = await addResponse.json().catch(() => ({}));
                 throw new Error(errorData.message || "Failed to add DSRC to playlist");
             }
-
-            const successData = await addResponse.json();
-
+     
+            await addResponse.json();
+            
             showSuccessMessage(
                 "Added to Playlist",
                 "DSRC has been added to your playlist successfully!"
@@ -128,23 +147,22 @@ export default function AddToPlaylistModal({
         } catch (error) {
             console.error("Error adding to playlist:", error);
             let errorMessage = "Failed to add DSRC to playlist. Please try again.";
-
+     
             if (error.message.includes("already exists")) {
                 errorMessage = "This DSRC is already in the playlist.";
             } else if (error.message.includes("not found")) {
                 errorMessage = "Playlist not found.";
             } else if (error.message.includes("unauthorized")) {
                 errorMessage = "You don't have permission to modify this playlist.";
+            } else if (error.message.includes("Authentication required")) {
+                errorMessage = "Please reconnect your wallet.";
             }
-
-            showSuccessMessage(
-                "Error",
-                errorMessage
-            );
+     
+            showSuccessMessage("Error", errorMessage);
         } finally {
             setAddingToPlaylist(false);
         }
-    };
+     };
 
     const filterPlaylists = (query, playlistsToFilter = originalPlaylists) => {
         if (!query.trim()) {

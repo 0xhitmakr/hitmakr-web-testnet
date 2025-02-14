@@ -1,0 +1,133 @@
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  font-size: 0.875rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 1rem;
+  background-color: #202020;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.header:hover {
+  border-color: #d1d1d1;
+}
+
+.selectedValue {
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chevron {
+  width: 1rem;
+  height: 1rem;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+.chevronUp {
+  transform: rotate(180deg);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #202020;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.searchContainer {
+  position: relative;
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e5e5;
+  overflow: hidden;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+  color: #666;
+}
+
+.searchInput {
+  width: 83%;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background: #202020;
+  margin: auto;
+  color: white;
+  font-size: 1rem;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: white;
+}
+
+.optionsList {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.optionsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.optionsList::-webkit-scrollbar-track {
+  background: #202020;
+}
+
+.optionsList::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.option {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.option:hover {
+  background-color: #242323;
+}
+
+.selected {
+  background-color: #242323;
+  font-weight: 500;
+}
+
+.noResults {
+  padding: 0.75rem 1rem;
+  color: #666;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .container {
+    max-width: 100%;
+  }
+}

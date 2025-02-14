@@ -23,80 +23,94 @@ const UserFollow = ({ userAddress }) => {
 
     const fetchFollowStatus = async () => {
         try {
-            const authToken = localStorage.getItem("authToken");
-            if (!authToken || !address) return;
-
+            const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+            const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+            
+            if (!authToken || !nonceToken || !address) return;
+    
             const response = await fetch(
                 `${API_BASE_URL}/follow/follow-status/${userAddress}`,
                 {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
+                        'x-nonce-token': nonceToken,
                         'x-user-address': address,
                         'x-chain-id': chainId?.toString(),
                         'Content-Type': 'application/json'
                     }
                 }
             );
-
+    
             if (!response.ok) {
-                throw new Error('Failed to fetch follow status');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch follow status');
             }
-
+    
             const data = await response.json();
             setCurrentlyFollowing(data.isFollowing);
         } catch (error) {
             console.error('Error fetching follow status:', error);
         }
     };
-
+    
     const fetchFollowerCount = async () => {
         try {
-            const authToken = localStorage.getItem("authToken");
-            if (!authToken || !userAddress) return;
-
+            const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+            const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+            
+            if (!authToken || !nonceToken || !userAddress) return;
+    
             const response = await fetch(
                 `${API_BASE_URL}/follow/follow-counts/${userAddress}`,
                 {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
+                        'x-nonce-token': nonceToken,
                         'x-user-address': address,
                         'x-chain-id': chainId?.toString(),
                         'Content-Type': 'application/json'
                     }
                 }
             );
-
+    
             if (!response.ok) {
-                throw new Error('Failed to fetch follower count');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch follower count');
             }
-
+    
             const data = await response.json();
             setFollowerCount(data.followers);
         } catch (error) {
             console.error('Error fetching follower count:', error);
         }
     };
-
+    
     const handleFollow = async () => {
         if (!address || !userAddress) return;
         
         setIsLoading(true);
-        const authToken = localStorage.getItem("authToken");
+        const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+        const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
         
-        if (!authToken) {
-            toast.error("Authentication required");
+        if (!authToken || !nonceToken) {
+            setModalState({
+                show: true,
+                title: "Error",
+                description: "Authentication required. Please reconnect your wallet."
+            });
             setIsLoading(false);
             return;
         }
-
+    
         try {
             const endpoint = currentlyFollowing ? 'unfollow' : 'follow';
             const response = await fetch(`${API_BASE_URL}/follow/${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${authToken}`,
+                    'x-nonce-token': nonceToken,
                     'x-user-address': address,
                     'x-chain-id': chainId?.toString(),
                     'Content-Type': 'application/json'
@@ -105,20 +119,28 @@ const UserFollow = ({ userAddress }) => {
                     followingAddress: userAddress
                 })
             });
-
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || `Failed to ${endpoint}`);
             }
-
+    
             const data = await response.json();
             setCurrentlyFollowing(!currentlyFollowing);
             setFollowerCount(data.counts.followers);
             
-            toast.success(data.message);
+            setModalState({
+                show: true,
+                title: "Success",
+                description: data.message || `Successfully ${endpoint}ed user`
+            });
         } catch (error) {
             console.error('Follow/Unfollow error:', error);
-            toast.error(error.message || 'Failed to update follow status');
+            setModalState({
+                show: true,
+                title: "Error",
+                description: error.message || 'Failed to update follow status'
+            });
             // Revert the state in case of error
             setCurrentlyFollowing(currentlyFollowing);
         } finally {

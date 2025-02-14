@@ -3,7 +3,12 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "_verificationContract",
+				"name": "_profilesContract",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_controlCenter",
 				"type": "address"
 			}
 		],
@@ -32,7 +37,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "InvalidVerificationContract",
+		"name": "NoProfile",
 		"type": "error"
 	},
 	{
@@ -42,7 +47,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "UserNotVerified",
+		"name": "ZeroAddress",
 		"type": "error"
 	},
 	{
@@ -110,6 +115,48 @@
 		"type": "event"
 	},
 	{
+		"inputs": [],
+		"name": "controlCenter",
+		"outputs": [
+			{
+				"internalType": "contract IHitmakrControlCenter",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "creativeIDRegistry",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "id",
+				"type": "string"
+			},
+			{
+				"internalType": "uint40",
+				"name": "timestamp",
+				"type": "uint40"
+			},
+			{
+				"internalType": "bool",
+				"name": "exists",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -140,45 +187,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "getTotalCreativeIDs",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "hasCreativeID",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "creativeId",
-				"type": "string"
-			}
-		],
-		"name": "isCreativeIDTaken",
+		"name": "paused",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -191,12 +200,12 @@
 	},
 	{
 		"inputs": [],
-		"name": "paused",
+		"name": "profilesContract",
 		"outputs": [
 			{
-				"internalType": "bool",
+				"internalType": "contract IHitmakrProfiles",
 				"name": "",
-				"type": "bool"
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -221,6 +230,25 @@
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"name": "takenCreativeIDs",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "toggleEmergencyPause",
 		"outputs": [],
@@ -229,12 +257,12 @@
 	},
 	{
 		"inputs": [],
-		"name": "verificationContract",
+		"name": "totalCreativeIDs",
 		"outputs": [
 			{
-				"internalType": "contract IHitmakrVerification",
+				"internalType": "uint256",
 				"name": "",
-				"type": "address"
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",

@@ -21,31 +21,34 @@ const HeartButton = ({ dsrcId, showModal }) => {
                 setIsInitializing(false);
                 return;
             }
-
+    
             try {
-                const authToken = localStorage.getItem("authToken");
-                if (!authToken) {
+                const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+                const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token"); // Retrieve nonceToken
+    
+                if (!authToken || !nonceToken) { // Check for nonceToken as well
                     setIsInitializing(false);
                     return;
                 }
-
+    
                 const response = await fetch(
                     `${API_BASE_URL}/heart/status/${dsrcId}`,
                     {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${authToken}`,
+                            'x-nonce-token': nonceToken, // Include nonceToken header
                             'x-user-address': address,
                             'x-chain-id': chainId?.toString(),
                             'Content-Type': 'application/json'
                         }
                     }
                 );
-
+    
                 if (!response.ok) {
                     throw new Error('Failed to fetch like status');
                 }
-
+    
                 const data = await response.json();
                 setHasLiked(data.hasLiked);
             } catch (error) {
@@ -54,10 +57,11 @@ const HeartButton = ({ dsrcId, showModal }) => {
                 setIsInitializing(false);
             }
         };
-
+    
         fetchLikeStatus();
     }, [address, dsrcId, chainId]);
-
+    
+    
     const handleHeartClick = async () => {
         if (!address) {
             showModal({
@@ -67,24 +71,27 @@ const HeartButton = ({ dsrcId, showModal }) => {
             });
             return;
         }
-
+    
         if (isLoading) return;
-
+    
         setIsAnimating(true);
         setIsLoading(true);
-
+    
         try {
-            const authToken = localStorage.getItem("authToken");
-            if (!authToken) {
+            const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+            const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token"); // Retrieve nonceToken
+    
+            if (!authToken || !nonceToken) { // Check for nonceToken as well
                 throw new Error("Authentication required");
             }
-
+    
             const response = await fetch(
                 `${API_BASE_URL}/heart/toggle`,
                 {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
+                        'x-nonce-token': nonceToken, // Include nonceToken header
                         'x-user-address': address,
                         'x-chain-id': chainId?.toString(),
                         'Content-Type': 'application/json'
@@ -94,20 +101,20 @@ const HeartButton = ({ dsrcId, showModal }) => {
                     })
                 }
             );
-
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to toggle like');
             }
-
+    
             const data = await response.json();
             setHasLiked(data.action === 'liked');
-            
+    
             toast.success(data.message);
-            
+    
         } catch (error) {
             console.error('Heart action error:', error);
-            
+    
             showModal({
                 show: true,
                 title: "Action Failed",

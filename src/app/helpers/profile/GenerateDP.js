@@ -3,47 +3,55 @@
 import { createAvatar } from "@dicebear/core";
 import { avataaarsNeutral } from "@dicebear/collection";
 import { useAccount } from "wagmi";
-import { useCompleteProfileRPC } from "@/app/config/hitmakrprofiledetails/hitmakrProfileDetailsRPC";
+import { useProfileDetailsRPC } from "@/app/config/hitmakrprofiledetails/hitmakrProfileDetailsRPC";
 import Image from "next/image";
 import LoaderWhiteSmall from "@/app/components/animations/loaders/loaderWhiteSmall";
 
-export default function GenerateDp({ seed, options, width, height }) {
+export default function GenerateDP({ seed, options, width, height }) {
   const { isConnected, address } = useAccount();
-  const { profile, loading, error } = useCompleteProfileRPC(address);
+  const { details, loading, error } = useProfileDetailsRPC(address);
 
+  // Create default avatar
   const avatar = createAvatar(avataaarsNeutral, {
     seed: seed || "hitmakr",
     ...options,
   });
 
-  const svgString = profile?.imageURI || avatar.toString();
+  // Generate SVG string based on profile existence
+  const svgString = details?.imageURI || avatar.toString();
 
   if (loading) {
-    return (<>
-      <LoaderWhiteSmall />
-    </>);
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <LoaderWhiteSmall />
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <Image
-        src={`data:image/svg+xml;utf8,${encodeURIComponent(avatar.toString())}`}
-        alt="Generated Avatar"
-        width={width}
-        height={height}
-        unoptimized
-      />
+      <div className="flex items-center justify-center w-full h-full">
+        <Image
+          src={`data:image/svg+xml;utf8,${encodeURIComponent(avatar.toString())}`}
+          alt="Generated Avatar"
+          width={width}
+          height={height}
+          className="rounded-full"
+          unoptimized
+        />
+      </div>
     );
   }
 
   return (
-    <>
-      {profile?.imageURI ? (
+    <div className="flex items-center justify-center w-full h-full">
+      {details?.imageURI ? (
         <Image
-          src={profile.imageURI}
-          alt="Profile Picture"
+          src={details.imageURI}
+          alt={`Profile Picture - ${details.fullName || 'User'}`}
           width={width}
           height={height}
+          className="rounded-full object-cover"
           unoptimized
         />
       ) : (
@@ -52,9 +60,10 @@ export default function GenerateDp({ seed, options, width, height }) {
           alt="Generated Avatar"
           width={width}
           height={height}
+          className="rounded-full"
           unoptimized
         />
       )}
-    </>
+    </div>
   );
 }

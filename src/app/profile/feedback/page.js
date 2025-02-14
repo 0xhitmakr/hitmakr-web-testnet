@@ -34,11 +34,21 @@ export default function FeedbackPage() {
   };
 
   const handleSubmitFeedback = async () => {
-    const authToken = localStorage.getItem("authToken");
+    const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+    const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token"); // Retrieve nonceToken
 
     setIsLoading(true);
 
     try {
+      // Optional: Check if authToken and nonceToken are present.
+      // For feedback, it might not be strictly necessary to be authenticated,
+      // but for consistency with other updated functions, we can include the check.
+      if (!authToken || !nonceToken) {
+        // You can decide how to handle missing tokens for feedback.
+        // For now, let's proceed without throwing an error, as feedback might be allowed for non-authenticated users.
+        console.warn("Authentication tokens missing when submitting feedback. Proceeding without nonceToken.");
+      }
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/feedback/feedback`,
         {
@@ -46,9 +56,11 @@ export default function FeedbackPage() {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${authToken}`,
+            "x-nonce-token": nonceToken, // Include nonceToken header
             "x-user-address": address,
             "x-chain-id": chainId.toString(),
           },
+          credentials: 'include', // Important for CORS
           body: JSON.stringify({ feedback, email }),
         }
       );

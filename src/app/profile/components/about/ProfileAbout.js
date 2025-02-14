@@ -4,8 +4,10 @@ import React, { useMemo, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styles from "./styles/ProfileAbout.module.css";
 import GetProfileDetails from "@/app/helpers/profile/GetProfileDetailsByAddress";
-import { useGetDSRCNonce } from '@/app/config/hitmakrdsrcfactory/hitmakrDSRCFactoryRPC';
-import { useGetUserStats } from '@/app/config/hitmakrpurchaseindexer/hitmakrPurchaseIndexerRPC';
+// Import the updated hook for DSRC count
+import { useGetDSRCCountForYear } from '@/app/config/hitmakrdsrcfactory/hitmakrDSRCFactoryRPC';
+// Assuming you have an updated hook for user stats, if not, keep the old one or adjust as needed
+import { useGetUserStats } from '@/app/config/hitmakrpurchaseindexer/hitmakrPurchaseIndexerRPC'; // Keep this if it's still the relevant one
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_HITMAKR_SERVER;
 const INDEXER_ADDRESS = process.env.NEXT_PUBLIC_HITMAKR_INDEXER_ADDRESS_SKL;
@@ -43,9 +45,9 @@ const PURCHASE_STATS_CONFIG = [
 
 const formatNumber = (num) => {
     if (typeof num !== 'number') return num;
-    
+
     if (num < 1000) return num;
-    
+
     const K = 1000;
     const M = K * 1000;
     const B = M * 1000;
@@ -53,11 +55,11 @@ const formatNumber = (num) => {
     if (num >= B) {
         return `${Math.floor(num / B)}B+`;
     }
-    
+
     if (num >= M) {
         return `${Math.floor(num / M)}M+`;
     }
-    
+
     if (num >= K) {
         return `${Math.floor(num / K)}K+`;
     }
@@ -88,7 +90,11 @@ StatOption.propTypes = {
 StatOption.displayName = 'StatOption';
 
 const ProfileStats = ({ address }) => {
-    const { nonce, isLoading: nonceLoading, error: nonceError } = useGetDSRCNonce(address);
+    // Replace useGetDSRCNonce with useGetDSRCCountForYear
+    const currentYear = useMemo(() => {
+        return new Date().getFullYear();
+    }, []);
+    const { count: releaseCount, isLoading: releaseCountLoading, error: releaseCountError } = useGetDSRCCountForYear(address, currentYear);
     const { stats: userStats, loading: statsLoading } = useGetUserStats(INDEXER_ADDRESS, address);
     const [followersCount, setFollowersCount] = useState(0);
     const [heartsCount, setHeartsCount] = useState(0);
@@ -162,9 +168,10 @@ const ProfileStats = ({ address }) => {
     const statsData = useMemo(() => {
         const baseStats = BASE_STATS_CONFIG.map(config => {
             let value;
-            
+
             if (config.id === 'releases') {
-                value = nonceLoading ? "..." : nonceError ? 0 : nonce || 0;
+                // Use releaseCount and releaseCountLoading/releaseCountError
+                value = releaseCountLoading ? "..." : releaseCountError ? 0 : releaseCount || 0;
             } else if (config.id === 'followers') {
                 value = isLoadingFollowers ? "..." : followersCount;
             } else if (config.id === 'hearts') {
@@ -185,7 +192,7 @@ const ProfileStats = ({ address }) => {
                         value = "0";
                 }
             }
-            
+
             return {
                 ...config,
                 value
@@ -193,15 +200,15 @@ const ProfileStats = ({ address }) => {
         });
 
         const hasPurchases = userStats && Number(userStats.totalPurchases) > 0;
-        
+
         if (hasPurchases) {
             const purchaseStats = PURCHASE_STATS_CONFIG.map(config => {
                 const value = config.formatter(
-                    config.id === 'firstPurchase' 
-                        ? userStats.firstPurchaseTime 
+                    config.id === 'firstPurchase'
+                        ? userStats.firstPurchaseTime
                         : userStats.lastPurchaseTime
                 );
-                
+
                 if (value) {
                     return {
                         ...config,
@@ -215,15 +222,15 @@ const ProfileStats = ({ address }) => {
         }
 
         return baseStats;
-    }, [nonce, nonceLoading, nonceError, followersCount, isLoadingFollowers, 
-        heartsCount, isLoadingHearts, userStats, statsLoading]);
+    }, [releaseCount, releaseCountLoading, releaseCountError, followersCount, isLoadingFollowers,
+        heartsCount, isLoadingHearts, userStats, statsLoading, currentYear]); // Added currentYear to dependencies
 
     return (
         <div className={styles.profileAbout}>
             <div className={styles.profileAboutRight}>
                 <div className={styles.profileAboutRightOptions}>
                     {statsData.map(({ id, label, value }) => (
-                        <StatOption 
+                        <StatOption
                             key={id}
                             label={label}
                             value={value}
@@ -234,7 +241,7 @@ const ProfileStats = ({ address }) => {
             <div className={styles.profileAboutLeft}>
                 <div className={styles.profileAboutLeftContainer}>
                     <div className={styles.profileAboutLeftContainerBasic}>
-                        <GetProfileDetails 
+                        <GetProfileDetails
                             address={address}
                             fallbackName="Ah, the elusive 'Anonymous user'👻 strikes again! No profile name, just vibes. They could be anyone – the next big thing in music or just a super-secret lurker. Either way, they're here to shake things up!"
                             fallbackBio="Bio? Who needs one when you're this mysterious! They're letting the silence speak for itself – or maybe they just couldn't think of anything clever. Either way, they're here on Hitmakr, keeping us all guessing!"

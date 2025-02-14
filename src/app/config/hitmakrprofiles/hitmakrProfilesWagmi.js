@@ -1,21 +1,21 @@
-"use client"
-
+"use client";
 import { 
   useReadContract,
   useWriteContract,
-} from 'wagmi'
-import { useAccount } from 'wagmi'
-import abi from "./abi/abi"
+} from 'wagmi';
 
-const PROFILES_ADDRESS = process.env.NEXT_PUBLIC_HITMAKR_PROFILES_ADDRESS
+import { useAccount } from 'wagmi';
+import { ethers } from 'ethers';
+import abi from "./abi/abi";
 
+const PROFILES_ADDRESS = process.env.NEXT_PUBLIC_HITMAKR_PROFILES_ADDRESS;
 
 export const useRegister = () => {
-  const { writeContract, isPending, data } = useWriteContract()
-  const { isConnected } = useAccount()
+  const { writeContract, isPending, data } = useWriteContract();
+  const { isConnected } = useAccount();
 
   const register = async (name) => {
-    if (!name) throw new Error('Name is required')
+    if (!name) throw new Error('Name is required');
     
     try {
       writeContract({
@@ -24,70 +24,66 @@ export const useRegister = () => {
         functionName: 'register',
         args: [name],
         enabled: isConnected,
-      })
+      });
     } catch (error) {
-      console.error('Error registering profile:', error)
-      throw error
+      console.error('Error registering profile:', error);
+      throw error;
     }
-  }
+  };
 
-  return { register, isPending, data }
-}
-
+  return { register, isPending, data };
+};
 
 export const useHasProfile = (address) => {
-  const { isConnected } = useAccount()
+  const { isConnected } = useAccount();
   
   return useReadContract({
     address: PROFILES_ADDRESS,
     abi,
-    functionName: 'hasProfile',
+    functionName: '_hasProfile',
     args: [address],
     enabled: isConnected && Boolean(address),
-  })
-}
-
+  });
+};
 
 export const useProfileAddressByName = (name) => {
-  const { isConnected } = useAccount()
+  const { isConnected } = useAccount();
+  const nameHash = name ? ethers.keccak256(ethers.toUtf8Bytes(name)) : null;
 
   return useReadContract({
     address: PROFILES_ADDRESS,
     abi,
-    functionName: 'profileAddressByName',
-    args: [name],
+    functionName: '_profileByNameHash',
+    args: [nameHash],
     enabled: isConnected && Boolean(name),
-  })
-}
-
+  });
+};
 
 export const useNameByAddress = (address) => {
-  const { isConnected } = useAccount()
+  const { isConnected } = useAccount();
 
   return useReadContract({
     address: PROFILES_ADDRESS,
     abi,
-    functionName: 'nameByAddress',
+    functionName: '_nameByAddress',
     args: [address],
     enabled: isConnected && Boolean(address),
-  })
-}
-
+  });
+};
 
 export const useProfileCount = () => {
-  const { isConnected } = useAccount()
+  const { isConnected } = useAccount();
 
   return useReadContract({
     address: PROFILES_ADDRESS,
     abi,
-    functionName: 'profileCount',
+    functionName: '_profileCount',
     enabled: isConnected,
-  })
-}
-
+  });
+};
 
 export const useTokenURI = (tokenId) => {
-  const { isConnected } = useAccount()
+  const { isConnected } = useAccount();
 
   return useReadContract({
     address: PROFILES_ADDRESS,
@@ -95,12 +91,11 @@ export const useTokenURI = (tokenId) => {
     functionName: 'tokenURI',
     args: [tokenId],
     enabled: isConnected && tokenId !== undefined,
-  })
-}
-
+  });
+};
 
 export const useOwnerOf = (tokenId) => {
-  const { isConnected } = useAccount()
+  const { isConnected } = useAccount();
 
   return useReadContract({
     address: PROFILES_ADDRESS,
@@ -108,12 +103,11 @@ export const useOwnerOf = (tokenId) => {
     functionName: 'ownerOf',
     args: [tokenId],
     enabled: isConnected && tokenId !== undefined,
-  })
-}
-
+  });
+};
 
 export const useBalanceOf = (address) => {
-  const { isConnected } = useAccount()
+  const { isConnected } = useAccount();
 
   return useReadContract({
     address: PROFILES_ADDRESS,
@@ -121,5 +115,5 @@ export const useBalanceOf = (address) => {
     functionName: 'balanceOf',
     args: [address],
     enabled: isConnected && Boolean(address),
-  })
-}
+  });
+};

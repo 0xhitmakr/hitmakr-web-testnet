@@ -24,17 +24,25 @@ export default function PlaylistData() {
 
   const fetchPlaylists = async (pageNum) => {
     if (!address) return;
-    
+
     setIsLoading(true);
     setError(null);
-    const authToken = localStorage.getItem("authToken");
+    const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+    const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token"); // Retrieve nonceToken
 
     try {
+      if (!authToken || !nonceToken) { // Check for nonceToken
+        // Handle case where tokens are missing, e.g., redirect to login, show error, etc.
+        // For now, let's throw an error to be consistent with other updated functions.
+        throw new Error("Authentication token not found");
+      }
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/playlist/playlists?page=${pageNum}&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
+            "x-nonce-token": nonceToken, // Include nonceToken header
             "x-user-address": address,
             "x-chain-id": wagmiChainId.toString(),
           },
@@ -47,20 +55,20 @@ export default function PlaylistData() {
       }
 
       const data = await response.json();
-      
+
       if (pageNum === 1) {
         setPlaylists(data.playlists);
       } else {
         setPlaylists(prev => [...prev, ...data.playlists]);
       }
-      
+
       setHasMore(data.pagination.hasNextPage);
     } catch (error) {
       console.error("Error fetching playlists:", error);
       setError(error.message);
       setModalContent({
         title: "Error",
-        description: "Failed to load playlists. Please try again."
+        description: error.message || "Failed to load playlists. Please try again."
       });
       setShowModal(true);
     } finally {

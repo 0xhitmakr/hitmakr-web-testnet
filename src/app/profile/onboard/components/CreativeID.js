@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { useRecoilState } from "recoil";
@@ -77,10 +79,7 @@ const CreativeID = () => {
             return;
         }
 
-        if (!hitmakrCreativesRegisterState.rcaIdStatus || 
-            !selectedCountry || 
-            creativeCode.length !== 5 || 
-            fullCreativeID.length !== 7) {
+        if (!selectedCountry || creativeCode.length !== 5 || fullCreativeID.length !== 7) {
             setErrorMessage("Please fill all fields correctly");
             return;
         }
@@ -145,6 +144,7 @@ const CreativeID = () => {
                 ...prev,
                 registeredRcaId: fullCreativeID,
             }));
+            window.location.reload();
         }
         
         if (txReceiptError || registerError) {
@@ -183,9 +183,6 @@ const CreativeID = () => {
     return (
         <div className={styles.hitmakrRcaId}>
             <div className={styles.hitmakrRcaIdContainer}>
-                <div className={styles.hitmakrRcaIdHeader}>
-                    <p>Creative Registry</p>
-                </div>
                 {!hasCreativeID ? (
                     <div className={styles.hitmakrRcaIdInputs}>
                         <div className={styles.creativeCcInput}>

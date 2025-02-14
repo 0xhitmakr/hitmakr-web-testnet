@@ -9,7 +9,7 @@ import '@flaticon/flaticon-uicons/css/all/all.css';
 import LoaderWhiteSmall from "@/app/components/animations/loaders/loaderWhiteSmall";
 import { useAccount, useSwitchChain, useReadContract } from "wagmi";
 import { skaleCalypsoTestnet } from 'viem/chains';
-import { formatUnits, formatUSDC } from "@/app/helpers/FormatUnits";
+import { formatUSDC } from "@/app/helpers/FormatUnits";
 import HitmakrMiniModal from "@/app/components/modals/HitmakrMiniModal";
 import RouterPushLink from "@/app/helpers/RouterPushLink";
 import styles from "../../components/releases/styles/ProfileReleases.module.css";
@@ -25,7 +25,6 @@ const USDC_ABI = [{
 }];
 
 const DSRCEarningsView = ({ dsrcid, onEarningsUpdate }) => {
-
     const [showDropdown, setShowDropdown] = useState(false);
     const [copyText, setCopyText] = useState("Copy DSRC");
     const [isDistributingPurchase, setIsDistributingPurchase] = useState(false);
@@ -41,20 +40,16 @@ const DSRCEarningsView = ({ dsrcid, onEarningsUpdate }) => {
     const [hasPendingRoyalties, setHasPendingRoyalties] = useState(false);
     const [currentBalance, setCurrentBalance] = useState("0");
 
-
     const dropdownRef = useRef(null);
     const { routeTo } = RouterPushLink();
 
-
     const { address } = useAccount();
     const { switchChain } = useSwitchChain();
-    
 
     const { dsrcAddress, isLoading: addressLoading } = useGetDSRC(dsrcid);
     const { details, loading: detailsLoading, refetch: refetchDetails } = useGetDSRCDetails(dsrcAddress);
     const { distribute, loading: distributeLoading, isCorrectChain } = useDistributeRoyalties(dsrcAddress);
     const { receiveRoyalties, loading: receiveLoading } = useReceiveRoyalties(dsrcAddress);
-
 
     const { data: usdcBalance } = useReadContract({
         address: USDC_ADDRESS,
@@ -64,9 +59,7 @@ const DSRCEarningsView = ({ dsrcid, onEarningsUpdate }) => {
         enabled: Boolean(dsrcAddress),
     });
 
-
     const isLoading = addressLoading || detailsLoading;
-
 
     useEffect(() => {
         if (details?.earnings && usdcBalance) {
@@ -75,47 +68,24 @@ const DSRCEarningsView = ({ dsrcid, onEarningsUpdate }) => {
             const purchaseEarnings = BigInt(details.earnings.purchaseEarnings || 0);
 
             setCurrentBalance(usdcBalance.toString());
-
-            const actualBalance = balance - purchaseEarnings;
-            
-            setHasRoyalties(actualBalance > pendingAmount);
-            
+            setHasRoyalties(balance - purchaseEarnings > pendingAmount);
             setHasPendingRoyalties(pendingAmount > 0n);
         }
     }, [details?.earnings, usdcBalance]);
 
     useEffect(() => {
         if (details?.earnings) {
-            const newEarnings = {
-                purchaseEarnings: details.earnings.purchaseEarnings || "0",
-                royaltyEarnings: details.earnings.royaltyEarnings || "0",
-                pendingAmount: details.earnings.pendingAmount || "0"
-            };
-    
             const timeoutId = setTimeout(() => {
-                onEarningsUpdate(newEarnings);
+                onEarningsUpdate({
+                    purchaseEarnings: details.earnings.purchaseEarnings || "0",
+                    royaltyEarnings: details.earnings.royaltyEarnings || "0",
+                    pendingAmount: details.earnings.pendingAmount || "0"
+                });
             }, 100);
-    
+
             return () => clearTimeout(timeoutId);
         }
     }, [details?.earnings, onEarningsUpdate]);
-
-    const truncateText = (text, maxLength = 15) => {
-        if (typeof text !== 'string') return text;
-        return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
-    };
-    
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setShowDropdown(false);
-                setCopyText("Copy DSRC");
-            }
-        }
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
 
     useEffect(() => {
         const fetchMetadata = async () => {
@@ -135,6 +105,23 @@ const DSRCEarningsView = ({ dsrcid, onEarningsUpdate }) => {
         fetchMetadata();
     }, [details?.tokenUri]);
 
+    const truncateText = (text, maxLength = 15) => {
+        if (typeof text !== 'string') return text;
+        return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+    };
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowDropdown(false);
+                setCopyText("Copy DSRC");
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     const handleCopyAddress = async () => {
         try {
             if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -144,7 +131,7 @@ const DSRCEarningsView = ({ dsrcid, onEarningsUpdate }) => {
                 prompt("Copy the address manually:", dsrcAddress);
                 setCopyText("Manual Copy");
             }
-    
+
             setTimeout(() => {
                 setCopyText("Copy DSRC");
                 setShowDropdown(false);
@@ -162,14 +149,14 @@ const DSRCEarningsView = ({ dsrcid, onEarningsUpdate }) => {
 
     const handleShare = async () => {
         if (!details || !metadata) return;
-    
+
         const shareUrl = `${window.location.origin}/dsrc/${dsrcid}`;
         const shareData = {
             title: metadata.name,
             text: `Check out "${metadata.name}" on Hitmakr\nDSRC ID: ${dsrcid}\n`,
             url: shareUrl
         };
-    
+
         try {
             if (navigator.share && navigator.canShare(shareData)) {
                 await navigator.share(shareData);
@@ -231,9 +218,7 @@ const DSRCEarningsView = ({ dsrcid, onEarningsUpdate }) => {
     };
 
     const handleReceiveRoyalties = async () => {
-        if (!await checkDistributionRequirements()) {
-            return;
-        }
+        if (!await checkDistributionRequirements()) return;
 
         setIsReceivingRoyalty(true);
 
@@ -260,22 +245,16 @@ const DSRCEarningsView = ({ dsrcid, onEarningsUpdate }) => {
     };
 
     const handleDistribute = async (distributeType) => {
-        const setLoading = distributeType === 0 
-            ? setIsDistributingPurchase 
-            : setIsDistributingRoyalty;
-    
-        if (!await checkDistributionRequirements()) {
-            return;
-        }
-    
+        const setLoading = distributeType === 0 ? setIsDistributingPurchase : setIsDistributingRoyalty;
+
+        if (!await checkDistributionRequirements()) return;
+
         setLoading(true);
-    
+
         try {
-            if (distributeType === 1) {
-                if (hasRoyalties && !hasPendingRoyalties) {
-                    await handleReceiveRoyalties();
-                    await refetchDetails();
-                }
+            if (distributeType === 1 && hasRoyalties && !hasPendingRoyalties) {
+                await handleReceiveRoyalties();
+                await refetchDetails();
             }
 
             const receipt = await distribute(distributeType);
@@ -296,12 +275,11 @@ const DSRCEarningsView = ({ dsrcid, onEarningsUpdate }) => {
                 await refetchDetails();
                 
                 if (onEarningsUpdate && details?.earnings) {
-                    const updatedEarnings = {
+                    onEarningsUpdate({
                         ...details.earnings,
                         pendingAmount: "0",
                         purchaseEarnings: distributeType === 0 ? "0" : details.earnings.purchaseEarnings
-                    };
-                    onEarningsUpdate(updatedEarnings);
+                    });
                 }
             }
         } catch (error) {
@@ -370,9 +348,11 @@ const DSRCEarningsView = ({ dsrcid, onEarningsUpdate }) => {
                     </div>
                     
                     <div className={styles.detailsWrapper}>
-                        <h1 className={styles.title} onClick={()=>{routeTo(`/dsrc/${dsrcid}`)}}>{truncateText(metadata.name, 30)}</h1>
+                        <h1 className={styles.title} onClick={() => routeTo(`/dsrc/${dsrcid}`)}>{truncateText(metadata.name, 30)}</h1>
                         <div className={styles.idContainer}>
-                            <p className={styles.description}onClick={()=> routeTo(`/profile?address=${details.creator}`)}>{<GetUsernameByAddress address={details.creator}/>}</p>
+                            <p className={styles.description} onClick={() => routeTo(`/profile?address=${details.creator}`)}>
+                                <GetUsernameByAddress address={details.creator}/>
+                            </p>
                             <span className={styles.chainPill}>
                                 {details.selectedChain}
                             </span>

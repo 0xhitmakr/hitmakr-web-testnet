@@ -1,0 +1,9 @@
+.scrollContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+  gap: 20px;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}

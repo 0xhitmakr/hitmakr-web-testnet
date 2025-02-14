@@ -76,18 +76,25 @@ export default function CreatePlaylist() {
     setIsLoading(prev => ({ ...prev, imageUpload: true }));
     const formData = new FormData();
     formData.append("profilePicture", playlistData.imageFile); // Using the same field name as profile upload
-    const authToken = localStorage.getItem("authToken");
+    const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+    const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token"); // Retrieve nonceToken
 
     try {
+      if (!authToken || !nonceToken) { // Check for nonceToken
+        throw new Error("Authentication token not found");
+      }
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/user/profile-dp-url-generator`,
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${authToken}`,
+            "x-nonce-token": nonceToken, // Include nonceToken header
             "x-user-address": address,
             "x-chain-id": wagmiChainId.toString(),
           },
+          credentials: 'include', // Important for CORS
           body: formData,
         }
       );
@@ -156,14 +163,19 @@ export default function CreatePlaylist() {
     }
 
     setIsLoading(prev => ({ ...prev, playlistCreate: true }));
-    const authToken = localStorage.getItem("authToken");
+    const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+    const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token"); // Retrieve nonceToken
 
     try {
+      if (!authToken || !nonceToken) { // Check for nonceToken
+        throw new Error("Authentication token not found");
+      }
+
       const playlistParams = {
         name: sanitizeString(playlistData.name),
         description: sanitizeString(playlistData.description),
         imageUrl: playlistData.imageUrl,
-        isPublic: true 
+        isPublic: true
       };
 
       const response = await fetch(
@@ -173,9 +185,11 @@ export default function CreatePlaylist() {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${authToken}`,
+            "x-nonce-token": nonceToken, // Include nonceToken header
             "x-user-address": address,
             "x-chain-id": wagmiChainId.toString(),
           },
+          credentials: 'include', // Important for CORS
           body: JSON.stringify(playlistParams),
         }
       );
@@ -186,7 +200,7 @@ export default function CreatePlaylist() {
       }
 
       const data = await response.json();
-      
+
       setPlaylistData({
         imageFile: null,
         imageUrl: "",

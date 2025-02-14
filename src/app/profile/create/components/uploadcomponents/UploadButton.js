@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useRecoilState } from "recoil";
-import { useSignTypedData, useAccount } from 'wagmi';
+import { useRecoilState, useSetRecoilState, useResetRecoilState } from "recoil";
+import { useAccount } from 'wagmi';
 import { ethers } from 'ethers';
 import HitmakrCreativesStore from "@/app/config/store/HitmakrCreativesStore";
-import { useGetDSRCNonce, 
-    useGenerateDSRCSignature  } from "@/app/config/hitmakrdsrcfactory/hitmakrDSRCFactoryRPC";
+import { useGetYearCount } from "@/app/config/hitmakrdsrcfactory/hitmakrDSRCFactoryRPC";
 import styles from "../../styles/Create.module.css";
 import HitmakrButton from "@/app/components/buttons/HitmakrButton";
 import RouterPushLink from "@/app/helpers/RouterPushLink";
@@ -18,99 +17,96 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_HITMAKR_SERVER;
 
 export default function UploadButton() {
     const { address, chainId } = useAccount();
-    const { signTypedDataAsync } = useSignTypedData();
-    const { nonce, isLoading: nonceLoading } = useGetDSRCNonce(address);
-    const { generateSignature } = useGenerateDSRCSignature();
+    const { yearCount, isLoading: yearCountLoading } = useGetYearCount(address);
     const { routeTo } = RouterPushLink();
 
     const [uploadState, setUploadState] = useRecoilState(HitmakrCreativesStore.CreativesUpload);
+    const resetUploadState = useResetRecoilState(HitmakrCreativesStore.CreativesUpload);
+    const resetNewCreativeUpload = useResetRecoilState(HitmakrCreativesStore.NewCreativeUpload);
+    const setNewCreativeUpload = useSetRecoilState(HitmakrCreativesStore.NewCreativeUpload);
+
     const [uploadError, setUploadError] = useState(null);
     const [isFormValid, setIsFormValid] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [currentNonce, setCurrentNonce] = useState(0);
-
+    const [currentYearCount, setCurrentYearCount] = useState(0);
 
     useEffect(() => {
-        if (!nonceLoading && nonce !== undefined) {
-            setCurrentNonce(Number(nonce));
+        if (!yearCountLoading && yearCount && yearCount.count !== undefined) {
+            setCurrentYearCount(Number(yearCount.count));
         }
-    }, [nonce, nonceLoading]);
+    }, [yearCount, yearCountLoading]);
+
+    const resetAllStates = useCallback(() => {
+        resetUploadState();
+        resetNewCreativeUpload();
+        setNewCreativeUpload(prev => ({
+            ...prev,
+            newUpload: false,
+            tokenURI: "",
+            editions: {
+                streaming: { enabled: true, price: 0 },
+                collectors: { enabled: false, price: 5 },
+                licensing: { enabled: false, price: 100 }
+            },
+            royaltySplits: [],
+            isGated: false,
+            deadline: null
+        }));
+    }, [resetUploadState, resetNewCreativeUpload, setNewCreativeUpload]);
 
     const prepareRoyaltySplits = useCallback(() => {
         if (!uploadState.royaltySplits?.length) {
             throw new Error("Royalty splits are required");
         }
-    
+
         const recipients = [];
         const percentages = [];
-    
-        console.log('Processing royalty splits:', uploadState.royaltySplits);
-    
+
         for (const split of uploadState.royaltySplits) {
             const normalizedAddress = split.address.toLowerCase();
             if (!ethers.isAddress(normalizedAddress)) {
                 throw new Error(`Invalid address format for ${split.role}: ${split.address}`);
             }
-            
+
             const basisPoints = Math.round(parseFloat(split.percentage) * 100);
-            
+
             if (isNaN(basisPoints) || basisPoints < 0 || basisPoints > BASIS_POINTS) {
                 throw new Error(`Invalid percentage for ${split.role}: ${split.percentage}`);
             }
-    
+
             recipients.push(normalizedAddress);
             percentages.push(basisPoints);
         }
-    
+
         const total = percentages.reduce((a, b) => a + b, 0);
-        console.log('Prepared splits - Total basis points:', total, 'Expected:', BASIS_POINTS);
-    
         if (total !== BASIS_POINTS) {
             throw new Error(`Total percentage must equal exactly 100% (got ${total/100}%)`);
         }
-    
+
         return { recipients, percentages };
     }, [uploadState.royaltySplits]);
 
     const handleDSRCCreation = async (tokenURI, uploadHash) => {
         if (!address) throw new Error("Wallet not connected");
         if (!uploadHash) throw new Error("Upload hash not found");
-        if (nonceLoading) throw new Error("Waiting for nonce");
-        if (typeof currentNonce !== 'number') throw new Error("Invalid nonce");
+        if (yearCountLoading) throw new Error("Waiting for year count");
+        if (typeof currentYearCount !== 'number') throw new Error("Invalid year count");
 
         try {
             const { recipients, percentages } = prepareRoyaltySplits();
 
-            const deadline = Math.floor(Date.now() / 1000) + 3600; 
-
-            const signatureParams = {
+            const dsrcParams = {
                 tokenURI,
-                price: ethers.parseUnits(uploadState.mintPrice.toString(), 6),
-                recipients: recipients.map(addr => ethers.getAddress(addr)), 
-                percentages: percentages, 
-                nonce: BigInt(currentNonce),
-                deadline: BigInt(deadline),
+                collectorsPrice: ethers.parseUnits(uploadState.editions.collectors.price.toString(), 6).toString(),
+                licensingPrice: ethers.parseUnits(uploadState.editions.licensing.price.toString(), 6).toString(),
+                recipients,
+                percentages,
                 selectedChain: uploadState.selectedChain || DEFAULT_CHAIN
             };
 
-            console.log('Signature Params:', {
-                ...signatureParams,
-                price: signatureParams.price.toString(),
-                percentages: signatureParams.percentages.map(String),
-                nonce: signatureParams.nonce.toString(),
-                deadline: signatureParams.deadline.toString()
-            });
-
-            const signatureResult = await generateSignature(signatureParams, signTypedDataAsync);
-            
-            if (!signatureResult?.signature) {
-                throw new Error("Failed to generate signature");
-            }
-
-            console.log('Signature:', signatureResult.signature);
-
-            const authToken = localStorage.getItem("authToken");
-            if (!authToken) {
+            const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+            const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+            if (!authToken || !nonceToken) {
                 throw new Error("Authentication token not found");
             }
 
@@ -119,19 +115,18 @@ export default function UploadButton() {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${authToken}`,
+                    "x-nonce-token": nonceToken,
                     "x-user-address": address,
                     "x-chain-id": chainId.toString()
                 },
                 body: JSON.stringify({
                     tokenURI,
-                    price: signatureResult.params.price,
-                    recipients: signatureResult.params.recipients,
-                    percentages: signatureResult.params.percentages,
-                    nonce: signatureResult.params.nonce,
-                    deadline: signatureResult.params.deadline,
-                    selectedChain: signatureResult.params.selectedChain,
-                    signature: signatureResult.signature,
-                    uploadHash
+                    uploadHash,
+                    collectorsPrice: dsrcParams.collectorsPrice.toString(),
+                    licensingPrice: dsrcParams.licensingPrice.toString(),
+                    recipients: dsrcParams.recipients,
+                    percentages: dsrcParams.percentages,
+                    selectedChain: dsrcParams.selectedChain
                 })
             });
 
@@ -149,7 +144,7 @@ export default function UploadButton() {
 
     const handleUpload = async () => {
         const formData = new FormData();
-        
+
         if (!uploadState.selectedFile || !uploadState.selectedCover) {
             throw new Error("Missing required files");
         }
@@ -160,7 +155,7 @@ export default function UploadButton() {
         formData.append("subscribersUpload", uploadState.subscribersUpload);
         formData.append("selectedCategory", uploadState.selectedCategory);
         formData.append("royaltySplits", JSON.stringify(uploadState.royaltySplits || []));
-        formData.append("mintPrice", uploadState.mintPrice ?? 0);
+        formData.append("editions", JSON.stringify(uploadState.editions));
         formData.append("copyrightChecked", uploadState.copyrightChecked);
         formData.append("selectedChain", uploadState.selectedChain || DEFAULT_CHAIN);
         formData.append("supportedChains", JSON.stringify([uploadState.selectedChain || DEFAULT_CHAIN]));
@@ -169,8 +164,9 @@ export default function UploadButton() {
             formData.append("lyrics", uploadState.selectedLyrics);
         }
 
-        const authToken = localStorage.getItem("authToken");
-        if (!authToken) {
+        const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+        const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+        if (!authToken || !nonceToken) {
             throw new Error("Authentication token not found");
         }
 
@@ -179,6 +175,7 @@ export default function UploadButton() {
             body: formData,
             headers: {
                 "Authorization": `Bearer ${authToken}`,
+                "x-nonce-token": nonceToken,
                 "x-user-address": address,
                 "x-chain-id": chainId.toString()
             }
@@ -208,13 +205,15 @@ export default function UploadButton() {
             toast.loading("Uploading files...");
             const uploadResult = await handleUpload();
             toast.dismiss();
-            
+
             toast.loading("Creating DSRC...");
             const { tokenURI, uploadHash } = uploadResult;
             await handleDSRCCreation(tokenURI, uploadHash);
-            
+
             toast.dismiss();
             toast.success("Content uploaded successfully!");
+
+            resetAllStates();
             
             await new Promise(resolve => setTimeout(resolve, 1000));
             routeTo(`/profile?address=${address}&view=releases`);
@@ -222,7 +221,7 @@ export default function UploadButton() {
         } catch (error) {
             toast.dismiss();
             const errorMessage = error.message || "Something went wrong!";
-            console.log(errorMessage)
+            console.log(errorMessage);
             setUploadError(errorMessage);
             toast.error(errorMessage);
         } finally {
@@ -239,55 +238,22 @@ export default function UploadButton() {
                     uploadState?.songDetails?.title?.trim() &&
                     uploadState?.songDetails?.description?.trim() &&
                     uploadState?.songDetails?.genre &&
-                    uploadState?.songDetails?.country &&
-                    uploadState?.songDetails?.language &&
+                    uploadState?.songDetails?.country?.trim() &&
+                    uploadState?.songDetails?.language?.trim() &&
                     uploadState?.songDetails?.license &&
                     uploadState?.royaltySplits?.length > 0 &&
-                    uploadState?.mintPrice !== undefined &&
-                    uploadState?.mintPrice !== null &&
-                    !isNaN(uploadState?.mintPrice) &&
+                    uploadState?.editions?.collectors?.enabled && 
+                    uploadState?.editions?.licensing?.enabled &&
                     uploadState?.copyrightChecked
                 );
-    
-                if (!hasRequiredFields) {
-                    console.log('Missing required fields');
-                    setIsFormValid(false);
-                    return;
-                }
-    
-                if (!uploadState.royaltySplits?.length) {
-                    console.log('No royalty splits found');
-                    setIsFormValid(false);
-                    return;
-                }
-    
-                let totalPercentage = 0;
-                for (const split of uploadState.royaltySplits) {
-                    const normalizedAddress = split.address.toLowerCase();
-                    if (!ethers.isAddress(normalizedAddress)) {
-                        console.log('Invalid address:', split.address);
-                        setIsFormValid(false);
-                        return;
-                    }
-                    totalPercentage += parseFloat(split.percentage || 0);
-                }
-    
-                console.log('Validation - Total percentage:', totalPercentage);
-                
-                if (Math.abs(totalPercentage - 100) > 0.01) {
-                    console.log('Invalid total percentage:', totalPercentage);
-                    setIsFormValid(false);
-                    return;
-                }
-    
-                setIsFormValid(true);
-                console.log('Form validation passed');
+
+                setIsFormValid(hasRequiredFields);
             } catch (error) {
                 console.error('Form validation error:', error);
                 setIsFormValid(false);
             }
         };
-    
+
         validateForm();
     }, [uploadState]);
 
@@ -306,8 +272,8 @@ export default function UploadButton() {
                     isDark={!isFormValid || isLoading}
                     buttonWidth="50%"
                     buttonFunction={handleSubmit}
-                    isLoading={isLoading || nonceLoading}
-                    disabled={!isFormValid || isLoading || nonceLoading || !currentNonce || !address}
+                    isLoading={isLoading || yearCountLoading}
+                    disabled={!isFormValid || isLoading || yearCountLoading || !currentYearCount || !address}
                 />
             </div>
         </div>

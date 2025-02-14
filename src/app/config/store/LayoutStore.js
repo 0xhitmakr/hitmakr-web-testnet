@@ -1,32 +1,30 @@
-"use client"
+"use client";
 
-import { atom } from 'recoil';
-import { recoilPersist } from 'recoil-persist';
-
+import { atom } from "recoil";
+import { recoilPersist } from "recoil-persist";
 
 function getStorage() {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     return window.localStorage;
   }
   return undefined;
 }
 
 const { persistAtom } = recoilPersist({
-  key: 'HitmakrLayoutStore', 
+  key: "HitmakrLayoutStore",
   storage: getStorage(),
   converter: JSON,
 });
 
-
 const LayoutMetadata = atom({
-  key: 'LayoutMetadata',
+  key: "LayoutMetadata",
   default: {
     isProfileBarActive: false,
     isLibraryBarActive: false,
     searchInput: "",
+    searchtype: "title",
   },
 });
-
 
 const LayoutStore = {
   LayoutMetadata,

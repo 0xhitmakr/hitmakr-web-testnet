@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAccount } from 'wagmi';
-import DSRCView from '../releases/components/DSRCView';
-import LoaderWhiteSmall from '@/app/components/animations/loaders/loaderWhiteSmall';
-import styles from "../releases/styles/ProfileReleases.module.css"
+import { useState, useEffect, useCallback } from "react";
+import { useAccount } from "wagmi";
+import DSRCView from "../releases/components/DSRCView";
+import LoaderWhiteSmall from "@/app/components/animations/loaders/loaderWhiteSmall";
+import styles from "../releases/styles/ProfileReleases.module.css";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_HITMAKR_SERVER;
 const ITEMS_PER_PAGE = 10;
@@ -22,55 +22,67 @@ const ProfileHearts = ({ address }) => {
     if (isLoading || !hasMore) return;
     setIsLoading(true);
     setError(null);
-
+ 
     try {
-      const authToken = localStorage.getItem("authToken");
-      if (!authToken) {
-        throw new Error("Authentication required");
-      }
-
-      const response = await fetch(
-        `${API_BASE_URL}/heart/user/${address}/likes?page=${currentPage}&limit=${ITEMS_PER_PAGE}`,
-        {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'x-user-address': currentUserAddress,
-            'x-chain-id': chainId?.toString(),
-            'Content-Type': 'application/json'
-          }
+        const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+        const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+ 
+        if (!authToken || !nonceToken) {
+            throw new Error("Authentication required. Please reconnect your wallet.");
         }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch liked DSRCs');
-      }
-
-      const data = await response.json();
-      
-      const newUniqueDSRCs = data.likes.filter(like => {
-        if (!seenDSRCIds.has(like.dsrcId)) {
-          seenDSRCIds.add(like.dsrcId);
-          return true;
+ 
+        const response = await fetch(
+            `${API_BASE_URL}/heart/user/${address}/likes?page=${currentPage}&limit=${ITEMS_PER_PAGE}`,
+            {
+                method: "GET",
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'x-nonce-token': nonceToken,
+                    'x-user-address': currentUserAddress,
+                    'x-chain-id': chainId?.toString(),
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+ 
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to fetch liked DSRCs");
         }
-        return false;
-      });
-      
-      if (newUniqueDSRCs.length === 0) {
-        setHasMore(false);
-        return;
-      }
-      
-      setLikedDSRCs(prev => [...prev, ...newUniqueDSRCs]);
-      setCurrentPage(prev => prev + 1);
-      setHasMore(data.pagination.hasNextPage);
+ 
+        const data = await response.json();
+ 
+        const newUniqueDSRCs = data.likes.filter((like) => {
+            if (!seenDSRCIds.has(like.dsrcId)) {
+                seenDSRCIds.add(like.dsrcId);
+                return true;
+            }
+            return false;
+        });
+ 
+        if (newUniqueDSRCs.length === 0) {
+            setHasMore(false);
+            return;
+        }
+ 
+        setLikedDSRCs((prev) => [...prev, ...newUniqueDSRCs]);
+        setCurrentPage((prev) => prev + 1);
+        setHasMore(data.pagination.hasNextPage);
     } catch (error) {
-      console.error('Error loading liked DSRCs:', error);
-      setError(error.message);
+        console.error("Error loading liked DSRCs:", error);
+        setError(error.message || "Failed to load liked DSRCs");
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  }, [currentPage, isLoading, hasMore, address, currentUserAddress, chainId, seenDSRCIds]);
+ }, [
+    currentPage,
+    isLoading, 
+    hasMore,
+    address,
+    currentUserAddress,
+    chainId,
+    seenDSRCIds
+ ]);
 
   useEffect(() => {
     setLikedDSRCs([]);
@@ -92,9 +104,7 @@ const ProfileHearts = ({ address }) => {
 
   if (error) {
     return (
-      <div className={styles.error}>
-        Error loading liked DSRCs: {error}
-      </div>
+      <div className={styles.error}>Error loading liked DSRCs: {error}</div>
     );
   }
 
@@ -110,13 +120,12 @@ const ProfileHearts = ({ address }) => {
     <div className={styles.profileReleases}>
       <div className={styles.dsrcGrid}>
         {likedDSRCs.map((like) => (
-          <div 
-            key={like.dsrcId} 
-            className={styles.dsrcIds}
-          >
-            <DSRCView 
+          <div key={like.dsrcId} className={styles.dsrcIds}>
+            <DSRCView
               dsrcid={like.dsrcId}
               uploadHash={like.uploadHash}
+              songId={like?.songDetails?._id}
+              hashTags={like?.songDetails?.hashTags}
             />
           </div>
         ))}
@@ -139,9 +148,7 @@ const ProfileHearts = ({ address }) => {
       )}
 
       {!hasMore && likedDSRCs.length > 0 && (
-        <p className={styles.noMore}>
-          No more liked DSRCs to load
-        </p>
+        <p className={styles.noMore}>No more liked DSRCs to load</p>
       )}
     </div>
   );

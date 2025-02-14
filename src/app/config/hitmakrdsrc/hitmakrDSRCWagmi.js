@@ -2,15 +2,22 @@
 import { useState } from 'react';
 import { useReadContract, useWriteContract, useAccount, useChainId, usePublicClient, useWalletClient, useSwitchChain } from 'wagmi';
 import { skaleCalypsoTestnet } from 'viem/chains';
-import { parseUnits, formatUnits } from 'viem';
+import { parseUnits } from 'viem';
 import abi from './abi/abi.json';
 import usdcAbi from "../TestUSDC/abi/abi.json"
+import { useQuery } from '@tanstack/react-query';
 
 
 const PAYMENT_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_SKALE_TEST_USDC;
 const USDC_ADDRESS = process.env.NEXT_PUBLIC_SKALE_TEST_USDC;
 const USDC_DECIMALS = 6;
 
+// Edition enum to match contract
+const Edition = {
+    Streaming: 0,
+    Collectors: 1,
+    Licensing: 2
+};
 
 export const useDSRCDetails = (contractAddress) => {
     const { data: dsrcId } = useReadContract({
@@ -38,16 +45,10 @@ export const useDSRCDetails = (contractAddress) => {
         functionName: 'paymentToken'
     });
 
-    const { data: price } = useReadContract({
-        address: contractAddress,
-        abi,
-        functionName: 'price'
-    });
-
     const { data: selectedChain } = useReadContract({
         address: contractAddress,
         abi,
-        functionName: 'getSelectedChain'
+        functionName: 'selectedChain'
     });
 
     const { data: earningsInfo } = useReadContract({
@@ -56,10 +57,31 @@ export const useDSRCDetails = (contractAddress) => {
         functionName: 'getEarningsInfo'
     });
 
-    const { data: royaltySplits } = useReadContract({
+    const { data: streamingConfig } = useReadContract({
         address: contractAddress,
         abi,
-        functionName: 'getRoyaltySplits'
+        functionName: 'getEditionConfig',
+        args: [Edition.Streaming]
+    });
+
+    const { data: collectorsConfig } = useReadContract({
+        address: contractAddress,
+        abi,
+        functionName: 'getEditionConfig',
+        args: [Edition.Collectors]
+    });
+
+    const { data: licensingConfig } = useReadContract({
+        address: contractAddress,
+        abi,
+        functionName: 'getEditionConfig',
+        args: [Edition.Licensing]
+    });
+
+    const { data: totalSupply } = useReadContract({
+        address: contractAddress,
+        abi,
+        functionName: 'totalSupply_'
     });
 
     return {
@@ -68,40 +90,68 @@ export const useDSRCDetails = (contractAddress) => {
             tokenUri,
             creator,
             paymentToken,
-            price: price?.toString(),
             selectedChain,
+            totalSupply: totalSupply?.toString(),
+            editions: {
+                streaming: streamingConfig ? {
+                    price: streamingConfig[0]?.toString(),
+                    isEnabled: streamingConfig[1],
+                    isCreated: streamingConfig[2]
+                } : null,
+                collectors: collectorsConfig ? {
+                    price: collectorsConfig[0]?.toString(),
+                    isEnabled: collectorsConfig[1],
+                    isCreated: collectorsConfig[2]
+                } : null,
+                licensing: licensingConfig ? {
+                    price: licensingConfig[0]?.toString(),
+                    isEnabled: licensingConfig[1],
+                    isCreated: licensingConfig[2]
+                } : null
+            },
             earnings: earningsInfo ? {
                 purchaseEarnings: earningsInfo[0]?.toString(),
                 royaltyEarnings: earningsInfo[1]?.toString(),
                 pendingAmount: earningsInfo[2]?.toString(),
                 totalEarnings: earningsInfo[3]?.toString()
-            } : null,
-            royaltySplits: royaltySplits?.map(split => ({
-                recipient: split.recipient,
-                percentage: Number(split.percentage)
-            }))
+            } : null
         } : null,
         isLoading: false
     };
 };
 
-
 export const useHasPurchased = (contractAddress, address) => {
-    const { data: purchased, isLoading, refetch } = useReadContract({
-        address: contractAddress,
-        abi,
-        functionName: 'hasPurchased',
-        args: [address],
-        enabled: Boolean(contractAddress && address)
+    const checkStatus = async () => {
+      if (!address) return {
+        streaming: false,
+        collectors: false,
+        licensing: false
+      };
+      const contract = getContract(contractAddress);
+      const [streaming, collectors, licensing] = await Promise.all([
+        contract.editionPurchased(address, Edition.Streaming),
+        contract.editionPurchased(address, Edition.Collectors),
+        contract.editionPurchased(address, Edition.Licensing),
+      ]);
+      return {
+        streaming,
+        collectors,
+        licensing
+      };
+    };
+
+    const editionsPurchasedQuery = useQuery({
+        queryKey: ["purchasedEditions", contractAddress, address],
+        queryFn: checkStatus,
+        enabled: !!contractAddress && !!address,
     });
 
     return {
-        hasPurchased: purchased,
-        isLoading,
-        refetch
+        hasPurchased: editionsPurchasedQuery.data,
+        isLoading: editionsPurchasedQuery.isLoading,
+        refetch: editionsPurchasedQuery.refetch
     };
 };
-
 
 export const usePurchaseDSRC = (contractAddress) => {
     const [loading, setLoading] = useState(false);
@@ -122,7 +172,7 @@ export const usePurchaseDSRC = (contractAddress) => {
         }
     };
 
-    const purchase = async () => {
+    const purchase = async (edition) => {
         if (!contractAddress || !address || !walletClient) {
             throw new Error('Missing required parameters');
         }
@@ -135,15 +185,16 @@ export const usePurchaseDSRC = (contractAddress) => {
                 return;
             }
 
-            const price = await publicClient.readContract({
+            const editionConfig = await publicClient.readContract({
                 address: contractAddress,
                 abi,
-                functionName: 'price',
+                functionName: 'getEditionConfig',
+                args: [edition]
             });
 
+            const price = editionConfig[0];
+
             if (price > 0n) {
-                const priceInUSDC = parseUnits(price.toString(), 0);
-                
                 const balance = await publicClient.readContract({
                     address: PAYMENT_TOKEN_ADDRESS,
                     abi: usdcAbi,
@@ -151,8 +202,9 @@ export const usePurchaseDSRC = (contractAddress) => {
                     args: [address],
                 });
 
-                if (balance < priceInUSDC) {
-                    throw new Error(`Insufficient USDC balance`);
+                if (balance < price) {
+                    window.open('https://testnet.portal.skale.space/bridge?from=mainnet&to=giant-half-dual-testnet&token=usdc&type=erc20', '_blank');
+                    throw new Error('Insufficient USDC balance. A new window has been opened to bridge USDC to SKALE Network');
                 }
 
                 const currentAllowance = await publicClient.readContract({
@@ -162,12 +214,12 @@ export const usePurchaseDSRC = (contractAddress) => {
                     args: [address, contractAddress],
                 });
 
-                if (currentAllowance < priceInUSDC) {
+                if (currentAllowance < price) {
                     const approveTxHash = await writeContractAsync({
                         address: PAYMENT_TOKEN_ADDRESS,
                         abi: usdcAbi,
                         functionName: 'approve',
-                        args: [contractAddress, priceInUSDC],
+                        args: [contractAddress, price],
                     });
 
                     await publicClient.waitForTransactionReceipt({
@@ -180,6 +232,7 @@ export const usePurchaseDSRC = (contractAddress) => {
                 address: contractAddress,
                 abi,
                 functionName: 'purchase',
+                args: [edition],
             });
 
             const receipt = await publicClient.waitForTransactionReceipt({
@@ -202,7 +255,6 @@ export const usePurchaseDSRC = (contractAddress) => {
         isNetworkSwitching,
     };
 };
-
 
 export const useDistributeRoyalties = (contractAddress) => {
     const [loading, setLoading] = useState(false);
@@ -239,7 +291,7 @@ export const useDistributeRoyalties = (contractAddress) => {
 
             const pendingAmount = BigInt(earningsInfo[2].toString());
 
-            if (distributeType === 1) {
+            if (distributeType === 1) { // Distribute and Receive
                 if (balance > pendingAmount) {
                     const receiveHash = await writeContractAsync({
                         address: contractAddress,
@@ -250,20 +302,8 @@ export const useDistributeRoyalties = (contractAddress) => {
                     await publicClient.waitForTransactionReceipt({
                         hash: receiveHash,
                     });
-
-                    const updatedEarningsInfo = await publicClient.readContract({
-                        address: contractAddress,
-                        abi,
-                        functionName: 'getEarningsInfo'
-                    });
-
-                    const updatedPendingAmount = BigInt(updatedEarningsInfo[2].toString());
-                    
-                    if (updatedPendingAmount === 0n) {
-                        throw new Error('No earnings pending for distribution after receiving royalties');
-                    }
                 } else {
-                    throw new Error('No new royalties available to receive and distribute');
+                   console.log("No new royalties available to receive, distributing purchase earnings only.");
                 }
             } else if (pendingAmount === 0n) {
                 throw new Error('No earnings pending for distribution');
@@ -297,14 +337,14 @@ export const useDistributeRoyalties = (contractAddress) => {
     };
 };
 
-export const useUpdatePrice = (contractAddress) => {
+export const useUpdateEditionPrice = (contractAddress) => {
     const [loading, setLoading] = useState(false);
     const chainId = useChainId();
     const publicClient = usePublicClient();
     const { data: walletClient } = useWalletClient();
     const { writeContractAsync } = useWriteContract();
 
-    const updatePrice = async (newPrice) => {
+    const updatePrice = async (edition, newPrice) => {
         if (!contractAddress || !walletClient) {
             throw new Error('Missing required parameters');
         }
@@ -319,8 +359,8 @@ export const useUpdatePrice = (contractAddress) => {
             const hash = await writeContractAsync({
                 address: contractAddress,
                 abi,
-                functionName: 'updatePrice',
-                args: [newPrice],
+                functionName: 'updateEditionPrice',
+                args: [edition, newPrice],
             });
 
             const receipt = await publicClient.waitForTransactionReceipt({
@@ -343,6 +383,51 @@ export const useUpdatePrice = (contractAddress) => {
     };
 };
 
+export const useUpdateEditionStatus = (contractAddress) => {
+    const [loading, setLoading] = useState(false);
+    const chainId = useChainId();
+    const publicClient = usePublicClient();
+    const { data: walletClient } = useWalletClient();
+    const { writeContractAsync } = useWriteContract();
+
+    const updateStatus = async (edition, isEnabled) => {
+        if (!contractAddress || !walletClient) {
+            throw new Error('Missing required parameters');
+        }
+
+        if (chainId !== skaleCalypsoTestnet.id) {
+            throw new Error('Please switch to Skale Calypso network');
+        }
+
+        setLoading(true);
+
+        try {
+            const hash = await writeContractAsync({
+                address: contractAddress,
+                abi,
+                functionName: 'updateEditionStatus',
+                args: [edition, isEnabled],
+            });
+
+            const receipt = await publicClient.waitForTransactionReceipt({
+                hash,
+            });
+
+            return receipt;
+        } catch (error) {
+            console.error('Status update error:', error);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
+        updateStatus,
+        loading,
+        isCorrectChain: chainId === skaleCalypsoTestnet.id,
+    };
+};
 
 export const useReceiveRoyalties = (contractAddress) => {
     const [loading, setLoading] = useState(false);
@@ -388,3 +473,5 @@ export const useReceiveRoyalties = (contractAddress) => {
         isCorrectChain: chainId === skaleCalypsoTestnet.id,
     };
 };
+
+export { Edition };

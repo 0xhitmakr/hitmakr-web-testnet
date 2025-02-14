@@ -847,3 +847,462 @@
 .select::-ms-expand {
     display: none;
 }
+
+.categoryNavigationContainer {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+  }
+  
+  .createUploadContainerInputCategory {
+    display: flex;
+    flex: 1;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    white-space: nowrap;
+    padding: 0 10px;
+  }
+  
+  .createUploadContainerInputCategory::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+  
+  .categoryOption {
+    display: inline-flex;
+    margin: 0 5px;
+  }
+  
+  .navigationButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #202020;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.2s ease;
+  }
+  
+  .navigationButton:hover {
+    background-color: #303030;
+  }
+  
+  .navigationButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* Update existing radio button styles */
+  .createUploadContainerInputCategory label {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 500px;
+    cursor: pointer;
+    color: #828282;
+    transition: background-color 0.2s, color 0.2s;
+    margin: 0 5px;
+    padding: 5px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  
+  /* Media queries for responsive design */
+  @media (max-width: 450px) {
+    .createUploadContainerInputCategory label {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+    
+    .navigationButton {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .categoryNavigationContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 0 20px;
+  }
+  
+  .categorySlider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px; /* Fixed width for the slider */
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .categoryOption {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  .navigationButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #202020;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    color: white;
+    transition: all 0.2s ease;
+  }
+  
+  .navigationButton:hover {
+    background-color: #303030;
+    transform: scale(1.1);
+  }
+  
+  .navigationButton:active {
+    transform: scale(0.95);
+  }
+  
+  /* Update existing radio styles */
+  .categoryOption input[type="radio"] {
+    display: none;
+  }
+  
+  .categoryOption label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 500px;
+    cursor: pointer;
+    color: #fff;
+    background-color: #8023E4;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    text-align: center;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Media query for mobile responsiveness */
+  @media (max-width: 450px) {
+    .categorySlider {
+      width: 120px;
+    }
+    
+    .categoryOption label {
+      padding: 6px 15px;
+      font-size: 12px;
+      min-width: 80px;
+    }
+    
+    .navigationButton {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .chainSelectContainer {
+    position: relative;
+    min-width: 150px;
+    user-select: none;
+  }
+  
+  .chainSelectButton {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background-color: #202020;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .chainSelectButton:hover {
+    background-color: #252525;
+    border-color: #404040;
+  }
+  
+  .chainSelectIcon {
+    margin-left: 8px;
+    transition: transform 0.2s ease;
+  }
+  
+  .chainSelectIcon.rotate {
+    transform: rotate(180deg);
+  }
+  
+  .chainSelectDropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background-color: #202020;
+    border-radius: 100px;
+    overflow: hidden;
+    z-index: 100;
+    animation: dropdownFadeIn 0.2s ease;
+  }
+  
+  .chainSelectOption {
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #B0B0B0;
+    font-size: 14px;
+  }
+  
+  .chainSelectOption:hover {
+    background-color: #252525;
+    color: white;
+  }
+  
+  .chainSelectOption.selected {
+    background-color: #8023E4;
+    color: white;
+  }
+  
+  @keyframes dropdownFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Media Query for mobile */
+  @media (max-width: 450px) {
+    .chainSelectContainer {
+      min-width: 120px;
+    }
+  
+    .chainSelectButton {
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+  
+    .chainSelectOption {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+  }
+
+  .editionPrices {
+    width: 100%;
+    padding: 1.25rem;
+    box-sizing: border-box;
+}
+
+.title {
+    font-size: 1.5rem;
+    color: #ffffff;
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.editionsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 2rem;
+    width: 100%;
+    max-width: 75rem;
+    margin: 0 auto;
+}
+
+.edition {
+    background: #151515;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.edition:hover {
+    transform: translateY(-0.25rem);
+}
+
+.editionInfo {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.editionName {
+    font-size: 1.25rem;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.editionLabel {
+    font-size: 0.875rem;
+    color: #666666;
+    margin-top: 0.5rem;
+}
+
+.priceControl {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.priceInputContainer {
+    position: relative;
+    width: 100%;
+    text-align: center;
+}
+
+.priceInput {
+    width: 8rem;
+    font-size: 3rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    text-align: center;
+}
+
+.buttonContainer {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.priceButton {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: #ffffff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.priceButton:hover {
+    background: #e0e0e0;
+    transform: scale(1.1);
+}
+
+.priceButton:active {
+    transform: scale(0.95);
+}
+
+.priceButton svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.priceInput::-webkit-outer-spin-button,
+.priceInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.priceInput[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.priceInput:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.validationMessage {
+    grid-column: 1 / -1;
+    margin-top: 1.25rem;
+    padding: 1rem;
+    background: rgba(255, 68, 68, 0.1);
+    border-radius: 0.5rem;
+    color: #ff4444;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.errorText {
+    color: #ff4444;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+@media (max-width: 64rem) {
+    .editionsContainer {
+        grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    }
+}
+
+@media (max-width: 48rem) {
+    .title {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .edition {
+        padding: 1.25rem;
+    }
+
+    .priceInput {
+        font-size: 2.5rem;
+    }
+
+    .buttonContainer {
+        gap: 0.75rem;
+    }
+
+    .priceButton {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .priceButton svg {
+        width: 1rem;
+        height: 1rem;
+    }
+}
+
+@media (max-width: 30rem) {
+    .editionsContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .priceInput {
+        font-size: 2rem;
+    }
+}

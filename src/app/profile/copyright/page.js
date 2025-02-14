@@ -36,11 +36,16 @@ export default function CopyrightClaimPage() {
   const handleChangeReferenceLink = (e) => setReferenceLink(e.target.value);
 
   const handleSubmitClaim = async () => {
-    const authToken = localStorage.getItem("authToken");
+    const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+    const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token"); // Retrieve nonceToken
 
     setIsLoading(true);
 
     try {
+      if (!authToken || !nonceToken) { // Check for nonceToken
+        throw new Error("Authentication required");
+      }
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/dsrc-copyright/claim`,
         {
@@ -48,9 +53,11 @@ export default function CopyrightClaimPage() {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${authToken}`,
+            "x-nonce-token": nonceToken, // Include nonceToken header
             "x-user-address": address,
             "x-chain-id": chainId.toString(),
           },
+          credentials: 'include', // Important for CORS
           body: JSON.stringify({ dsrcId, claimDescription, email, referenceLink }),
         }
       );
@@ -68,7 +75,7 @@ export default function CopyrightClaimPage() {
       console.error("Error submitting claim:", error);
       setModalContent({
         title: "Error",
-        description: "Failed to submit claim. Please try again later.",
+        description: error.message || "Failed to submit claim. Please try again later.", // Improved error message
       });
     } finally {
       setIsLoading(false);

@@ -1,0 +1,142 @@
+.editionPrices {
+    width: 100%;
+    padding: 2rem;
+    background-color: #151515;
+    border-radius: 0.75rem;
+}
+
+.editionTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 2rem;
+}
+
+.editionSection {
+    margin-bottom: 2rem;
+}
+
+.editionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.editionName {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.editionLabel {
+    font-size: 0.875rem;
+    color: #8b8b8b;
+}
+
+.priceContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.priceButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: #ffffff;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.priceButton:hover {
+    background-color: #dbdbdb;
+}
+
+.priceButton i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000000;
+}
+
+.priceInput {
+    width: 150px;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+}
+
+/* Remove spinner buttons from number input */
+.priceInput::-webkit-outer-spin-button,
+.priceInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.priceInput[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Disabled state for streaming edition */
+.priceInput:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.validationMessage {
+    text-align: center;
+    color: #ff7663;
+    font-size: 0.875rem;
+    margin-top: 1rem;
+}
+
+/* Animation for button press */
+@keyframes buttonPress {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.priceButton:active {
+    animation: buttonPress 0.2s ease;
+}
+
+/* Responsive styles */
+@media (max-width: 640px) {
+    .editionPrices {
+        padding: 1.5rem;
+    }
+
+    .priceInput {
+        width: 120px;
+        font-size: 2rem;
+    }
+
+    .priceButton {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .editionTitle {
+        font-size: 1.125rem;
+    }
+
+    .editionName {
+        font-size: 1rem;
+    }
+}

@@ -12,58 +12,57 @@ const RoyaltySplitsInput = () => {
   );
   const { royaltySplits, newAddress } = uploadState;
   const MAX_ROYALTY_PERCENTAGE = 100;
+  const DECIMAL_PRECISION = 2;
 
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (royaltySplits.length === 0 && address) {
-        try {
-            const normalizedAddress = ethers.getAddress(address.toLowerCase());
-            setUploadState({
-                ...uploadState,
-                royaltySplits: [
-                    {
-                        address: normalizedAddress,
-                        role: "Artist",
-                        percentage: MAX_ROYALTY_PERCENTAGE,
-                        id: 0,
-                    },
-                ],
-            });
-        } catch (error) {
-            console.error('Error setting initial royalty split:', error);
-        }
+      try {
+        const normalizedAddress = ethers.getAddress(address.toLowerCase());
+        setUploadState({
+          ...uploadState,
+          royaltySplits: [
+            {
+              address: normalizedAddress,
+              role: "Artist",
+              percentage: MAX_ROYALTY_PERCENTAGE,
+              id: 0,
+            },
+          ],
+        });
+      } catch (error) {
+        console.error('Error setting initial royalty split:', error);
+      }
     }
-}, [address, royaltySplits.length, setUploadState, uploadState]);
-
-  
+  }, [address, royaltySplits.length, setUploadState, uploadState]);
 
   const handleAddAddress = () => {
     try {
-        const normalizedAddress = ethers.getAddress(newAddress.toLowerCase());
-        
-        if (royaltySplits.some(split => split.address.toLowerCase() === normalizedAddress.toLowerCase())) {
-            setError("Address already added to the splits.");
-            return;
-        }
+      const normalizedAddress = ethers.getAddress(newAddress.toLowerCase());
+      
+      if (royaltySplits.some(split => split.address.toLowerCase() === normalizedAddress.toLowerCase())) {
+        setError("Address already added to the splits.");
+        return;
+      }
 
-        const newSplit = {
-            address: normalizedAddress, 
-            role: "Other",
-            percentage: 0,
-            id: Date.now(),
-        };
+      const newSplit = {
+        address: normalizedAddress, 
+        role: "Other",
+        percentage: 0,
+        id: Date.now(),
+      };
 
-        setUploadState({
-            ...uploadState,
-            royaltySplits: [...royaltySplits, newSplit],
-            newAddress: "",
-        });
-        setError("");
+      setUploadState({
+        ...uploadState,
+        royaltySplits: [...royaltySplits, newSplit],
+        newAddress: "",
+      });
+      setError("");
     } catch (error) {
-        setError("Please enter a valid wallet address.");
+      setError("Please enter a valid wallet address.");
     }
-};
+  };
 
   const handleRoleChange = (id, newRole) => {
     setUploadState({
@@ -74,39 +73,64 @@ const RoyaltySplitsInput = () => {
     });
   };
 
-  const handleRemoveAddress = (id) => {
-    if (id === 0) return;
-    setUploadState({
-      ...uploadState,
-      royaltySplits: royaltySplits.filter((split) => split.id !== id),
+  const normalizePercentages = (splits) => {
+    const total = splits.reduce((sum, split) => sum + (parseFloat(split.percentage) || 0), 0);
+    
+    // If total is already 100% (within rounding error), return as is
+    if (Math.abs(total - MAX_ROYALTY_PERCENTAGE) <= 0.01) return splits;
+
+    // Adjust all percentages proportionally to sum to 100%
+    return splits.map((split, index) => {
+      if (index === splits.length - 1) {
+        // Last split gets the remainder to ensure exact 100%
+        const sumOthers = splits.slice(0, -1).reduce(
+          (sum, s) => sum + Math.round(parseFloat(s.percentage) * MAX_ROYALTY_PERCENTAGE / total * 100) / 100,
+          0
+        );
+        return {
+          ...split,
+          percentage: +(MAX_ROYALTY_PERCENTAGE - sumOthers).toFixed(DECIMAL_PRECISION)
+        };
+      }
+      // Other splits get proportional amounts
+      return {
+        ...split,
+        percentage: +(parseFloat(split.percentage) * MAX_ROYALTY_PERCENTAGE / total).toFixed(DECIMAL_PRECISION)
+      };
     });
   };
 
-  const isValidAddress = (address) => {
-    return address.startsWith("0x") && address.length === 42;
+  const handleRemoveAddress = (id) => {
+    if (id === 0) return;
+    const remainingSplits = royaltySplits.filter((split) => split.id !== id);
+    // Normalize remaining splits to maintain 100% total
+    setUploadState({
+      ...uploadState,
+      royaltySplits: normalizePercentages(remainingSplits),
+    });
   };
 
   const handleSplitEvenly = () => {
     const numSplits = royaltySplits.length;
     if (numSplits === 0) return;
 
-    const baseAmount = Math.floor((MAX_ROYALTY_PERCENTAGE / numSplits) * 100) / 100;
-    const remainder = MAX_ROYALTY_PERCENTAGE - (baseAmount * (numSplits - 1));
+    const baseAmount = +(MAX_ROYALTY_PERCENTAGE / numSplits).toFixed(DECIMAL_PRECISION);
+    const remainder = +(MAX_ROYALTY_PERCENTAGE - (baseAmount * (numSplits - 1))).toFixed(DECIMAL_PRECISION);
 
     const updatedSplits = royaltySplits.map((split, index) => ({
-        ...split,
-        percentage: index === 0 ? remainder : baseAmount
+      ...split,
+      percentage: index === 0 ? remainder : baseAmount
     }));
 
     setUploadState({
-        ...uploadState,
-        royaltySplits: updatedSplits,
+      ...uploadState,
+      royaltySplits: updatedSplits,
     });
   };
 
   const handleSplitRemaining = () => {
-    const totalAllocated = royaltySplits.reduce((sum, split) => sum + split.percentage, 0);
-    const remaining = MAX_ROYALTY_PERCENTAGE - totalAllocated;
+    const totalAllocated = royaltySplits.reduce((sum, split) => sum + (parseFloat(split.percentage) || 0), 0);
+    const remaining = +(MAX_ROYALTY_PERCENTAGE - totalAllocated).toFixed(DECIMAL_PRECISION);
 
     if (remaining <= 0) {
       setError("No remaining percentage to split.");
@@ -120,9 +144,9 @@ const RoyaltySplitsInput = () => {
       return;
     }
 
-    const baseSplitAmount = Math.floor((remaining / splitsToUpdate.length) * 100) / 100;
-    const totalBaseAmount = baseSplitAmount * (splitsToUpdate.length - 1);
-    const firstSplitAmount = remaining - totalBaseAmount;
+    const baseSplitAmount = +(remaining / splitsToUpdate.length).toFixed(DECIMAL_PRECISION);
+    const totalBaseAmount = +(baseSplitAmount * (splitsToUpdate.length - 1)).toFixed(DECIMAL_PRECISION);
+    const firstSplitAmount = +(remaining - totalBaseAmount).toFixed(DECIMAL_PRECISION);
 
     let remainingDistributed = false;
 
@@ -130,9 +154,9 @@ const RoyaltySplitsInput = () => {
       if (split.percentage < MAX_ROYALTY_PERCENTAGE) {
         if (!remainingDistributed) {
           remainingDistributed = true;
-          return { ...split, percentage: split.percentage + firstSplitAmount };
+          return { ...split, percentage: +(split.percentage + firstSplitAmount).toFixed(DECIMAL_PRECISION) };
         }
-        return { ...split, percentage: split.percentage + baseSplitAmount };
+        return { ...split, percentage: +(split.percentage + baseSplitAmount).toFixed(DECIMAL_PRECISION) };
       }
       return split;
     });
@@ -148,35 +172,39 @@ const RoyaltySplitsInput = () => {
     const parsedPercentage = parseFloat(newPercentage);
     
     if (isNaN(parsedPercentage) || parsedPercentage < 0 || parsedPercentage > MAX_ROYALTY_PERCENTAGE) {
-        setError(`Percentage must be between 0 and ${MAX_ROYALTY_PERCENTAGE}`);
-        return;
+      setError(`Percentage must be between 0 and ${MAX_ROYALTY_PERCENTAGE}`);
+      return;
     }
 
-    const roundedPercentage = Math.round(parsedPercentage * 100) / 100;
+    const roundedPercentage = +(parsedPercentage).toFixed(DECIMAL_PRECISION);
 
     const updatedSplits = royaltySplits.map(split =>
-        split.id === id ? { ...split, percentage: roundedPercentage } : split
+      split.id === id ? { ...split, percentage: roundedPercentage } : split
     );
 
     const totalPercentage = updatedSplits.reduce(
-        (sum, split) => sum + parseFloat(split.percentage || 0), 
-        0
+      (sum, split) => sum + (parseFloat(split.percentage) || 0), 
+      0
     );
 
     if (totalPercentage > MAX_ROYALTY_PERCENTAGE + 0.01) {
-        setError(`Total percentage cannot exceed ${MAX_ROYALTY_PERCENTAGE}%`);
-        return;
+      setError(`Total percentage cannot exceed ${MAX_ROYALTY_PERCENTAGE}%`);
+      return;
     }
 
     setUploadState({
-        ...uploadState,
-        royaltySplits: updatedSplits,
+      ...uploadState,
+      royaltySplits: updatedSplits,
     });
     setError("");
-};
+  };
 
-  const totalAllocated = royaltySplits.reduce((sum, split) => sum + split.percentage, 0);
+  const totalAllocated = royaltySplits.reduce(
+    (sum, split) => sum + (parseFloat(split.percentage) || 0), 
+    0
+  );
 
+  // Your existing JSX remains exactly the same
   return (
     <div className={styles.createUploadContainerInput}>
       <div className={styles.createUploadContainerInputCover}>

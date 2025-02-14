@@ -1,106 +1,122 @@
-"use client";
+import React, { useState } from 'react';
+import { useCampAuth } from '@/app/config/camp/CampAuthProvider';
+import { CampModal } from "@campnetwork/sdk/react";
+import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 
-import React, { useState, useEffect } from "react";
-import styles from "../styles/Settings.module.css";
-import "@flaticon/flaticon-uicons/css/all/all.css";
-import { useAccount } from "wagmi";
-import { useSIWE } from "connectkit";
-import ThirdPartyLinkFunction from "@/app/helpers/ThirdPartyLinkFunction";
-import { creativesLinks } from "@/lib/helpers/Links";
-import LoaderWhiteSmall from "@/app/components/animations/loaders/loaderWhiteSmall";
+const ConnectionSettingData = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { linkedSocials, isLoadingSocials, refetchSocials } = useCampAuth();
 
-export default function ConnectionSettingData() {
-  const { address, chainId } = useAccount();
-  const { isSignedIn } = useSIWE();
-  const [spotifyData, setSpotifyData] = useState(null);
-  const [isFetchingSpotifyData, setIsFetchingSpotifyData] = useState(false);
-  const { handleThirdPartyLink, isLinkOpening } = ThirdPartyLinkFunction();
-  useEffect(() => {
-    fetchSpotifyData();
-  }, [address, isSignedIn, chainId]);
+  const handleModalClose = async () => {
+    setIsModalOpen(false);
+    await refetchSocials();
+  };
 
-  const fetchSpotifyData = async () => {
-    if (!address || !isSignedIn || !chainId) return;
+  const socialIcons = [
+    { name: 'twitter', icon: 'fi-brands-twitter-alt', isLinked: linkedSocials?.twitter },
+    { name: 'discord', icon: 'fi-brands-discord', isLinked: linkedSocials?.discord },
+    { name: 'spotify', icon: 'fi-brands-spotify', isLinked: linkedSocials?.spotify },
+    { name: 'telegram', icon: 'fi fi-brands-telegram', isLinked: linkedSocials?.telegram },
+    { name: 'tiktok', icon: 'fi-brands-tik-tok', isLinked: linkedSocials?.tiktok },
+  ];
 
-    setIsFetchingSpotifyData(true);
-
-    try {
-      const authToken = localStorage.getItem("authToken");
-      const response = await fetch(
-        `/api/creatives/camp/auth/spotify?searchWalletAddress=${address}`,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "X-User-Address": address,
-            "X-Chain-Id": chainId.toString(),
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch Spotify data");
+  const iconVariants = {
+    initial: { scale: 0.9, opacity: 0 },
+    animate: { 
+      scale: 1, 
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 20
       }
-
-      const data = await response.json();
-      setSpotifyData(data);
-    } catch (err) {
-      console.error("Error:", err);
-      setSpotifyData(null);
-    } finally {
-      setIsFetchingSpotifyData(false);
+    },
+    hover: { 
+      scale: 1.1,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 10
+      }
+    },
+    tap: { 
+      scale: 0.95 
     }
   };
 
-
   return (
-    <>
-      <div className={styles.connectionData}>
-        
-        <div className={styles.connectionDataOptions}>
-          <div
-            className={`${styles.connectionDataOption} ${
-              spotifyData && spotifyData.data ? styles.spotify : ""
-            }`}
-            onClick={() => handleThirdPartyLink(creativesLinks.campfireHub)}
+    <div className="p-4">
+      <div className="grid grid-cols-5 gap-4">
+        {socialIcons.map((social, index) => (
+          <motion.div
+            key={social.name}
+            className={`
+              relative flex items-center justify-center p-4 rounded-lg cursor-pointer
+              ${social.isLinked ? 'bg-zinc-800' : 'bg-zinc-900'}
+              hover:bg-zinc-800 transition-colors duration-200
+            `}
+            variants={iconVariants}
+            initial="initial"
+            animate="animate"
+            whileHover="hover"
+            whileTap="tap"
+            onClick={() => setIsModalOpen(true)}
           >
-            {isFetchingSpotifyData ?
-              <LoaderWhiteSmall /> :
-              <i className="fi fi-brands-spotify"></i>
-              
-            }
-            {spotifyData && spotifyData.data && ( 
-              <span>
-                <i className="fi fi-sr-shield-trust"></i>
-              </span>
+            <i className={`${social.icon} text-2xl ${social.isLinked ? 'text-green-400' : 'text-zinc-400'}`} />
+            {social.isLinked && (
+              <div className="absolute -top-1 -right-1">
+                <div className="w-3 h-3 bg-green-400 rounded-full" />
+              </div>
             )}
-          </div>
-          <div className={`${styles.connectionDataOption}`}>
-            <i className="fi fi-brands-twitter-alt"></i>
-          </div>
-          <div className={`${styles.connectionDataOption}`}>
-            <i className="fi fi-brands-apple"></i>
-          </div>
-          <div className={`${styles.connectionDataOption}`}>
-            <i className="fi fi-brands-discord"></i>
-          </div>
-          <div className={`${styles.connectionDataOption}`}>
-            <i className="fi fi-brands-tik-tok"></i>
-          </div>
-          <div className={`${styles.connectionDataOption}`}>
-            <i className="fi fi-brands-instagram"></i>
-          </div>
-          <div className={`${styles.connectionDataOption}`}>
-            <i className="fi fi-brands-snapchat"></i>
-          </div>
-          <div className={`${styles.connectionDataOption}`}>
-            <i className="fi fi-brands-reddit"></i>
-          </div>
-          <div className={`${styles.connectionDataOption}`}>
-            <i className="fi fi-brands-google"></i>
-          </div>
-        </div>
+          </motion.div>
+        ))}
       </div>
-    </>
+
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setIsModalOpen(false)}
+            />
+            
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative w-full max-w-md bg-zinc-900 rounded-xl border border-zinc-800 shadow-xl"
+            >
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="absolute right-4 top-4 text-neutral-400 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="p-6">
+                <div className="mb-6 text-center">
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    Connect Your Socials
+                  </h3>
+                  <p className="text-neutral-400 text-sm">
+                    Connect your social accounts to enhance your profile and access exclusive features.
+                  </p>
+                </div>
+
+                <div className="flex justify-center">
+                  <CampModal onClose={handleModalClose} />
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
   );
-}
+};
+
+export default ConnectionSettingData;

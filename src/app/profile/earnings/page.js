@@ -2,88 +2,74 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAccount } from 'wagmi';
-import { useGetCurrentYearCount, useGetYearCount } from '@/app/config/hitmakrdsrcfactory/hitmakrDSRCFactoryRPC';
 import { useCreativeIDRPC } from '@/app/config/hitmakrcreativeid/hitmakrCreativeIDRPC';
 import styles from './styles/Earnings.module.css';
 import DSRCEarningsView from './components/DSRCEarningsView';
 import LoaderWhiteSmall from '@/app/components/animations/loaders/loaderWhiteSmall';
-import { formatUnits } from '@/app/helpers/FormatUnits';
+import { formatUSDC } from '@/app/helpers/FormatUnits';
 import RouterPushLink from '@/app/helpers/RouterPushLink';
 
-const DEPLOYMENT_YEAR = 24;
+const API_BASE_URL = process.env.NEXT_PUBLIC_HITMAKR_SERVER;
 const ITEMS_PER_PAGE = 10;
 
 const EarningsPage = () => {
     const { address } = useAccount();
-    const { yearCount: currentYearData, isLoading: isLoadingYearCount } = useGetCurrentYearCount(address);
     const { creativeIDInfo, loading: isLoadingCreativeId } = useCreativeIDRPC(address);
     const { routeTo } = RouterPushLink();
 
+    // State management
     const [dsrcs, setDsrcs] = useState([]);
-    const [page, setPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
+    const [totalDSRCs, setTotalDSRCs] = useState(0);
+    const [error, setError] = useState(null);
     const [earningsMap, setEarningsMap] = useState(new Map());
 
-    // Calculate year range
-    const yearRange = useMemo(() => {
-        if (!currentYearData?.year || !creativeIDInfo?.exists) return [];
-        const years = [];
-        for (let year = currentYearData.year; year >= DEPLOYMENT_YEAR; year--) {
-            years.push(year);
-        }
-        return years;
-    }, [currentYearData?.year, creativeIDInfo?.exists]);
+    // Fetch DSRCs from the server
+    const fetchDSRCs = async (page) => {
+        if (!address || isLoading) return;
 
-    const year0Count = useGetYearCount(address, yearRange[0] || 0);
-    const year1Count = useGetYearCount(address, yearRange[1] || 0);
-    const year2Count = useGetYearCount(address, yearRange[2] || 0);
-    const year3Count = useGetYearCount(address, yearRange[3] || 0);
-    const year4Count = useGetYearCount(address, yearRange[4] || 0);
+        setIsLoading(true);
+        setError(null);
 
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/dsrc/creator/${address}?page=${page}&limit=${ITEMS_PER_PAGE}`
+            );
 
-    const yearCounts = useMemo(() => [
-        year0Count,
-        year1Count,
-        year2Count,
-        year3Count,
-        year4Count
-    ], [year0Count, year1Count, year2Count, year3Count, year4Count]);
-
-    const years = useMemo(() => {
-        if (!currentYearData?.year || !creativeIDInfo?.exists) return [];
-        
-        const yearData = [];
-        
-        if (currentYearData.count > 0) {
-            yearData.push({
-                year: currentYearData.year,
-                count: currentYearData.count,
-                startIndex: currentYearData.count,
-                endIndex: 1
-            });
-        }
-        
-        yearRange.slice(1).forEach((year, index) => {
-            const { count } = yearCounts[index + 1] || { count: 0 };
-            if (count > 0) {
-                yearData.push({
-                    year,
-                    count,
-                    startIndex: count,
-                    endIndex: 1
-                });
+            if (!response.ok) {
+                throw new Error('Failed to fetch DSRCs');
             }
-        });
-        
-        return yearData;
-    }, [currentYearData, yearCounts, yearRange, creativeIDInfo?.exists]);
 
-    useEffect(() => {
-        if (!isLoadingCreativeId && !creativeIDInfo?.exists) {
-            routeTo("/profile/onboard");
+            const data = await response.json();
+
+            if (data.success) {
+                setDsrcs(prev => page === 1 ? data.data.dsrcs : [...prev, ...data.data.dsrcs]);
+                setHasMore(data.data.pagination.hasMore);
+                setTotalDSRCs(data.data.pagination.total);
+            } else {
+                throw new Error(data.message || 'Failed to fetch DSRCs');
+            }
+        } catch (error) {
+            console.error('Error fetching DSRCs:', error);
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
         }
-    }, [creativeIDInfo, isLoadingCreativeId, routeTo]);
+    };
 
+    // Initial load
+    useEffect(() => {
+        if (creativeIDInfo?.exists) {
+            setCurrentPage(1);
+            setDsrcs([]);
+            setEarningsMap(new Map());
+            fetchDSRCs(1);
+        }
+    }, [address, creativeIDInfo]);
+
+    // Calculate total earnings
     const totalEarnings = useMemo(() => {
         const totals = {
             purchase: 0n,
@@ -100,54 +86,7 @@ const EarningsPage = () => {
         return totals;
     }, [earningsMap]);
 
-    const totalDSRCs = useMemo(() => {
-        return years.reduce((sum, year) => sum + year.count, 0);
-    }, [years]);
-
-    const loadMoreDSRCs = async () => {
-        if (isLoading || !creativeIDInfo?.id || years.length === 0) return;
-        
-        setIsLoading(true);
-        
-        const startIndex = (page - 1) * ITEMS_PER_PAGE;
-        const endIndex = startIndex + ITEMS_PER_PAGE;
-        
-        let dsrcIds = [];
-        let countSoFar = 0;
-
-        for (const yearInfo of years) {
-            if (countSoFar >= endIndex) break;
-            
-            const yearStartCount = countSoFar;
-            const yearEndCount = countSoFar + yearInfo.count;
-
-            if (yearStartCount < endIndex && yearEndCount > startIndex) {
-                const skipItems = Math.max(0, startIndex - yearStartCount);
-                const takeItems = Math.min(
-                    yearInfo.count - skipItems,
-                    endIndex - Math.max(startIndex, yearStartCount)
-                );
-
-                const start = yearInfo.startIndex - skipItems;
-                const end = Math.max(start - takeItems + 1, 1);
-
-                for (let i = start; i >= end; i--) {
-                    const dsrcId = `${creativeIDInfo.id}${yearInfo.year.toString().padStart(2, '0')}${i.toString().padStart(5, '0')}`;
-                    dsrcIds.push({
-                        id: dsrcId,
-                        year: yearInfo.year,
-                        index: i
-                    });
-                }
-            }
-            countSoFar += yearInfo.count;
-        }
-
-        setDsrcs(prev => [...prev, ...dsrcIds]);
-        setPage(p => p + 1);
-        setIsLoading(false);
-    };
-
+    // Handle earnings updates
     const handleEarningsUpdate = (dsrcId, dsrcEarnings) => {
         if (!dsrcEarnings) return;
 
@@ -158,19 +97,22 @@ const EarningsPage = () => {
         });
     };
 
-    useEffect(() => {
-        setDsrcs([]);
-        setPage(1);
-        setEarningsMap(new Map());
-    }, [address, creativeIDInfo?.id]);
-
-    useEffect(() => {
-        if (years.length > 0 && dsrcs.length === 0) {
-            loadMoreDSRCs();
+    const loadMoreDSRCs = () => {
+        if (!isLoading && hasMore) {
+            const nextPage = currentPage + 1;
+            setCurrentPage(nextPage);
+            fetchDSRCs(nextPage);
         }
-    }, [years.length, dsrcs.length]);
+    };
 
-    if (isLoadingCreativeId || isLoadingYearCount || yearCounts.some(yc => yc?.isLoading)) {
+    // Redirect if no Creative ID
+    useEffect(() => {
+        if (!isLoadingCreativeId && !creativeIDInfo?.exists) {
+            routeTo("/profile/onboard");
+        }
+    }, [creativeIDInfo, isLoadingCreativeId, routeTo]);
+
+    if (isLoadingCreativeId) {
         return <div className={styles.loading}><LoaderWhiteSmall /></div>;
     }
 
@@ -178,7 +120,9 @@ const EarningsPage = () => {
         return <div className={styles.noCreativeId}>No Creative ID found for this address</div>;
     }
 
-    const hasMore = dsrcs.length < totalDSRCs;
+    if (error) {
+        return <div className={styles.error}>Error: {error}</div>;
+    }
 
     return (
         <div className={styles.earnings}>
@@ -190,24 +134,24 @@ const EarningsPage = () => {
                 <div className={styles.totalEarnings}>
                     <div className={styles.earningCard}>
                         <h3>Total Purchase Earnings</h3>
-                        <p>{formatUnits(totalEarnings.purchase, 6)} USDC</p>
+                        <p>{formatUSDC(totalEarnings.purchase)} USDC</p>
                     </div>
                     <div className={styles.earningCard}>
                         <h3>Total Royalty Earnings</h3>
-                        <p>{formatUnits(totalEarnings.royalty, 6)} USDC</p>
+                        <p>{formatUSDC(totalEarnings.royalty)} USDC</p>
                     </div>
                     <div className={styles.earningCard}>
                         <h3>Total Pending</h3>
-                        <p>{formatUnits(totalEarnings.pending, 6)} USDC</p>
+                        <p>{formatUSDC(totalEarnings.pending)} USDC</p>
                     </div>
                 </div>
             </div>
 
             {dsrcs.map((dsrc) => (
-                <div key={dsrc.id} className={styles.dsrcIds}>
+                <div key={dsrc.dsrcId} className={styles.dsrcIds}>
                     <DSRCEarningsView 
-                        dsrcid={dsrc.id}
-                        onEarningsUpdate={(earnings) => handleEarningsUpdate(dsrc.id, earnings)}
+                        dsrcid={dsrc.dsrcId}
+                        onEarningsUpdate={(earnings) => handleEarningsUpdate(dsrc.dsrcId, earnings)}
                     />
                 </div>
             ))}

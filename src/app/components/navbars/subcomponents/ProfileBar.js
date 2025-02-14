@@ -51,6 +51,14 @@ const ProfileBar = ({ isOpen, profileBarRef, nameData }) => {
           
           <div
             className={styles.mainProfileBarOption}
+            onClick={() => routeTo("/profile/create")}
+          >
+            <i className="fi fi-rr-plus"></i>
+            <p>Create</p>
+          </div>
+          
+          <div
+            className={styles.mainProfileBarOption}
             onClick={() => routeTo("/profile/settings")}
           >
             <i className="fi fi-rr-settings"></i>

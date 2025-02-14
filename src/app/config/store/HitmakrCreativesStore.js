@@ -1,8 +1,5 @@
-"use client";
-
 import { atom } from 'recoil';
 import { recoilPersist } from 'recoil-persist';
-
 
 function getStorage() {
   if (typeof window !== 'undefined') {
@@ -17,7 +14,6 @@ const { persistAtom } = recoilPersist({
   converter: JSON,
 });
 
-
 const HitmakrCreatives = atom({
   key: 'HitmakrCreatives',
   default: {
@@ -28,7 +24,6 @@ const HitmakrCreatives = atom({
   },
   effects_UNSTABLE: [persistAtom],
 });
-
 
 const HitmakrVerificationForm = atom({
   key: 'HitmakrVerificationForm',
@@ -43,7 +38,6 @@ const HitmakrVerificationForm = atom({
     remainingTime: 0,
   }
 });
-
 
 const CreativesUpload = atom({
   key: 'CreativesUpload',
@@ -66,11 +60,15 @@ const CreativesUpload = atom({
     newAddress: '',
     copyrightChecked: false,
     copyrightOverwrite: false,
-    mintPrice: 5,
+    editions: {
+      streaming: { enabled: true, price: 0 },
+      collectors: { enabled: false, price: 5 },
+      licensing: { enabled: false, price: 100 }
+    },
     selectedChain: 'SKL',
+    deadline: null,
   },
 });
-
 
 const HitmakrMySpotify = atom({
   key: 'HitmakrMySpotify',
@@ -80,7 +78,6 @@ const HitmakrMySpotify = atom({
     spotifyDataError: null,
   },
 });
-
 
 const HitmakrCreativesRegister = atom({
   key: 'HitmakrCreativesRegister',
@@ -92,7 +89,6 @@ const HitmakrCreativesRegister = atom({
   },
 });
 
-
 const HitmakrCreativesMetaStates = atom({
   key: 'HitmakrCreativesMetaStates',
   default: {
@@ -100,18 +96,21 @@ const HitmakrCreativesMetaStates = atom({
   },
 });
 
-
 const NewCreativeUpload = atom({
   key: 'NewCreativeUpload',
   default: {
     newUpload: false,
     tokenURI: "",
-    initialPrice: 0, 
-    royaltySplits: [], 
+    editions: {
+      streaming: { enabled: true, price: 0 },
+      collectors: { enabled: false, price: 5 },
+      licensing: { enabled: false, price: 100 }
+    },
+    royaltySplits: [],
     isGated: false,
+    deadline: null,
   },
 });
-
 
 const HitmakrCreativesStore = {
   HitmakrCreatives,

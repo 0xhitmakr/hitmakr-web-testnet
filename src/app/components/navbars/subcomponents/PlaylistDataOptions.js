@@ -33,22 +33,33 @@ export default function PlaylistDataOptions() {
     if (!address || loading || (!hasMore && pageNumber > 1)) return;
     
     setLoading(true);
-    const authToken = localStorage.getItem("authToken");
-
+  
     try {
+      // Get both tokens from localStorage
+      const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+      const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+  
+      if (!authToken || !nonceToken) {
+        throw new Error("Authentication tokens not found");
+      }
+  
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/playlist/playlists?page=${pageNumber}&limit=10`,
         {
           headers: {
-            Authorization: `Bearer ${authToken}`,
-            "x-user-address": address,
-            "x-chain-id": wagmiChainId.toString(),
+            'Authorization': `Bearer ${authToken}`,
+            'x-nonce-token': nonceToken,
+            'x-user-address': address,
+            'x-chain-id': wagmiChainId.toString(),
           },
         }
       );
-
-      if (!response.ok) throw new Error("Failed to fetch playlists");
-
+  
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to fetch playlists");
+      }
+  
       const data = await response.json();
       
       let newPlaylists;
@@ -70,7 +81,14 @@ export default function PlaylistDataOptions() {
       setError(null);
     } catch (error) {
       console.error("Error fetching playlists:", error);
-      setError("Failed to load playlists");
+      const errorMessage = error.message || "Failed to load playlists";
+      setError(errorMessage);
+      
+      // If tokens are missing, you might want to trigger a re-authentication
+      if (errorMessage === "Authentication tokens not found") {
+        // Add your re-authentication logic here if needed
+        // For example: redirectToLogin() or refreshTokens()
+      }
     } finally {
       setLoading(false);
     }

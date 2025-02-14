@@ -9,7 +9,6 @@ import abi from "./abi/abi"
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_HITMAKR_CREATIVE_ID_ADDRESS
 
-
 export const useRegisterCreativeID = () => {
     const { writeContract, isPending, data } = useWriteContract()
     const { isConnected } = useAccount()
@@ -54,7 +53,6 @@ export const useRegisterCreativeID = () => {
     }
 }
 
-
 const formatCreativeIDResponse = (data) => {
     if (!data || data.length !== 3) return null
     return {
@@ -63,7 +61,6 @@ const formatCreativeIDResponse = (data) => {
         exists: Boolean(data[2]) && data[0] !== ""
     }
 }
-
 
 export const useCreativeID = (address) => {
     const { isConnected } = useAccount()
@@ -98,7 +95,6 @@ export const useCreativeID = (address) => {
     }
 }
 
-
 export const useHasCreativeID = (address) => {
     const { isConnected } = useAccount()
     const { isValidChain } = useSkaleChainValidation()
@@ -108,7 +104,7 @@ export const useHasCreativeID = (address) => {
             {
                 address: CONTRACT_ADDRESS,
                 abi,
-                functionName: 'hasCreativeID',
+                functionName: 'getCreativeID',
                 args: [address],
                 enabled: isConnected && Boolean(address),
             },
@@ -121,14 +117,15 @@ export const useHasCreativeID = (address) => {
         ]
     })
 
+    const hasCreativeID = responses.data?.[0]?.[2] || false // Check exists flag from getCreativeID
+
     return {
         ...responses,
-        data: responses.data?.[0],
+        data: hasCreativeID,
         isPaused: responses.data?.[1] || false,
         isValidChain
     }
 }
-
 
 export const useIsCreativeIDTaken = (creativeID) => {
     const { isConnected } = useAccount()
@@ -140,7 +137,7 @@ export const useIsCreativeIDTaken = (creativeID) => {
             {
                 address: CONTRACT_ADDRESS,
                 abi,
-                functionName: 'isCreativeIDTaken',
+                functionName: 'takenCreativeIDs',
                 args: [creativeID],
                 enabled: isConnected && isValidCreativeID,
             },
@@ -170,7 +167,7 @@ export const useTotalCreativeIDs = () => {
             {
                 address: CONTRACT_ADDRESS,
                 abi,
-                functionName: 'getTotalCreativeIDs',
+                functionName: 'totalCreativeIDs',
                 enabled: isConnected,
             },
             {
@@ -189,7 +186,6 @@ export const useTotalCreativeIDs = () => {
         isValidChain
     }
 }
-
 
 export const useToggleEmergencyPause = () => {
     const { writeContract, isPending, data } = useWriteContract()

@@ -106,12 +106,15 @@ const DSRCComments = () => {
             return;
         }
     
-        const authToken = localStorage.getItem("authToken");
-        if (!authToken) {
+        // Get both authentication tokens
+        const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+        const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+    
+        if (!authToken || !nonceToken) {
             setModalState({
                 show: true,
                 title: "Error",
-                description: "Authentication required"
+                description: "Authentication required. Please reconnect your wallet."
             });
             return;
         }
@@ -122,6 +125,7 @@ const DSRCComments = () => {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${authToken}`,
+                    'x-nonce-token': nonceToken,
                     'x-user-address': address,
                     'x-chain-id': chainId?.toString() || '1',
                     'Content-Type': 'application/json'
@@ -132,12 +136,13 @@ const DSRCComments = () => {
                 })
             });
     
-            const data = await response.json();
-            
             if (!response.ok) {
-                throw new Error(data.message || 'Failed to post comment');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to post comment');
             }
     
+            const data = await response.json();
+            
             setComment('');
             await fetchComments(1, true); // Refresh comments
             setModalState({
@@ -152,6 +157,12 @@ const DSRCComments = () => {
                 title: "Error",
                 description: error.message || "Failed to post comment"
             });
+    
+            // Handle authentication errors specifically
+            if (error.message?.toLowerCase().includes('token')) {
+                // Trigger wallet reconnection or authentication refresh if needed
+                // For example: reconnectWallet() or refreshAuth()
+            }
         } finally {
             setIsSubmitting(false);
         }

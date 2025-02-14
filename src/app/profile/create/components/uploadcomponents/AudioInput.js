@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useRecoilState } from "recoil";
 import { useAccount } from 'wagmi';
-import { useSIWE } from 'connectkit';
 import HitmakrCreativesStore from "@/app/config/store/HitmakrCreativesStore";
 import styles from "../../styles/Create.module.css";
 import HitmakrMiniAudioPlayer from "@/app/components/musicplayers/miniplayer/HitmakrMiniAudioPlayer";
@@ -15,7 +14,6 @@ const AudioInput = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
   const { address, chainId } = useAccount();
-  const { isSignedIn } = useSIWE();
   const allowedFileTypes = ["audio/mpeg", "audio/wav", "audio/flac"];
   const [uploadState, setUploadState] = useRecoilState(
     HitmakrCreativesStore.CreativesUpload
@@ -42,7 +40,7 @@ const AudioInput = () => {
       return;
     }
 
-    if (!address || !isSignedIn || !chainId) {
+    if (!address || !chainId) {
       setModalContent({
         title: "Wallet Not Connected",
         description: "Please connect your wallet and sign in."
@@ -58,16 +56,28 @@ const AudioInput = () => {
       const formData = new FormData();
       formData.append('song', file);
 
-      const authToken = localStorage.getItem('authToken');
+      const authToken = localStorage.getItem('@appkit/siwx-auth-token');
+      const nonceToken = localStorage.getItem('@appkit/siwx-nonce-token'); 
+
+      if (!authToken || !nonceToken) {
+        setModalContent({
+          title: "Authentication Required",
+          description: "Please sign in again to verify copyright."
+        });
+        setShowModal(true);
+        setIsVerifying(false);
+        return;
+      }
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/copyright/copyright-check`, {
         method: 'POST',
-        credentials: 'include',  
+        credentials: 'include',
         body: formData,
         headers: {
           'Authorization': `Bearer ${authToken}`,
-          'x-user-address': address, 
-          'x-chain-id': chainId.toString(),  
+          'x-nonce-token': nonceToken, // Include nonceToken header
+          'x-user-address': address,
+          'x-chain-id': chainId.toString(),
         },
       });
 
@@ -103,6 +113,11 @@ const AudioInput = () => {
     } catch (error) {
       console.error('Error verifying copyright:', error);
       setVerificationResult({ type: 'error' });
+      setModalContent({
+        title: "Verification Error",
+        description: error.message || "Failed to verify copyright. Please try again later."
+      });
+      setShowModal(true);
     } finally {
       setIsVerifying(false);
     }

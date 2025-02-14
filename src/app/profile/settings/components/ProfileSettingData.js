@@ -10,10 +10,7 @@ import {
   useUpdateProfileDetails, 
   useSetProfileDetails 
 } from "@/app/config/hitmakrprofiledetails/hitmakrProfileDetailsWagmi";
-import { 
-  useProfileDetailsRPC, 
-  useHasProfileDetailsRPC 
-} from "@/app/config/hitmakrprofiledetails/hitmakrProfileDetailsRPC";
+import { useProfileDetailsRPC } from "@/app/config/hitmakrprofiledetails/hitmakrProfileDetailsRPC";
 import tandds from "@/lib/helpers/TandD";
 import LoaderWhiteSmall from "@/app/components/animations/loaders/loaderWhiteSmall";
 import { useSwitchChain } from "wagmi";
@@ -23,9 +20,17 @@ import { GetTransactionStatus } from "@/app/helpers/GetTransactionStatus";
 export default function ProfileSettingsData() {
   const { address, chainId: wagmiChainId } = useAccount();
   const { details, loading: profileLoading } = useProfileDetailsRPC(address);
-  const { hasDetails, loading: hasDetailsLoading } = useHasProfileDetailsRPC(address);
-  const { updateProfileDetails, isPending: isUpdatePending, isValidChain, data: updateProfileDetailsData } = useUpdateProfileDetails();
-  const { setProfileDetails, isPending: isSetPending, data: setProfileDetailsData } = useSetProfileDetails();
+  const { 
+    updateProfileDetails, 
+    isPending: isUpdatePending, 
+    isValidChain,
+    data: updateProfileDetailsData 
+  } = useUpdateProfileDetails();
+  const { 
+    setProfileDetails, 
+    isPending: isSetPending, 
+    data: setProfileDetailsData 
+  } = useSetProfileDetails();
   const { chains, switchChain, isPending: networkSwitching } = useSwitchChain();
 
   const [profileData, setProfileData] = useState({
@@ -106,13 +111,14 @@ export default function ProfileSettingsData() {
         lastUpdateTimestamp.current = Date.now();
         setModalContent({
           title: "Success",
-          description: hasDetails ? "Profile updated successfully!" : "Profile created successfully!",
+          description: details?.initialized ? "Profile updated successfully!" : "Profile created successfully!",
         });
         setShowModal(true);
         setTransactionHash(null);
+        window.location.reload();
       }
     }
-  }, [transactionHash, txReceiptData, hasDetails]);
+  }, [transactionHash, txReceiptData, details?.initialized]);
 
   const validateInput = (name, value) => {
     switch (name) {
@@ -125,7 +131,7 @@ export default function ProfileSettingsData() {
         if (value.length > 500) return "Bio must be less than 500 characters";
         return "";
       case "dateOfBirth":
-        if (!hasDetails && !value) return "Date of birth is required for profile creation";
+        if (!details?.initialized && !value) return "Date of birth is required for profile creation";
         if (value) {
           const birthDate = new Date(value);
           const today = new Date();
@@ -145,46 +151,58 @@ export default function ProfileSettingsData() {
 
   const handleImageUpload = async () => {
     if (!profileData.profilePicture) return;
-
+  
     setUploadLoadingState(prev => ({ ...prev, imageUpload: true }));
     const formData = new FormData();
     formData.append("profilePicture", profileData.profilePicture);
     
     try {
+      const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+      const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+  
+      if (!authToken || !nonceToken) {
+        throw new Error("Authentication tokens not found");
+      }
+  
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/user/profile-dp-url-generator`,
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            Authorization: `Bearer ${authToken}`,
+            "x-nonce-token": nonceToken,
             "x-user-address": address,
             "x-chain-id": wagmiChainId.toString(),
           },
+          credentials: 'include', // Important for CORS
           body: formData,
         }
       );
-
-      if (!response.ok) throw new Error("Image upload failed");
-
+  
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Image upload failed');
+      }
+  
       const data = await response.json();
       setProfileData(prev => ({
         ...prev,
         imageUrl: data.profilePictureUrl,
         profilePicture: null
       }));
-
+  
       setModalContent({
         title: "Success",
         description: "Profile picture uploaded successfully!"
       });
-      setShowModal(true);
     } catch (error) {
+      console.error('Upload error:', error);
       setModalContent({
         title: "Error",
-        description: "Failed to upload profile picture. Please try again."
+        description: error.message || "Failed to upload profile picture. Please try again."
       });
-      setShowModal(true);
     } finally {
+      setShowModal(true);
       setUploadLoadingState(prev => ({ ...prev, imageUpload: false }));
     }
   };
@@ -257,7 +275,7 @@ export default function ProfileSettingsData() {
   };
 
   const handleSubmit = async () => {
-    if (!hasDetails) {
+    if (!details?.initialized) {
       if (!profileData.fullName || !profileData.dateOfBirth || !profileData.country) {
         setModalContent({
           title: "Missing Required Fields",
@@ -276,24 +294,6 @@ export default function ProfileSettingsData() {
       return;
     }
 
-    const errors = {
-      fullName: validateInput("fullName", profileData.fullName),
-      bio: validateInput("bio", profileData.bio),
-      dateOfBirth: validateInput("dateOfBirth", profileData.dateOfBirth),
-      country: validateInput("country", profileData.country)
-    };
-
-    setValidationErrors(errors);
-
-    if (Object.values(errors).some(error => error)) {
-      setModalContent({
-        title: "Validation Error",
-        description: "Please fix all errors before submitting.",
-      });
-      setShowModal(true);
-      return;
-    }
-
     if (!isValidChain) {
       setModalContent({
         title: "Wrong Network",
@@ -307,7 +307,7 @@ export default function ProfileSettingsData() {
       setIsWaitingForTransaction(true);
       setIsTransactionSuccess(false);
       
-      if (!hasDetails) {
+      if (!details?.initialized) {
         const dobTimestamp = Math.floor(new Date(profileData.dateOfBirth).getTime() / 1000);
         await setProfileDetails(
           profileData.fullName,
@@ -345,7 +345,7 @@ export default function ProfileSettingsData() {
 
   const isFormSubmitting = isUpdatePending || isSetPending || txReceiptLoading || isWaitingForTransaction;
 
-  if (profileLoading || hasDetailsLoading) {
+  if (profileLoading) {
     return <div className={styles.profileSettingsLoading}><LoaderWhiteSmall /></div>;
   }
 
@@ -412,7 +412,7 @@ export default function ProfileSettingsData() {
 
           <div className={styles.formDetails}>
             <label htmlFor="fullName" className={styles.formDetailsLabel}>
-              Full Name: {!hasDetails && <span className={styles.required}>*</span>}
+              Full Name: {!details?.initialized && <span className={styles.required}>*</span>}
             </label>
             <input
               type="text"
@@ -427,7 +427,7 @@ export default function ProfileSettingsData() {
             )}
           </div>
 
-          {!hasDetails && (
+          {!details?.initialized && (
             <div className={styles.formDetails}>
               <label htmlFor="dateOfBirth" className={styles.formDetailsLabel}>
                 Date of Birth: <span className={styles.required}>*</span>
@@ -465,7 +465,7 @@ export default function ProfileSettingsData() {
 
           <div className={styles.formDetails}>
             <label htmlFor="country" className={styles.formDetailsLabel}>
-              Place: {!hasDetails && <span className={styles.required}>*</span>}
+              Place: {!details?.initialized && <span className={styles.required}>*</span>}
             </label>
             <input
               type="text"
@@ -480,7 +480,7 @@ export default function ProfileSettingsData() {
             )}
           </div>
 
-          {hasDetails && (
+          {details?.initialized && (
             <div className={styles.formDetails}>
               <label className={styles.formDetailsLabel}>
                 <p>
@@ -494,8 +494,8 @@ export default function ProfileSettingsData() {
             <HitmakrButton
               buttonWidth="50%"
               buttonFunction={handleSubmit}
-              buttonName={hasDetails ? "Update Profile" : "Create Profile"}
-              isDark={hasDetails && !hasChanges}
+              buttonName={details?.initialized ? "Update Profile" : "Create Profile"}
+              isDark={details?.initialized && !hasChanges}
               isLoading={isFormSubmitting}
             />
           </div>

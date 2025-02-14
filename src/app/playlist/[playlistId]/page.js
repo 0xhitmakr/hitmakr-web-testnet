@@ -44,6 +44,18 @@ export default function PlaylistDetails() {
     const dropdownRef = useRef(null);
     const colorThiefRef = useRef(new ColorThief());
 
+    const getRequestHeaders = () => {
+        const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+        const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+        return {
+            'Authorization': `Bearer ${authToken}`,
+            'x-nonce-token': nonceToken,
+            'x-user-address': address,
+            'x-chain-id': wagmiChainId?.toString() || "",
+            'Content-Type': 'application/json'
+        };
+    };
+
     const handlePlaylistPlay = async () => {
         if (tracks.length === 0) return;
         
@@ -60,15 +72,10 @@ export default function PlaylistDetails() {
             try {
                 let nextPage = page + 1;
                 while (true) {
-                    const authToken = localStorage.getItem("authToken");
                     const response = await fetch(
                         `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/playlist/playlists/${playlistId}/tracks?page=${nextPage}&limit=20`,
                         {
-                            headers: {
-                                Authorization: `Bearer ${authToken}`,
-                                "x-user-address": address,
-                                "x-chain-id": wagmiChainId?.toString() || "",
-                            },
+                            headers: getRequestHeaders()
                         }
                     );
 
@@ -123,7 +130,8 @@ export default function PlaylistDetails() {
         if (!playlistId || !address) return;
 
         setDeleteLoading(true);
-        const authToken = localStorage.getItem("authToken");
+        const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+        const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
 
         try {
             const response = await fetch(
@@ -131,10 +139,12 @@ export default function PlaylistDetails() {
                 {
                     method: 'DELETE',
                     headers: {
-                        Authorization: `Bearer ${authToken}`,
-                        "x-user-address": address,
-                        "x-chain-id": wagmiChainId?.toString() || "",
-                    },
+                        'Authorization': `Bearer ${authToken}`,
+                        'x-nonce-token': nonceToken,
+                        'x-user-address': address,
+                        'x-chain-id': wagmiChainId?.toString() || "",
+                        'Content-Type': 'application/json'
+                    }
                 }
             );
 
@@ -179,16 +189,11 @@ export default function PlaylistDetails() {
             return;
         }
 
-        const authToken = localStorage.getItem("authToken");
         try {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/playlist/playlists/${playlistId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${authToken}`,
-                        "x-user-address": address,
-                        "x-chain-id": wagmiChainId?.toString() || "",
-                    },
+                {   
+                    headers: getRequestHeaders()
                 }
             );
 
@@ -212,16 +217,11 @@ export default function PlaylistDetails() {
             return;
         }
 
-        const authToken = localStorage.getItem("authToken");
         try {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/playlist/playlists/${playlistId}/tracks?page=${pageNum}&limit=20`,
                 {
-                    headers: {
-                        Authorization: `Bearer ${authToken}`,
-                        "x-user-address": address,
-                        "x-chain-id": wagmiChainId?.toString() || "",
-                    },
+                    headers: getRequestHeaders()
                 }
             );
 
@@ -411,9 +411,9 @@ export default function PlaylistDetails() {
                 <HitmakrButton 
                     buttonName="Browse"
                     isDark={true}
-                    isLoading={isRouterLinkOpening("/browse")}
+                    isLoading={isRouterLinkOpening("/explore")}
                     buttonWidth="25%"
-                    buttonFunction={() => routeTo("/browse")}
+                    buttonFunction={() => routeTo("/explore")}
                 />
             </div>
         </div>

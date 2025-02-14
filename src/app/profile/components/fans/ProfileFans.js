@@ -29,52 +29,60 @@ export default function ProfileFans({ address }) {
     setError(null);
 
     try {
-        const authToken = localStorage.getItem("authToken");
-        if (!authToken) return;
-      const response = await fetch(
-        `${API_BASE_URL}/follow/followers/${address}?page=${currentPage}&limit=${ITEMS_PER_PAGE}`,
-        {
-          method: 'GET',
-          headers: {
-                'Authorization': `Bearer ${authToken}`,
-                'x-user-address': accountAddress,
-                'x-chain-id': chainId?.toString(),
-                'Content-Type': 'application/json'
+        const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+        const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+        
+        if (!authToken || !nonceToken) {
+            setError("Authentication required. Please reconnect your wallet.");
+            return;
+        }
+
+        const response = await fetch(
+            `${API_BASE_URL}/follow/followers/${address}?page=${currentPage}&limit=${ITEMS_PER_PAGE}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'x-nonce-token': nonceToken,
+                    'x-user-address': accountAddress,
+                    'x-chain-id': chainId?.toString(),
+                    'Content-Type': 'application/json'
+                }
             }
-        }
-      );
+        );
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch followers');
-      }
-
-      const data = await response.json();
-      
-      // Filter out duplicates using the Set
-      const newUniqueFollowers = data.followers.filter(follower => {
-        const lowercaseAddress = follower.toLowerCase();
-        if (!seenAddresses.has(lowercaseAddress)) {
-          seenAddresses.add(lowercaseAddress);
-          return true;
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch followers');
         }
-        return false;
-      });
-      
-      if (newUniqueFollowers.length === 0) {
-        setHasMore(false);
-        return;
-      }
-      
-      setFollowers(prev => [...prev, ...newUniqueFollowers]);
-      setCurrentPage(prev => prev + 1);
-      setHasMore(data.pagination.hasNextPage);
+
+        const data = await response.json();
+        
+        // Filter out duplicates using the Set
+        const newUniqueFollowers = data.followers.filter(follower => {
+            const lowercaseAddress = follower.toLowerCase();
+            if (!seenAddresses.has(lowercaseAddress)) {
+                seenAddresses.add(lowercaseAddress);
+                return true;
+            }
+            return false;
+        });
+        
+        if (newUniqueFollowers.length === 0) {
+            setHasMore(false);
+            return;
+        }
+        
+        setFollowers(prev => [...prev, ...newUniqueFollowers]);
+        setCurrentPage(prev => prev + 1);
+        setHasMore(data.pagination.hasNextPage);
     } catch (error) {
-      console.error('Error loading followers:', error);
-      setError(error.message);
+        console.error('Error loading followers:', error);
+        setError(error.message || 'Failed to load followers');
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  }, [currentPage, isLoading, hasMore, address, seenAddresses]);
+}, [currentPage, isLoading, hasMore, address, seenAddresses, accountAddress, chainId]);
 
   useEffect(() => {
     setFollowers([]);

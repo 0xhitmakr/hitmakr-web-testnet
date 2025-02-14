@@ -18,22 +18,29 @@ export default function PlaylistDetails({ playlistId, onBack }) {
     useEffect(() => {
         const fetchPlaylistDetails = async () => {
             setIsLoading(true);
-            const authToken = localStorage.getItem("authToken");
-
+            const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+            const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token"); // Retrieve nonceToken
+    
             try {
+                if (!authToken || !nonceToken) { // Check for nonceToken
+                    // Handle missing tokens - for consistency, throwing an error
+                    throw new Error("Authentication token not found");
+                }
+    
                 const response = await fetch(
                     `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/playlist/playlists/${playlistId}`,
                     {
                         headers: {
                             Authorization: `Bearer ${authToken}`,
+                            "x-nonce-token": nonceToken, // Include nonceToken header
                             "x-user-address": address,
                             "x-chain-id": wagmiChainId.toString(),
                         },
                     }
                 );
-
+    
                 if (!response.ok) throw new Error("Failed to fetch playlist details");
-
+    
                 const data = await response.json();
                 setPlaylist(data.playlist);
             } catch (error) {
@@ -48,7 +55,7 @@ export default function PlaylistDetails({ playlistId, onBack }) {
                 setIsLoading(false);
             }
         };
-
+    
         if (playlistId && address) {
             fetchPlaylistDetails();
         }

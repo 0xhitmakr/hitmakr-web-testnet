@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRef, useEffect, useState } from 'react';
@@ -7,10 +8,11 @@ import styles from "../styles/MainPlayer.module.css"
 import { useGetDSRC } from "@/app/config/hitmakrdsrcfactory/hitmakrDSRCFactoryRPC";
 import { useGetDSRCDetails } from "@/app/config/hitmakrdsrc/hitmakrDSRCRPC";
 import GetUsernameByAddress from '@/app/helpers/profile/GetUsernameByAddress';
+import { Draggable } from 'react-beautiful-dnd';
 
-export default function QueueItem({ dsrcId, index, playTrack }) {
+export default function QueueItem({ dsrcId, index, playTrack, draggableId }) {
     const [itemMetadata, setItemMetadata] = useState(null);
-    const { queueMetadata, currentTrack } = useMusicPlayer();
+    const { currentTrack } = useMusicPlayer();
     const { dsrcAddress } = useGetDSRC(dsrcId);
     const { details } = useGetDSRCDetails(dsrcAddress);
 
@@ -43,30 +45,37 @@ export default function QueueItem({ dsrcId, index, playTrack }) {
         if (dsrcId && !itemMetadata) {
           fetchData();
         }
-    }, [dsrcId, details, itemMetadata]); 
+    }, [dsrcId, details, itemMetadata]);
 
     const displayData = itemMetadata || defaultDisplayValues;
 
     return (
-        <div 
-            className={`${styles.queueItem} ${currentTrack === dsrcId ? styles.currentTrack : ''}`} 
-            onClick={() => playTrack(dsrcId)}
-        >
-              <Image
-                  src={displayData.image.includes('undefined') ? `https://api.dicebear.com/9.x/shapes/svg?seed=${dsrcId}` : displayData.image}
-                  alt={displayData.name || "Track"}
-                  width={40}
-                  height={40}
-                  className={styles.queueItemCover}
-                  unoptimized={true}
-              />
-            <div className={styles.queueItemInfo}>
-                <div className={styles.queueItemTitle}>{displayData.name}</div>
-                <div className={styles.queueItemArtist}><GetUsernameByAddress address={displayData.creator}/></div>
-            </div>
-            <div className={styles.queueItemDuration}>
-                {displayData.attributes ? displayData.attributes.find(attr => attr.trait_type === 'Duration')?.value || '--:--' : '--:--'}
-            </div>
-        </div>
+        <Draggable draggableId={draggableId} index={index}>
+            {(provided) => (
+                <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    className={`${styles.queueItem} ${currentTrack === dsrcId ? styles.currentTrack : ''}`}
+                    onClick={() => playTrack(dsrcId)}
+                >
+                    <Image
+                        src={displayData.image.includes('undefined') ? `https://api.dicebear.com/9.x/shapes/svg?seed=${dsrcId}` : displayData.image}
+                        alt={displayData.name || "Track"}
+                        width={40}
+                        height={40}
+                        className={styles.queueItemCover}
+                        unoptimized={true}
+                    />
+                    <div className={styles.queueItemInfo}>
+                        <div className={styles.queueItemTitle}>{displayData.name}</div>
+                        <div className={styles.queueItemArtist}><GetUsernameByAddress address={displayData.creator}/></div>
+                    </div>
+                    <div className={styles.queueItemDuration}>
+                        {displayData.attributes ? displayData.attributes.find(attr => attr.trait_type === 'Duration')?.value || '--:--' : '--:--'}
+                    </div>
+                </div>
+            )}
+        </Draggable>
     );
 }

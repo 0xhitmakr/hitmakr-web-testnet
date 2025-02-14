@@ -22,6 +22,11 @@
 	},
 	{
 		"inputs": [],
+		"name": "InvalidEdition",
+		"type": "error"
+	},
+	{
+		"inputs": [],
 		"name": "Unauthorized",
 		"type": "error"
 	},
@@ -91,15 +96,21 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
+				"internalType": "uint64",
 				"name": "timestamp",
-				"type": "uint256"
+				"type": "uint64"
 			},
 			{
 				"indexed": false,
 				"internalType": "uint256",
 				"name": "price",
 				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint8",
+				"name": "edition",
+				"type": "uint8"
 			}
 		],
 		"name": "PurchaseIndexed",
@@ -126,30 +137,6 @@
 				"internalType": "address",
 				"name": "",
 				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "dsrc",
-				"type": "address"
-			}
-		],
-		"name": "checkUserPurchase",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -219,14 +206,19 @@
 						"type": "string"
 					},
 					{
-						"internalType": "uint256",
+						"internalType": "uint64",
 						"name": "timestamp",
-						"type": "uint256"
+						"type": "uint64"
 					},
 					{
 						"internalType": "uint256",
 						"name": "price",
 						"type": "uint256"
+					},
+					{
+						"internalType": "uint8",
+						"name": "edition",
+						"type": "uint8"
 					}
 				],
 				"internalType": "struct HitmakrDSRCPurchaseIndexer.Purchase[]",
@@ -251,14 +243,14 @@
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint256",
+						"internalType": "uint64",
 						"name": "firstPurchaseTime",
-						"type": "uint256"
+						"type": "uint64"
 					},
 					{
-						"internalType": "uint256",
+						"internalType": "uint64",
 						"name": "lastPurchaseTime",
-						"type": "uint256"
+						"type": "uint64"
 					}
 				],
 				"internalType": "struct HitmakrDSRCPurchaseIndexer.UserStats",
@@ -273,38 +265,55 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "user",
+				"name": "",
 				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint8",
+				"name": "",
+				"type": "uint8"
 			}
 		],
-		"name": "getUserStats",
+		"name": "hasPurchasedEdition",
 		"outputs": [
 			{
-				"components": [
-					{
-						"internalType": "uint256",
-						"name": "totalPurchases",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "totalAmountSpent",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "firstPurchaseTime",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "lastPurchaseTime",
-						"type": "uint256"
-					}
-				],
-				"internalType": "struct HitmakrDSRCPurchaseIndexer.UserStats",
+				"internalType": "bool",
 				"name": "",
-				"type": "tuple"
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "dsrc",
+				"type": "address"
+			},
+			{
+				"internalType": "uint8",
+				"name": "edition",
+				"type": "uint8"
+			}
+		],
+		"name": "hasUserPurchasedEdition",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -326,6 +335,11 @@
 				"internalType": "uint256",
 				"name": "price",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint8",
+				"name": "edition",
+				"type": "uint8"
 			}
 		],
 		"name": "indexPurchase",
@@ -337,11 +351,11 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "user",
+				"name": "",
 				"type": "address"
 			}
 		],
-		"name": "isUserActiveBuyer",
+		"name": "isActiveBuyer",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -408,6 +422,84 @@
 		"name": "updateFactory",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "userPurchases",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "dsrcAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "dsrcId",
+				"type": "string"
+			},
+			{
+				"internalType": "uint64",
+				"name": "timestamp",
+				"type": "uint64"
+			},
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint8",
+				"name": "edition",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "userStats",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "totalPurchases",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "totalAmountSpent",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint64",
+				"name": "firstPurchaseTime",
+				"type": "uint64"
+			},
+			{
+				"internalType": "uint64",
+				"name": "lastPurchaseTime",
+				"type": "uint64"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	}
 ]

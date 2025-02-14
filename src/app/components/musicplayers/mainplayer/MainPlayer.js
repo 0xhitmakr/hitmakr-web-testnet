@@ -1,6 +1,7 @@
+
 "use client"
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { useMusicPlayer } from '@/app/config/audio/MusicPlayerProvider';
 import '@flaticon/flaticon-uicons/css/all/all.css';
 import Image from 'next/image';
@@ -12,6 +13,7 @@ import QueueItem from './components/QueueItem';
 import RouterPushLink from '@/app/helpers/RouterPushLink';
 import GetUsernameByAddress from '@/app/helpers/profile/GetUsernameByAddress';
 import { usePathname } from 'next/navigation';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 export default function MainPlayer() {
     const pathname = usePathname();
@@ -29,7 +31,8 @@ export default function MainPlayer() {
         playTrack,
         previousTrack,
         playHistory,
-        clearQueue
+        clearQueue,
+        reorderQueue
     } = useMusicPlayer();
 
     const [showQueue, setShowQueue] = useState(false);
@@ -55,39 +58,51 @@ export default function MainPlayer() {
     const isLoadingChunkRef = useRef(false);
     const lastPlaybackPositionRef = useRef(0);
     const loadedChunksRef = useRef(new Set());
-    
+
     const { dsrcAddress, isLoading: addressLoading } = useGetDSRC(currentTrack);
     const { details, loading: detailsLoading } = useGetDSRCDetails(dsrcAddress);
 
     const PRELOAD_CHUNKS = 4;
     const CHUNK_QUEUE_KEY = 'chunkQueue';
 
+    const onDragEnd = useCallback((result) => {
+        if (!result.destination) {
+            return;
+        }
+
+        if (result.destination.index === result.source.index) {
+            return;
+        }
+
+        reorderQueue(result.source.index, result.destination.index);
+    }, [reorderQueue]);
+
     const loadChunkSequentially = async (chunk, chunkIndex, chunkMap, sourceBufferRef, totalChunks) => {
         if (!chunk || chunk.loaded || chunk.loading) return;
-        
+
         if (chunkIndex > 0) {
             const previousChunk = chunkMap.get(chunkIndex - 1);
             if (!previousChunk?.loaded) {
                 await loadChunkSequentially(previousChunk, chunkIndex - 1, chunkMap, sourceBufferRef, totalChunks);
             }
         }
-    
+
         chunk.loading = true;
         let cleanup = null;
-    
+
         try {
             const response = await fetch(`https://gateway.irys.xyz/${chunk.id}`);
             if (!response.ok) throw new Error(`Failed to fetch chunk ${chunkIndex}`);
             const buffer = await response.arrayBuffer();
-    
+
             while (sourceBufferRef.current?.updating) {
                 await new Promise(resolve => setTimeout(resolve, 10));
             }
-    
+
             if (!sourceBufferRef.current) {
                 throw new Error('SourceBuffer was removed');
             }
-    
+
             await new Promise((resolve, reject) => {
                 const handleUpdateEnd = () => {
                     cleanup = () => {
@@ -100,7 +115,7 @@ export default function MainPlayer() {
                     chunk.loading = false;
                     resolve();
                 };
-    
+
                 const handleError = (error) => {
                     cleanup = () => {
                         if (sourceBufferRef.current) {
@@ -111,10 +126,10 @@ export default function MainPlayer() {
                     chunk.loading = false;
                     reject(error);
                 };
-    
+
                 sourceBufferRef.current.addEventListener('updateend', handleUpdateEnd);
                 sourceBufferRef.current.addEventListener('error', handleError);
-    
+
                 try {
                     sourceBufferRef.current.appendBuffer(buffer);
                 } catch (error) {
@@ -122,7 +137,7 @@ export default function MainPlayer() {
                     reject(error);
                 }
             });
-    
+
             if (chunkIndex < totalChunks - 1) {
                 const nextChunk = chunkMap.get(chunkIndex + 1);
                 if (nextChunk?.loaded && !chunk.loaded) {
@@ -133,13 +148,13 @@ export default function MainPlayer() {
             console.error(`Error loading chunk ${chunkIndex}:`, error);
             chunk.loading = false;
             cleanup?.();
-            
+
             if (!chunk.retryCount || chunk.retryCount < 3) {
                 chunk.retryCount = (chunk.retryCount || 0) + 1;
-                await new Promise(resolve => setTimeout(resolve, 1000 * chunk.retryCount)); // Exponential backoff
+                await new Promise(resolve => setTimeout(resolve, 1000 * chunk.retryCount));
                 return loadChunkSequentially(chunk, chunkIndex, chunkMap, sourceBufferRef, totalChunks);
             }
-            
+
             throw error;
         } finally {
             cleanup?.();
@@ -161,7 +176,7 @@ export default function MainPlayer() {
             });
 
             if (chunksToLoadRef.current.length > 0) {
-                loadNextChunk(); 
+                loadNextChunk();
             } else if (mediaSourceRef.current && mediaSourceRef.current.readyState === 'open') {
                 mediaSourceRef.current.endOfStream();
             }
@@ -173,14 +188,14 @@ export default function MainPlayer() {
     const preloadChunks = async (currentChunkIndex, chunkMap, totalChunks, loadChunk) => {
         const endIndex = Math.min(currentChunkIndex + PRELOAD_CHUNKS, totalChunks - 1);
         const preloadPromises = [];
-    
+
         for (let i = currentChunkIndex; i <= endIndex; i++) {
             const chunk = chunkMap.get(i);
             if (!chunk?.loaded && !chunk?.loading) {
                 preloadPromises.push(loadChunk(i));
             }
         }
-    
+
         if (preloadPromises.length > 0) {
             try {
                 await Promise.all(preloadPromises);
@@ -190,7 +205,7 @@ export default function MainPlayer() {
         }
     };
 
-    useEffect(() => {   
+    useEffect(() => {
         if (!audioRef.current || !sourceBufferRef.current) return;
 
         const handleTimeUpdate = () => {
@@ -198,7 +213,7 @@ export default function MainPlayer() {
 
             const buffered = sourceBufferRef.current.buffered;
             const currentTime = audioRef.current.currentTime;
-            
+
             if (buffered.length > 0) {
                 const bufferedEnd = buffered.end(buffered.length - 1);
                 if (bufferedEnd - currentTime < 10 && chunksToLoadRef.current.length > 0) {
@@ -233,7 +248,7 @@ export default function MainPlayer() {
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current.currentTime = 0;
-                
+
                 audioRef.current.onplay = null;
                 audioRef.current.onpause = null;
                 audioRef.current.ontimeupdate = null;
@@ -243,21 +258,20 @@ export default function MainPlayer() {
                 audioRef.current.onseeking = null;
                 audioRef.current.onseeked = null;
                 audioRef.current.onloadedmetadata = null;
-                
-                // Clear source
+
                 audioRef.current.src = '';
                 audioRef.current.removeAttribute('src');
                 audioRef.current.load();
             }
-    
+
             if (sourceBufferRef.current && mediaSourceRef.current) {
                 try {
                     sourceBufferRef.current.abort();
-                    
+
                     if (sourceBufferRef.current.buffered.length > 0) {
                         sourceBufferRef.current.remove(0, Infinity);
                     }
-    
+
                     const waitForRemoval = new Promise((resolve) => {
                         if (sourceBufferRef.current.updating) {
                             sourceBufferRef.current.addEventListener('updateend', resolve, { once: true });
@@ -278,23 +292,23 @@ export default function MainPlayer() {
                     console.error('Error cleaning source buffer:', e);
                 }
             }
-    
+
             if (audioRef.current?.src) {
                 URL.revokeObjectURL(audioRef.current.src);
             }
-    
+
             if (cleanupRef.current) {
                 cleanupRef.current();
                 cleanupRef.current = null;
             }
-    
+
             mediaSourceRef.current = null;
             sourceBufferRef.current = null;
             chunksToLoadRef.current = [];
             loadedChunksRef.current.clear();
             lastPlaybackPositionRef.current = 0;
             isLoadingChunkRef.current = false;
-    
+
             setCurrentTime(0);
             setDuration(0);
             setIsBuffering(false);
@@ -305,7 +319,7 @@ export default function MainPlayer() {
             console.error('Error in cleanup:', error);
         }
     };
-    
+
     const waitForSourceOpen = (mediaSource) => {
         return new Promise((resolve) => {
             if (mediaSource.readyState === 'open') {
@@ -315,27 +329,26 @@ export default function MainPlayer() {
             }
         });
     };
-    
+
     const resetForNewTrack = async () => {
         cleanupMediaResources();
-        
-        // Clear any pending timeouts
+
         if (window.loadingTimeout) {
             clearTimeout(window.loadingTimeout);
         }
-    
+
         try {
             const newMediaSource = new MediaSource();
             mediaSourceRef.current = newMediaSource;
-            
+
             const mediaSourceUrl = URL.createObjectURL(newMediaSource);
-            
+
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current.currentTime = 0;
                 audioRef.current.src = mediaSourceUrl;
             }
-    
+
             await new Promise((resolve, reject) => {
                 const timeoutId = setTimeout(() => reject(new Error('MediaSource open timeout')), 5000);
                 newMediaSource.addEventListener('sourceopen', () => {
@@ -343,23 +356,21 @@ export default function MainPlayer() {
                     resolve();
                 }, { once: true });
             });
-    
+
             if (newMediaSource.readyState === 'open') {
                 sourceBufferRef.current = newMediaSource.addSourceBuffer('audio/mpeg');
             }
         } catch (error) {
             console.error('Error resetting track:', error);
-            cleanupMediaResources(); 
+            cleanupMediaResources();
             throw error;
         }
     };
-    
 
-    
 
     useEffect(() => {
         let isCurrentTrack = true;
-        
+
         return () => {
             isCurrentTrack = false;
             cleanupMediaResources();
@@ -367,25 +378,23 @@ export default function MainPlayer() {
     }, [currentTrack, details]);
 
 
-
-    //========CORE=============
     useEffect(() => {
         let isCurrentTrack = true;
-    
+
         const setupNewTrack = async () => {
             if (!currentTrack || !details?.tokenUri || !audioRef.current) return;
-            
+
             try {
                 setIsTrackLoaded(false);
                 await cleanupMediaResources();
-                
+
                 const newMediaSource = new MediaSource();
                 mediaSourceRef.current = newMediaSource;
                 const mediaSourceUrl = URL.createObjectURL(newMediaSource);
-        
+
                 const sourceOpenPromise = new Promise((resolve, reject) => {
                     const timeoutId = setTimeout(() => reject(new Error('MediaSource open timeout')), 5000);
-                    
+
                     newMediaSource.addEventListener('sourceopen', () => {
                         clearTimeout(timeoutId);
                         try {
@@ -396,25 +405,25 @@ export default function MainPlayer() {
                         }
                     }, { once: true });
                 });
-        
+
                 audioRef.current.src = mediaSourceUrl;
-                
+
                 await sourceOpenPromise;
-                
+
                 const response = await fetch(details.tokenUri);
                 if (!response.ok) throw new Error('Failed to fetch metadata');
                 const data = await response.json();
-                
+
                 setMetadata(data);
                 setIsInitialLoading(true);
-        
+
                 const durationAttr = data.attributes.find(attr => attr.trait_type === 'Duration');
                 const totalDuration = durationAttr?.value ? parseMetadataDuration(durationAttr.value) : 0;
                 setDuration(totalDuration);
-        
+
                 const totalChunks = data.audio.length;
                 const chunkDuration = totalDuration / totalChunks;
-                
+
                 const chunkMap = new Map();
                 data.audio.forEach((id, i) => {
                     chunkMap.set(i, {
@@ -425,32 +434,32 @@ export default function MainPlayer() {
                         id: id
                     });
                 });
-        
-                let isCurrentTrackRef = true; 
-        
+
+                let isCurrentTrackRef = true;
+
                 const loadChunk = async (index) => {
                     if (!isCurrentTrackRef) return;
                     const chunk = chunkMap.get(index);
                     if (!chunk || chunk.loaded || chunk.loading) return;
-                    
+
                     try {
                         chunk.loading = true;
                         const response = await fetch(`https://gateway.irys.xyz/${chunk.id}`);
                         if (!response.ok) throw new Error(`Failed to fetch chunk ${index}`);
                         const buffer = await response.arrayBuffer();
-        
+
                         if (!isCurrentTrackRef || !sourceBufferRef.current) return;
-        
+
                         while (sourceBufferRef.current?.updating) {
                             await new Promise(resolve => setTimeout(resolve, 10));
                         }
-        
+
                         await new Promise((resolve, reject) => {
                             if (!sourceBufferRef.current) {
                                 reject(new Error('SourceBuffer not available'));
                                 return;
                             }
-        
+
                             const handleUpdateEnd = () => {
                                 sourceBufferRef.current?.removeEventListener('updateend', handleUpdateEnd);
                                 sourceBufferRef.current?.removeEventListener('error', handleError);
@@ -460,17 +469,17 @@ export default function MainPlayer() {
                                 setLoadedProgress((loadedChunks / totalChunks) * 100);
                                 resolve();
                             };
-        
+
                             const handleError = (error) => {
                                 sourceBufferRef.current?.removeEventListener('updateend', handleUpdateEnd);
                                 sourceBufferRef.current?.removeEventListener('error', handleError);
                                 chunk.loading = false;
                                 reject(error);
                             };
-        
+
                             sourceBufferRef.current.addEventListener('updateend', handleUpdateEnd);
                             sourceBufferRef.current.addEventListener('error', handleError);
-        
+
                             try {
                                 sourceBufferRef.current.appendBuffer(buffer);
                             } catch (error) {
@@ -487,7 +496,7 @@ export default function MainPlayer() {
                         }
                     }
                 };
-        
+
                 const loadChunksSequentially = async (startIndex, count) => {
                     if (!isCurrentTrackRef) return;
                     const endIndex = Math.min(startIndex + count, totalChunks);
@@ -496,13 +505,13 @@ export default function MainPlayer() {
                         if (!isCurrentTrackRef) break;
                     }
                 };
-        
+
                 const handleTimeUpdate = async () => {
                     if (!audioRef.current || !isCurrentTrackRef) return;
-                    
+
                     const currentTime = audioRef.current.currentTime;
                     const currentChunkIndex = Math.floor(currentTime / chunkDuration);
-                    
+
                     for (let i = 1; i <= 3; i++) {
                         const nextChunkIndex = currentChunkIndex + i;
                         const nextChunk = chunkMap.get(nextChunkIndex);
@@ -512,12 +521,12 @@ export default function MainPlayer() {
                         }
                     }
                 };
-        
+
                 const handleSeeking = async () => {
                     if (!audioRef.current || !isCurrentTrackRef) return;
                     const seekTime = audioRef.current.currentTime;
                     const seekChunkIndex = Math.floor(seekTime / chunkDuration);
-                    
+
                     setIsBuffering(true);
                     try {
                         await loadChunksSequentially(seekChunkIndex, 3);
@@ -525,23 +534,22 @@ export default function MainPlayer() {
                         setIsBuffering(false);
                     }
                 };
-        
+
                 audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
                 audioRef.current.addEventListener('seeking', handleSeeking);
-        
+
                 try {
                     await loadChunksSequentially(0, 3);
                     setIsInitialLoading(false);
                     setIsTrackLoaded(true);
-        
-                    // Background load remaining chunks
+
                     loadChunksSequentially(3, totalChunks - 3).catch(console.error);
                 } catch (error) {
                     console.error('Initial chunk loading error:', error);
                     setIsInitialLoading(false);
                     throw error;
                 }
-        
+
                 cleanupRef.current = () => {
                     isCurrentTrackRef = false;
                     if (audioRef.current) {
@@ -549,7 +557,7 @@ export default function MainPlayer() {
                         audioRef.current.removeEventListener('seeking', handleSeeking);
                     }
                 };
-        
+
             } catch (error) {
                 console.error('Error setting up track:', error);
                 cleanupMediaResources();
@@ -559,19 +567,18 @@ export default function MainPlayer() {
                 setIsTrackLoaded(false);
             }
         };
-    
+
         if (currentTrack && details) {
             setupNewTrack();
         }
-    
+
         return () => {
             isCurrentTrack = false;
             cleanupMediaResources();
         };
     }, [currentTrack, details]);
 
-    
-    
+
     useEffect(() => {
         if (audioRef.current) {
             if (isPlaying) {
@@ -583,14 +590,13 @@ export default function MainPlayer() {
             }
         }
     }, [isPlaying]);
-    
 
 
-    
+
 
     useEffect(() => {
         if (!audioRef.current) return;
-    
+
         const handlePlayPause = async () => {
             try {
                 if (isPlaying) {
@@ -606,7 +612,7 @@ export default function MainPlayer() {
                 console.error('Playback control error:', error);
             }
         };
-    
+
         handlePlayPause();
     }, [isPlaying, volume]);
 
@@ -659,17 +665,17 @@ export default function MainPlayer() {
 
     const handleProgressChange = async (e) => {
         const time = parseFloat(e.target.value);
-        setIsSeeking(true); 
+        setIsSeeking(true);
         setCurrentTime(time);
-        
+
         if (audioRef.current) {
             const wasPlaying = !audioRef.current.paused;
             if (wasPlaying) {
                 audioRef.current.pause();
             }
-            
+
             audioRef.current.currentTime = time;
-            
+
             if (wasPlaying) {
                 try {
                     await audioRef.current.play();
@@ -680,7 +686,7 @@ export default function MainPlayer() {
                 }
             }
         }
-        
+
         setTimeout(() => {
             setIsSeeking(false);
         }, 200);
@@ -708,7 +714,7 @@ export default function MainPlayer() {
     const handleEndedTransition = async () => {
         if (isTransitioningRef.current || !audioRef.current || isSeeking) return;
         isTransitioningRef.current = true;
-    
+
         try {
             if (isRepeat && currentTrack) {
                 audioRef.current.currentTime = 0;
@@ -722,22 +728,22 @@ export default function MainPlayer() {
                 isTransitioningRef.current = false;
                 return;
             }
-    
+
             if (queue.length > 0) {
                 if (audioRef.current) {
                     audioRef.current.pause();
                     audioRef.current.currentTime = 0;
                 }
-    
+
                 cleanupMediaResources();
-    
+
                 nextTrack();
-    
+
                 setCurrentTime(0);
                 setLoadedProgress(0);
-    
+
                 await new Promise(resolve => setTimeout(resolve, 500));
-    
+
                 if (isPlaying) {
                     try {
                         const playPromise = audioRef.current?.play();
@@ -764,29 +770,29 @@ export default function MainPlayer() {
             isTransitioningRef.current = false;
         }
     };
-    
+
     useEffect(() => {
         if (!audioRef.current || !duration) return;
-    
+
         const handleTimeUpdate = () => {
             if (!audioRef.current || isTransitioningRef.current || isSeeking) return;
-    
+
             const currentTime = audioRef.current.currentTime;
-            
+
             if (currentTime >= duration - 0.1 && !isTransitioningRef.current) {
                 handleEndedTransition();
             }
         };
-    
+
         audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
-    
+
         return () => {
             if (audioRef.current) {
                 audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
             }
         };
     }, [audioRef, duration, isSeeking, handleEndedTransition]);
-    
+
 
     const displayValues = metadata || defaultDisplayValues;
     const progressPercent = (currentTime / duration) * 100;
@@ -797,11 +803,11 @@ export default function MainPlayer() {
                 <div className={styles.hitmakrPlayer}>
                     <div className={styles.desktopPlayer}>
                         <div className={styles.nowPlaying}>
-                            <Image 
+                            <Image
                                 src={displayValues.image.includes('undefined') ? `https://api.dicebear.com/9.x/shapes/svg?seed=${currentTrack}` : displayValues.image}
-                                alt={displayValues.name || "Now Playing"} 
-                                width={56} 
-                                height={56} 
+                                alt={displayValues.name || "Now Playing"}
+                                width={56}
+                                height={56}
                                 className={styles.songCover}
                                 priority
                                 unoptimized={true}
@@ -824,10 +830,10 @@ export default function MainPlayer() {
                                 )}
                             </div>
                         </div>
-    
+
                         <div className={styles.playerControls}>
                             <div className={`${styles.controlButtons} ${noMusicPlaying ? styles.disabled : ''}`}>
-                                <button 
+                                <button
                                     className={`${styles.controlButton} ${isShuffle ? styles.active : ''}`}
                                     onClick={toggleShuffle}
                                     data-tooltip="Shuffle"
@@ -835,18 +841,18 @@ export default function MainPlayer() {
                                 >
                                     <i className="fi fi-sr-shuffle"></i>
                                 </button>
-                                
-                               
-                                <button 
-                                    className={styles.controlButton} 
+
+
+                                <button
+                                    className={styles.controlButton}
                                     onClick={previousTrack}
                                     data-tooltip="Previous"
                                     disabled={noMusicPlaying || playHistory.length === 0}
                                 >
                                     <i className="fi fi-sr-rewind"></i>
                                 </button>
-    
-                                <button 
+
+                                <button
                                     className={`${styles.playPauseButton} ${isBuffering ? styles.buffering : ''}`}
                                     onClick={playPause}
                                     disabled={noMusicPlaying || isBuffering}
@@ -859,17 +865,17 @@ export default function MainPlayer() {
                                         <i className={`fi ${isPlaying ? 'fi-sr-pause' : 'fi-sr-play'}`}></i>
                                     )}
                                 </button>
-    
-                                <button 
-                                    className={styles.controlButton} 
+
+                                <button
+                                    className={styles.controlButton}
                                     onClick={nextTrack}
                                     data-tooltip="Next"
                                     disabled={noMusicPlaying}
                                 >
                                     <i className="fi fi-sr-forward"></i>
                                 </button>
-    
-                                <button 
+
+                                <button
                                     className={`${styles.controlButton} ${isRepeat ? styles.active : ''}`}
                                     onClick={toggleRepeat}
                                     data-tooltip="Repeat"
@@ -878,12 +884,12 @@ export default function MainPlayer() {
                                     <i className="fi fi-sr-refresh"></i>
                                 </button>
                             </div>
-    
+
                             <div className={styles.progressBar}>
                                 <span className={styles.timeStamp}>{formatTime(currentTime)}</span>
                                 <div className={styles.sliderContainer}>
-                                    <div 
-                                        className={styles.loadedProgress} 
+                                    <div
+                                        className={styles.loadedProgress}
                                         style={{ width: `${loadedProgress}%` }}
                                     />
                                     <input
@@ -901,9 +907,9 @@ export default function MainPlayer() {
                                 <span className={styles.timeStamp}>{formatTime(duration)}</span>
                             </div>
                         </div>
-    
+
                         <div className={styles.volumeControls}>
-                            <button 
+                            <button
                                 className={styles.queueButton}
                                 onClick={() => setShowQueue(!showQueue)}
                                 data-tooltip="Queue"
@@ -915,15 +921,15 @@ export default function MainPlayer() {
                                     </span>
                                 )}
                             </button>
-    
-                            <button 
+
+                            <button
                                 className={`${styles.volumeButton} ${isMuted ? styles.muted : ''}`}
                                 onClick={toggleMute}
                                 data-tooltip="Volume"
                             >
                                 <i className={`fi ${isMuted ? 'fi-sr-volume-mute' : 'fi-sr-volume'}`}></i>
                             </button>
-    
+
                             <div className={styles.volumeSliderContainer}>
                                 <input
                                     type="range"
@@ -938,22 +944,22 @@ export default function MainPlayer() {
                             </div>
                         </div>
                     </div>
-    
+
                     <div className={styles.mobilePlayer}>
                         <div className={styles.playerContent}>
-                            <button 
+                            <button
                                 className={styles.toggleExpandButton}
                                 onClick={() => setIsExpanded(!isExpanded)}
                             >
                                 <i className={`fi ${isExpanded ? 'fi-sr-angle-down' : 'fi-sr-angle-up'}`}></i>
                             </button>
-    
+
                             <div className={styles.nowPlaying}>
-                                <Image 
-                                    src={displayValues.image} 
-                                    alt={displayValues.name || 'No track'} 
-                                    width={40} 
-                                    height={40} 
+                                <Image
+                                    src={displayValues.image}
+                                    alt={displayValues.name || 'No track'}
+                                    width={40}
+                                    height={40}
                                     className={styles.songCover}
                                     priority
                                     unoptimized={true}
@@ -967,9 +973,9 @@ export default function MainPlayer() {
                                     </div>
                                 </div>
                             </div>
-    
-                            <button 
-                                className={`${styles.playPauseButton} ${isBuffering ? styles.buffering : ''}`} 
+
+                            <button
+                                className={`${styles.playPauseButton} ${isBuffering ? styles.buffering : ''}`}
                                 onClick={playPause}
                                 disabled={noMusicPlaying || isBuffering}
                             >
@@ -981,14 +987,14 @@ export default function MainPlayer() {
                                     <i className={`fi ${isPlaying ? 'fi-sr-pause' : 'fi-sr-play'}`}></i>
                                 )}
                             </button>
-    
+
                             <div className={styles.progressBar}>
-                                <div 
-                                    className={styles.loadedProgress} 
+                                <div
+                                    className={styles.loadedProgress}
                                     style={{ width: `${loadedProgress}%` }}
                                 />
-                                <div 
-                                    className={styles.progressIndicator} 
+                                <div
+                                    className={styles.progressIndicator}
                                     style={{ width: `${progressPercent}%` }}
                                 />
                                 <input
@@ -1003,25 +1009,25 @@ export default function MainPlayer() {
                                 />
                             </div>
                         </div>
-    
+
                         <div className={`${styles.expandedControls} ${isExpanded ? styles.visible : ''}`}>
-                            <button 
+                            <button
                                 className={`${styles.controlButton} ${isShuffle ? styles.active : ''}`}
                                 onClick={toggleShuffle}
                                 disabled={noMusicPlaying}
                             >
                                 <i className="fi fi-sr-shuffle"></i>
                             </button>
-                            
-                            <button 
+
+                            <button
                                 className={styles.controlButton}
                                 onClick={previousTrack}
                                 disabled={noMusicPlaying || playHistory.length === 0}
                             >
                                 <i className="fi fi-sr-rewind"></i>
                             </button>
-    
-                            <button 
+
+                            <button
                                 className={styles.queueButton}
                                 onClick={() => setShowQueue(!showQueue)}
                             >
@@ -1032,16 +1038,16 @@ export default function MainPlayer() {
                                     </span>
                                 )}
                             </button>
-    
-                            <button 
+
+                            <button
                                 className={styles.controlButton}
                                 onClick={nextTrack}
                                 disabled={noMusicPlaying}
                             >
                                 <i className="fi fi-sr-forward"></i>
                             </button>
-    
-                            <button 
+
+                            <button
                                 className={`${styles.controlButton} ${isRepeat ? styles.active : ''}`}
                                 onClick={toggleRepeat}
                                 disabled={noMusicPlaying}
@@ -1050,7 +1056,7 @@ export default function MainPlayer() {
                             </button>
                         </div>
                     </div>
-    
+
                     {showQueue && (
                         <div className={styles.queuePanel}>
                             <div className={styles.queueHeader}>
@@ -1063,8 +1069,8 @@ export default function MainPlayer() {
                                     >
                                         <i className="fi fi-rr-trash"></i>
                                     </button>
-                                    <button 
-                                        className={styles.queueCloseButton} 
+                                    <button
+                                        className={styles.queueCloseButton}
                                         onClick={() => setShowQueue(false)}
                                     >
                                         ×
@@ -1072,20 +1078,31 @@ export default function MainPlayer() {
                                 </div>
                             </div>
                             <div className={styles.queueContent}>
-                                {queue.map((I, index) => (
-                                    <div key={I}>
-                                    <QueueItem
-                                        I={I}
-                                        index={index}
-                                        playTrack={playTrack}
-                                    />
-                                    </div>
-                                    
-                                ))}
+                                <DragDropContext onDragEnd={onDragEnd}>
+                                    <Droppable droppableId="queue-items-list">
+                                        {(provided) => (
+                                            <div
+                                                {...provided.droppableProps}
+                                                ref={provided.innerRef}
+                                            >
+                                                {queue.map((dsrcId, index) => (
+                                                    <QueueItem
+                                                        key={dsrcId}
+                                                        dsrcId={dsrcId}
+                                                        index={index}
+                                                        playTrack={playTrack}
+                                                        draggableId={dsrcId}
+                                                    />
+                                                ))}
+                                                {provided.placeholder}
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                </DragDropContext>
                             </div>
                         </div>
                     )}
-    
+
                     <audio
                         ref={audioRef}
                         onTimeUpdate={() => {
@@ -1115,6 +1132,6 @@ export default function MainPlayer() {
             </>
         );
     }
-    
-    
+
+
 }

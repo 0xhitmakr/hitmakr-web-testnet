@@ -10,7 +10,6 @@ import { creativesLinks } from "@/lib/helpers/Links";
 import ThirdPartyLinkFunction from "@/app/helpers/ThirdPartyLinkFunction";
 import CampxHitmakrVideo from "@/../public/video/CampxHitmakr.mp4";
 import { useAccount } from 'wagmi';
-import { useSIWE } from 'connectkit';
 import LoaderWhiteSmall from "@/app/components/animations/loaders/loaderWhiteSmall";
 import '@flaticon/flaticon-uicons/css/all/all.css';
 import HitmakrCreativesStore from "@/app/config/store/HitmakrCreativesStore";
@@ -23,7 +22,6 @@ export default function CampAuth() {
   const [spotifyData, setSpotifyData] = useState(null);
   const [isFetchingSpotifyData, setIsFetchingSpotifyData] = useState(false);
   const { address, chainId } = useAccount();
-  const { isSignedIn } = useSIWE();
   const [spotifyDataState, setSpotifyDataState] = useRecoilState(HitmakrCreativesStore.HitmakrMySpotify);
 
   useEffect(() => {
@@ -47,7 +45,7 @@ export default function CampAuth() {
 
   useEffect(() => {
     fetchSpotifyData(); 
-  }, [address, isSignedIn, chainId]);
+  }, [address, chainId]);
 
 
   const handleKnowMoreContainer = () => {
@@ -62,7 +60,7 @@ export default function CampAuth() {
 
 
   const fetchSpotifyData = async () => {
-    if (!address || !isSignedIn || !chainId) return; 
+    if (!address || !chainId) return; 
 
     setIsFetchingSpotifyData(true);
 

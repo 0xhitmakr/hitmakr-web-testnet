@@ -32,6 +32,7 @@ const GetDpByAddress = ({
     return (
       <div
         style={{ width: width, height: height }}
+        className="animate-pulse bg-gray-200 rounded-full"
       />
     );
   }

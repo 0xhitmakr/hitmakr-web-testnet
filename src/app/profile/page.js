@@ -4,13 +4,15 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import styles from "./styles/Profile.module.css";
 import dynamic from "next/dynamic";
+import { useAccount } from "wagmi";
+
 const TrianglifyPattern = dynamic(() => import('../components/bgs/TrianglifyPattern'), {
     ssr: false,
-  });
-import { useAccount } from "wagmi";
+});
+
 import GetDpByAddress from "../helpers/profile/GetDpByAddress";
 import GetUsernameByAddress from "../helpers/profile/GetUsernameByAddress";
-import { useHasCreativeIDRPC } from "../config/hitmakrcreativeid/hitmakrCreativeIDRPC";
+import { useCreativeIDRPC } from "../config/hitmakrcreativeid/hitmakrCreativeIDRPC";
 import { useProfileDetailsRPC } from "../config/hitmakrprofiledetails/hitmakrProfileDetailsRPC";
 import ProfileAbout from "./components/about/ProfileAbout";
 import ProfileReleases from "./components/releases/ProfileReleases";
@@ -18,7 +20,6 @@ import LoaderWhiteSmall from "../components/animations/loaders/loaderWhiteSmall"
 import UserFollow from "../helpers/profile/UserFollow";
 import ProfilePurchases from "./components/purchases/ProfilePurchases";
 import ProfileFans from "./components/fans/ProfileFans";
-import { useSIWE } from "connectkit";
 import ProfileHearts from "./components/hearts/ProfileHearts";
 
 const indexerContractAddress = process.env.NEXT_PUBLIC_HITMAKR_INDEXER_ADDRESS_SKL;
@@ -26,8 +27,7 @@ const indexerContractAddress = process.env.NEXT_PUBLIC_HITMAKR_INDEXER_ADDRESS_S
 export default function ProfilePage() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const { address: connectedAddress,isConnected } = useAccount();
-    const {isSignedIn} = useSIWE();
+    const { address: connectedAddress, isConnected } = useAccount();
     const [imageUrl, setImageUrl] = useState(null);
     const [isCopied, setIsCopied] = useState(false);
     
@@ -35,9 +35,14 @@ export default function ProfilePage() {
     const currentView = searchParams.get('view');
     const address = queryAddress || connectedAddress;
 
-    // Updated hooks
-    const { hasCreativeID: hasID, loading: creativeIdLoading, error: creativeIdError } = useHasCreativeIDRPC(address);
-    const { details: profileDetails, loading: profileLoading, error: profileError } = useProfileDetailsRPC(address);
+    // Use the hooks
+    const { creativeIDInfo, loading: creativeIdLoading, error: creativeIdError } = useCreativeIDRPC(address);
+    const { 
+        details: profileDetails, 
+        loading: profileLoading, 
+        error: profileError,
+        updating: profileUpdating
+    } = useProfileDetailsRPC(address);
 
     useEffect(() => {
         if (!currentView && address) {
@@ -62,9 +67,7 @@ export default function ProfilePage() {
             try {
                 await navigator.clipboard.writeText(address);
                 setIsCopied(true);
-                setTimeout(() => {
-                    setIsCopied(false);
-                }, 5000);
+                setTimeout(() => setIsCopied(false), 5000);
             } catch (err) {
                 console.error('Failed to copy address:', err);
             }
@@ -72,8 +75,7 @@ export default function ProfilePage() {
     };
 
     const handleViewChange = (view) => {
-        const newUrl = `/profile?address=${address}&view=${view}`;
-        router.push(newUrl);
+        router.push(`/profile?address=${address}&view=${view}`);
     };
 
     const getNavOptionClassName = (view) => {
@@ -97,13 +99,15 @@ export default function ProfilePage() {
         }
     };
 
-    if (creativeIdLoading || profileLoading) {
+    if (creativeIdLoading || profileLoading || profileUpdating) {
         return <div className={styles.profilePageLoading}><LoaderWhiteSmall /></div>;
     }
 
     if (creativeIdError || profileError) {
         return <div className={styles.profilePageLoading}>Error loading profile</div>;
     }
+
+    const hasID = creativeIDInfo?.exists;
 
     return (
         <div className={styles.profilePage}>
@@ -133,9 +137,7 @@ export default function ProfilePage() {
                     <div className={styles.profilePageNameItem}>
                         <GetUsernameByAddress address={address}/>
                         {hasID &&
-                            <>
-                                <i className="fi fi-sr-shield-trust"></i>
-                            </>
+                            <i className="fi fi-sr-magic-wand"></i>
                         }
                     </div>
                     <div className={styles.profilePageNameAddress}>
@@ -154,20 +156,10 @@ export default function ProfilePage() {
                     </div>
                 </div>
                 <div className={styles.profilePageOptions}>
-                    {/* {isOtherProfile() && hasID && (
-                            <div className={styles.profilePageOption} onClick={() => handleViewChange('tip')}>
-                                <i className="fi fi-rr-send-money"></i>
-                            </div>
-                        
-                    )} */}
                     {isOtherProfile() &&
-                        <>
-                            <div className={styles.profilePageOption}>
-                                <UserFollow
-                                    userAddress={address}
-                                />
-                            </div>
-                        </>
+                        <div className={styles.profilePageOption}>
+                            <UserFollow userAddress={address} />
+                        </div>
                     }
                 </div>
             </div>
@@ -193,7 +185,7 @@ export default function ProfilePage() {
                     >
                         <p>Purchases</p>
                     </div>
-                    {isConnected && isSignedIn &&
+                    {isConnected &&
                         <>
                             <div 
                                 className={getNavOptionClassName('fan')}
@@ -209,7 +201,6 @@ export default function ProfilePage() {
                             </div>
                         </>
                     }
-                    
                 </div>
             </div>
             <div className={styles.profilePageDisplay}>

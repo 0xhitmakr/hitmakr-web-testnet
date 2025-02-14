@@ -24,10 +24,10 @@ const DetailsInput = () => {
         ...prevUploadState,
         songDetails: {
           ...prevUploadState.songDetails,
-          [name]: selectedLanguageName, 
+          [name]: selectedLanguageName,
         },
       }));
-      return; 
+      return;
     }
 
     setUploadState((prevUploadState) => ({
@@ -45,7 +45,7 @@ const DetailsInput = () => {
         return code;
       }
     }
-    return ""; 
+    return "";
   };
 
   return (
@@ -96,8 +96,8 @@ const DetailsInput = () => {
           >
             <option value="">Select Genre</option>
             {musicGenres.map((genre) => (
-              <option key={genre} value={genre}>
-                {genre}
+              <option key={genre.name} value={genre.name}>
+                {genre.name}
               </option>
             ))}
           </select>
@@ -123,25 +123,25 @@ const DetailsInput = () => {
           </select>
         </div>
         <div className={styles.formDetails}>
-        <label htmlFor="language" className={styles.formDetailsLabel}>
-          Language
-        </label>
-        <select
-          id="language"
-          name="language"
-          onChange={handleDetailsChange}
-          required
-          className={styles.formDetailsInput}
-          value={getLanguageCode(songDetails.language)} // Get code from name
-        >
-          <option value="">Select Language</option>
-          {Object.entries(languagesData).map(([code, name]) => (
-            <option key={code} value={code}> 
-              {name} 
-            </option>
-          ))}
-        </select>
-      </div>
+          <label htmlFor="language" className={styles.formDetailsLabel}>
+            Language
+          </label>
+          <select
+            id="language"
+            name="language"
+            onChange={handleDetailsChange}
+            required
+            className={styles.formDetailsInput}
+            value={getLanguageCode(songDetails.language)} // Get code from name
+          >
+            <option value="">Select Language</option>
+            {Object.entries(languagesData).map(([code, name]) => (
+              <option key={code} value={code}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className={styles.formDetails}>
           <label htmlFor="license" className={styles.formDetailsLabel}>
             License
