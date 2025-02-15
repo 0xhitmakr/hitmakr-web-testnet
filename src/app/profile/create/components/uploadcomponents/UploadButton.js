@@ -46,7 +46,7 @@ export default function UploadButton() {
             editions: {
                 streaming: { enabled: true, price: 0 },
                 collectors: { enabled: false, price: 5 },
-                licensing: { enabled: false, price: 100 }
+                licensing: { enabled: false, price: 5 }
             },
             royaltySplits: [],
             isGated: false,
@@ -242,8 +242,8 @@ export default function UploadButton() {
                     uploadState?.songDetails?.language?.trim() &&
                     uploadState?.songDetails?.license &&
                     uploadState?.royaltySplits?.length > 0 &&
-                    uploadState?.editions?.collectors?.enabled && 
-                    uploadState?.editions?.licensing?.enabled &&
+                    uploadState?.editions?.collectors?.price >= 5 &&
+                    uploadState?.editions?.licensing?.price >= 5 &&
                     uploadState?.copyrightChecked
                 );
 
