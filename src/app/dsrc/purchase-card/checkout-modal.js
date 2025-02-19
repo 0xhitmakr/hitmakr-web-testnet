@@ -120,7 +120,7 @@ const CheckoutModal = ({ closeFunction, data }) => {
     if (allEditionsOwned) return "All Editions Owned";
     if (purchaseLoading) return "Processing...";
     if (!isCorrectChain) return "Switch Network";
-    return "Checkout";
+    return "NFT Checkout";
   };
 
   if (isLoading) {
@@ -131,7 +131,7 @@ const CheckoutModal = ({ closeFunction, data }) => {
     <div className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50">
       <div className="bg-[#151515] rounded-lg w-full max-w-sm">
         <div className="flex items-center justify-between p-3">
-          <h2 className="text-lg font-medium text-white">Checkout</h2>
+          <h2 className="text-lg font-medium text-white">NFT Checkout</h2>
           <button 
             onClick={closeFunction}
             className="text-gray-400 hover:text-white transition-colors"
