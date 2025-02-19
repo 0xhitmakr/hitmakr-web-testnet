@@ -22,9 +22,9 @@ const modal = createAppKit({
   siwx: siwxConfig,
   features: {
     analytics: true,
-    email: true,
-    socials: ['google', 'x', 'github', 'discord', 'apple', 'facebook', 'farcaster'],
-    emailShowWallets: true, 
+    email: false,
+    socials: false,
+    emailShowWallets: false, 
   },
   allWallets: 'SHOW',
   themeVariables: {
