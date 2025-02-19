@@ -20,7 +20,7 @@ async function processQueue(provider, wallet) {
     }
 
     // Amount to send per address (0.001 ETH)
-    const amountPerAddress = ethers.parseEther('0.001');
+    const amountPerAddress = ethers.parseEther('0.000005');
     
     // Check faucet balance
     const faucetBalance = await provider.getBalance(wallet.address);
