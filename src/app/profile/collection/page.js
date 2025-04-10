@@ -3,34 +3,36 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { useAccount } from "wagmi";
-import styles from "../styles/Playlist.module.css";
+import styles from "../styles/Collection.module.css";
 import HitmakrMiniModal from "@/app/components/modals/HitmakrMiniModal";
 import HitmakrButton from "@/app/components/buttons/HitmakrButton";
 import "@flaticon/flaticon-uicons/css/all/all.css";
 import RouterPushLink from "@/app/helpers/RouterPushLink";
 
-const PLAYLIST_NAME_MAX_LENGTH = 50;
-const PLAYLIST_DESCRIPTION_MAX_LENGTH = 350;
+const COLLECTION_NAME_MAX_LENGTH = 50;
+const COLLECTION_DESCRIPTION_MAX_LENGTH = 350;
 
-export default function CreatePlaylist() {
+export default function CreateCollection() {
   const { address, chainId: wagmiChainId } = useAccount();
 
-  const [playlistData, setPlaylistData] = useState({
+  const [collectionData, setCollectionData] = useState({
     imageFile: null,
     imageUrl: "",
     name: "",
     description: "",
+    type: "album", // Default value
   });
 
   const [isModified, setIsModified] = useState({
     image: false,
     name: false,
     description: false,
+    type: false,
   });
 
   const [isLoading, setIsLoading] = useState({
     imageUpload: false,
-    playlistCreate: false,
+    collectionCreate: false,
   });
 
   const [showModal, setShowModal] = useState(false);
@@ -39,7 +41,7 @@ export default function CreatePlaylist() {
     description: "",
   });
 
-  const playlistImageInputRef = useRef(null);
+  const collectionImageInputRef = useRef(null);
   const { routeTo } = RouterPushLink();
 
   const validateImage = (file) => {
@@ -58,7 +60,7 @@ export default function CreatePlaylist() {
   const handleImageSelect = (file) => {
     try {
       if (file && validateImage(file)) {
-        setPlaylistData((prev) => ({
+        setCollectionData((prev) => ({
           ...prev,
           imageFile: file,
         }));
@@ -74,17 +76,16 @@ export default function CreatePlaylist() {
   };
 
   const handleImageUpload = async () => {
-    if (!playlistData.imageFile) return;
+    if (!collectionData.imageFile) return;
 
     setIsLoading((prev) => ({ ...prev, imageUpload: true }));
     const formData = new FormData();
-    formData.append("profilePicture", playlistData.imageFile); // Using the same field name as profile upload
+    formData.append("profilePicture", collectionData.imageFile); // Using the same field name as profile upload
     const authToken = localStorage.getItem("@appkit/siwx-auth-token");
-    const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token"); // Retrieve nonceToken
+    const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
     console.log(authToken, nonceToken);
     try {
       if (!authToken || !nonceToken) {
-        // Check for nonceToken
         throw new Error("Authentication token not found");
       }
 
@@ -94,11 +95,11 @@ export default function CreatePlaylist() {
           method: "POST",
           headers: {
             Authorization: `Bearer ${authToken}`,
-            "x-nonce-token": nonceToken, // Include nonceToken header
+            "x-nonce-token": nonceToken,
             "x-user-address": address,
             "x-chain-id": wagmiChainId.toString(),
           },
-          credentials: "include", // Important for CORS
+          credentials: "include",
           body: formData,
         }
       );
@@ -106,7 +107,7 @@ export default function CreatePlaylist() {
       if (!response.ok) throw new Error("Image upload failed");
 
       const data = await response.json();
-      setPlaylistData((prev) => ({
+      setCollectionData((prev) => ({
         ...prev,
         imageUrl: data.profilePictureUrl,
         imageFile: null,
@@ -115,13 +116,13 @@ export default function CreatePlaylist() {
 
       setModalContent({
         title: "Success",
-        description: "Playlist image uploaded successfully!",
+        description: "Collection image uploaded successfully!",
       });
       setShowModal(true);
     } catch (error) {
       setModalContent({
         title: "Error",
-        description: "Failed to upload playlist image. Please try again.",
+        description: "Failed to upload collection image. Please try again.",
       });
       setShowModal(true);
     } finally {
@@ -144,97 +145,99 @@ export default function CreatePlaylist() {
     const { name, value } = event.target;
     let updatedValue = value;
 
-    if (name === "name" && value.length > PLAYLIST_NAME_MAX_LENGTH) {
-      updatedValue = value.slice(0, PLAYLIST_NAME_MAX_LENGTH);
+    if (name === "name" && value.length > COLLECTION_NAME_MAX_LENGTH) {
+      updatedValue = value.slice(0, COLLECTION_NAME_MAX_LENGTH);
     } else if (
       name === "description" &&
-      value.length > PLAYLIST_DESCRIPTION_MAX_LENGTH
+      value.length > COLLECTION_DESCRIPTION_MAX_LENGTH
     ) {
-      updatedValue = value.slice(0, PLAYLIST_DESCRIPTION_MAX_LENGTH);
+      updatedValue = value.slice(0, COLLECTION_DESCRIPTION_MAX_LENGTH);
     }
 
-    setPlaylistData((prev) => ({ ...prev, [name]: updatedValue }));
+    setCollectionData((prev) => ({ ...prev, [name]: updatedValue }));
     setIsModified((prev) => ({ ...prev, [name]: true }));
   };
 
-  const handleCreatePlaylist = async () => {
-    if (!playlistData.name || !playlistData.imageUrl) {
+  const handleCreateCollection = async () => {
+    if (!collectionData.name || !collectionData.imageUrl) {
       setModalContent({
         title: "Missing Information",
-        description: "Please provide a playlist name and image.",
+        description: "Please provide a collection name and image.",
       });
       setShowModal(true);
       return;
     }
 
-    setIsLoading((prev) => ({ ...prev, playlistCreate: true }));
+    setIsLoading((prev) => ({ ...prev, collectionCreate: true }));
     const authToken = localStorage.getItem("@appkit/siwx-auth-token");
-    const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token"); // Retrieve nonceToken
+    const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
 
     try {
       if (!authToken || !nonceToken) {
-        // Check for nonceToken
         throw new Error("Authentication token not found");
       }
 
-      const playlistParams = {
-        name: sanitizeString(playlistData.name),
-        description: sanitizeString(playlistData.description),
-        imageUrl: playlistData.imageUrl,
+      const collectionParams = {
+        name: sanitizeString(collectionData.name),
+        description: sanitizeString(collectionData.description),
+        imageUrl: collectionData.imageUrl,
+        type: collectionData.type,
         isPublic: true,
       };
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/playlist/playlists`,
+        `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/collection/collections`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${authToken}`,
-            "x-nonce-token": nonceToken, // Include nonceToken header
+            "x-nonce-token": nonceToken,
             "x-user-address": address,
             "x-chain-id": wagmiChainId.toString(),
           },
-          credentials: "include", // Important for CORS
-          body: JSON.stringify(playlistParams),
+          credentials: "include",
+          body: JSON.stringify(collectionParams),
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create playlist");
+        throw new Error(errorData.message || "Failed to create collection");
       }
 
       const data = await response.json();
 
-      setPlaylistData({
+      setCollectionData({
         imageFile: null,
         imageUrl: "",
         name: "",
         description: "",
+        type: "album",
       });
       setIsModified({
         image: false,
         name: false,
         description: false,
+        type: false,
       });
 
       // Show success message
       setModalContent({
         title: "Success",
-        description: "Playlist created successfully!",
+        description: "Collection created successfully!",
       });
 
-      routeTo(`/playlist/${data.playlist.playlistId}`);
+      routeTo(`/collection/${data.collection.collectionId}`);
     } catch (error) {
-      console.error("Error creating playlist:", error);
+      console.error("Error creating collection:", error);
       setModalContent({
         title: "Error",
         description:
-          error.message || "Failed to create playlist. Please try again.",
+          error.message || "Failed to create collection. Please try again.",
       });
     } finally {
-      setIsLoading((prev) => ({ ...prev, playlistCreate: false }));
+      setIsLoading((prev) => ({ ...prev, collectionCreate: false }));
       setShowModal(true);
     }
   };
@@ -246,8 +249,11 @@ export default function CreatePlaylist() {
       <div className={styles.hitmakrFormContainer}>
         <div>
           <div className={styles.formDetails}>
-            <label htmlFor="playlistImage" className={styles.formDetailsLabel}>
-              Playlist Cover
+            <label
+              htmlFor="collectionImage"
+              className={styles.formDetailsLabel}
+            >
+              Collection Cover
             </label>
             <div
               className={styles.createUploadContainerInputImage}
@@ -263,22 +269,22 @@ export default function CreatePlaylist() {
             >
               <input
                 type="file"
-                id="playlistImage"
-                ref={playlistImageInputRef}
+                id="collectionImage"
+                ref={collectionImageInputRef}
                 style={{ display: "none" }}
                 onChange={(e) => handleImageSelect(e.target.files[0])}
                 accept=".jpg, .png, .gif"
               />
 
               <div className={styles.imageContainer}>
-                {(playlistData.imageFile || playlistData.imageUrl) && (
+                {(collectionData.imageFile || collectionData.imageUrl) && (
                   <Image
                     src={
-                      playlistData.imageFile
-                        ? URL.createObjectURL(playlistData.imageFile)
-                        : playlistData.imageUrl
+                      collectionData.imageFile
+                        ? URL.createObjectURL(collectionData.imageFile)
+                        : collectionData.imageUrl
                     }
-                    alt="Playlist Cover"
+                    alt="Collection Cover"
                     width={300}
                     height={300}
                     style={{ objectFit: "cover", borderRadius: "10px" }}
@@ -288,7 +294,7 @@ export default function CreatePlaylist() {
 
                 <div
                   className={styles.imageOverlay}
-                  onClick={() => playlistImageInputRef.current.click()}
+                  onClick={() => collectionImageInputRef.current.click()}
                 >
                   <i className="fi fi-rr-picture" />
                   <p>Drag & Drop or Click to Change</p>
@@ -299,7 +305,7 @@ export default function CreatePlaylist() {
           </div>
 
           <div className={styles.formDetailsSave}>
-            {playlistData.imageFile && (
+            {collectionData.imageFile && (
               <div className="mt-4">
                 <HitmakrButton
                   buttonWidth="100px"
@@ -313,49 +319,66 @@ export default function CreatePlaylist() {
 
           <div className={styles.formDetails}>
             <label htmlFor="name" className={styles.formDetailsLabel}>
-              Playlist Name{" "}
+              Collection Name{" "}
               <small className={styles.inputLimit}>
-                {playlistData.name.length}/{PLAYLIST_NAME_MAX_LENGTH}
+                {collectionData.name.length}/{COLLECTION_NAME_MAX_LENGTH}
               </small>
             </label>
             <input
               type="text"
               id="name"
               name="name"
-              value={playlistData.name}
+              value={collectionData.name}
               onChange={handleChange}
               className={styles.formDetailsInput}
-              maxLength={PLAYLIST_NAME_MAX_LENGTH}
-              placeholder="Give your playlist a name"
+              maxLength={COLLECTION_NAME_MAX_LENGTH}
+              placeholder="Give your collection a name"
             />
+          </div>
+
+          <div className={styles.formDetails}>
+            <label htmlFor="type" className={styles.formDetailsLabel}>
+              Collection Type
+            </label>
+            <select
+              id="type"
+              name="type"
+              value={collectionData.type}
+              onChange={handleChange}
+              className={styles.formDetailsInput}
+            >
+              <option value="album">Album</option>
+              <option value="mixtape">Mixtape</option>
+              <option value="pack">Pack</option>
+            </select>
           </div>
 
           <div className={styles.formDetails}>
             <label htmlFor="description" className={styles.formDetailsLabel}>
               Description{" "}
               <small className={styles.inputLimit}>
-                {playlistData.description.length}/
-                {PLAYLIST_DESCRIPTION_MAX_LENGTH}
+                {collectionData.description.length}/
+                {COLLECTION_DESCRIPTION_MAX_LENGTH}
               </small>
             </label>
             <textarea
               id="description"
               name="description"
-              value={playlistData.description}
+              value={collectionData.description}
               onChange={handleChange}
               className={styles.formDetailsInput}
-              maxLength={PLAYLIST_DESCRIPTION_MAX_LENGTH}
-              placeholder="Describe your playlist"
+              maxLength={COLLECTION_DESCRIPTION_MAX_LENGTH}
+              placeholder="Describe your collection"
             />
           </div>
 
           <div className={styles.submitButton}>
             <HitmakrButton
               buttonWidth="50%"
-              buttonFunction={handleCreatePlaylist}
-              buttonName="Create Playlist"
+              buttonFunction={handleCreateCollection}
+              buttonName="Create Collection"
               isDark={!isFormModified}
-              isLoading={isLoading.playlistCreate}
+              isLoading={isLoading.collectionCreate}
             />
           </div>
         </div>
