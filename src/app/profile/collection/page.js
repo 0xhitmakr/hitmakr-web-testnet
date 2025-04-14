@@ -3,7 +3,7 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { useAccount } from "wagmi";
-import styles from "../styles/Collection.module.css";
+import styles from "./styles/Collection.module.css";
 import HitmakrMiniModal from "@/app/components/modals/HitmakrMiniModal";
 import HitmakrButton from "@/app/components/buttons/HitmakrButton";
 import "@flaticon/flaticon-uicons/css/all/all.css";

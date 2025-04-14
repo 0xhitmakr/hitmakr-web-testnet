@@ -1,3 +1,64 @@
+.viewToggle {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 10px 0;
+  padding: 0 10px;
+  background-color: rgba(32, 32, 32, 0.7);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.toggleButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: #b3b3b3;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  border-radius: 16px;
+  margin: 4px;
+  white-space: nowrap;
+}
+
+.toggleButton:hover {
+  color: #fff;
+}
+
+.toggleButton i {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activeToggle {
+  background-color: #8023E4;
+  color: #fff;
+}
+
+.activeToggle:hover {
+  background-color: #9044e8;
+}
+
+@media (max-width: 768px) {
+  .toggleButton span {
+    display: none;
+  }
+
+  .toggleButton {
+    padding: 8px;
+  }
+
+  .viewToggle {
+    width: auto;
+  }
+}
+
 .sidebar {
     width: 350px;
     position: fixed;
