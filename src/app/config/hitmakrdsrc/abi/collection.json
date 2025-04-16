@@ -1,0 +1,155 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_verificationContract",
+        "type": "address",
+        "internalType": "address"
+      },
+      { "name": "_dsrcFactory", "type": "address", "internalType": "address" }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "addDSRCToCollection",
+    "inputs": [
+      { "name": "collectionId", "type": "uint256", "internalType": "uint256" },
+      { "name": "dsrcAddress", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "collections",
+    "inputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [
+      { "name": "name", "type": "string", "internalType": "string" },
+      { "name": "description", "type": "string", "internalType": "string" },
+      {
+        "name": "collectionType",
+        "type": "uint8",
+        "internalType": "enum HitmakrCollection.CollectionType"
+      },
+      { "name": "createdAt", "type": "uint40", "internalType": "uint40" },
+      { "name": "exists", "type": "bool", "internalType": "bool" },
+      { "name": "coverArtUri", "type": "string", "internalType": "string" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "createCollection",
+    "inputs": [
+      { "name": "name", "type": "string", "internalType": "string" },
+      { "name": "description", "type": "string", "internalType": "string" },
+      {
+        "name": "collectionType",
+        "type": "uint8",
+        "internalType": "enum HitmakrCollection.CollectionType"
+      },
+      { "name": "coverArtUri", "type": "string", "internalType": "string" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "creatorCollections",
+    "inputs": [
+      { "name": "", "type": "address", "internalType": "address" },
+      { "name": "", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "dsrcFactory",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IHitmakrDSRCFactory"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getCollection",
+    "inputs": [
+      { "name": "collectionId", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct HitmakrCollection.Collection",
+        "components": [
+          { "name": "name", "type": "string", "internalType": "string" },
+          { "name": "description", "type": "string", "internalType": "string" },
+          {
+            "name": "collectionType",
+            "type": "uint8",
+            "internalType": "enum HitmakrCollection.CollectionType"
+          },
+          { "name": "createdAt", "type": "uint40", "internalType": "uint40" },
+          { "name": "exists", "type": "bool", "internalType": "bool" },
+          {
+            "name": "dsrcAddresses",
+            "type": "address[]",
+            "internalType": "address[]"
+          },
+          { "name": "coverArtUri", "type": "string", "internalType": "string" }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getCreatorCollections",
+    "inputs": [
+      { "name": "creator", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [
+      {
+        "name": "collectionIds",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "paused",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "totalCollections",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "verificationContract",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IHitmakrVerification"
+      }
+    ],
+    "stateMutability": "view"
+  }
+]

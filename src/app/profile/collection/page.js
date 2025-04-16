@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useAccount } from "wagmi";
 import styles from "./styles/Collection.module.css";
@@ -8,12 +8,44 @@ import HitmakrMiniModal from "@/app/components/modals/HitmakrMiniModal";
 import HitmakrButton from "@/app/components/buttons/HitmakrButton";
 import "@flaticon/flaticon-uicons/css/all/all.css";
 import RouterPushLink from "@/app/helpers/RouterPushLink";
+import {
+  fetchCreatorCollectionsDirectly,
+  useCreateCollection,
+  useGetCreatorCollections,
+  useGetTotalCollections,
+} from "@/app/config/hitmakrdsrc/hitmakrCollection";
+import { GetTransactionStatus } from "@/app/helpers/GetTransactionStatus";
+import { skaleChainId } from "@/lib/secure/Config";
 
 const COLLECTION_NAME_MAX_LENGTH = 50;
 const COLLECTION_DESCRIPTION_MAX_LENGTH = 350;
 
 export default function CreateCollection() {
   const { address, chainId: wagmiChainId } = useAccount();
+
+  const {
+    createCollection,
+    isPending: isCreating,
+    data: createData,
+    isError: createError,
+  } = useCreateCollection();
+
+  const { totalCollections } = useGetTotalCollections();
+
+  const { collections } = useGetCreatorCollections(address);
+
+  console.log("coll", collections, address, totalCollections);
+
+  const { txReceiptData, txReceiptLoading, txReceiptError } =
+    GetTransactionStatus(createData, skaleChainId);
+  console.log(
+    isCreating,
+    txReceiptData,
+    txReceiptLoading,
+    txReceiptError,
+    createError,
+    createData
+  );
 
   const [collectionData, setCollectionData] = useState({
     imageFile: null,
@@ -57,6 +89,99 @@ export default function CreateCollection() {
     return true;
   };
 
+  useEffect(() => {
+    const completeCollectionCreation = async () => {
+      if (txReceiptData && !txReceiptLoading && !txReceiptError) {
+        console.log("Transaction confirmed:", txReceiptData);
+        const authToken = localStorage.getItem("@appkit/siwx-auth-token");
+        const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
+
+        try {
+          const collectionParams = {
+            name: sanitizeString(collectionData.name),
+            description: sanitizeString(collectionData.description),
+            imageUrl: collectionData.imageUrl,
+            type: collectionData.type,
+            isPublic: true,
+          };
+
+          // Now store in backend
+          console.log("Storing collection in backend...");
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/collection/collections`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${authToken}`,
+                "x-nonce-token": nonceToken,
+                "x-user-address": address,
+                "x-chain-id": wagmiChainId.toString(),
+              },
+              credentials: "include",
+              body: JSON.stringify(collectionParams),
+            }
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              errorData.message || "Failed to create collection in backend"
+            );
+          }
+
+          const data = await response.json();
+          console.log("Collection stored in backend:", data);
+
+          setCollectionData({
+            imageFile: null,
+            imageUrl: "",
+            name: "",
+            description: "",
+            type: "album",
+          });
+
+          setIsModified({
+            image: false,
+            name: false,
+            description: false,
+            type: false,
+          });
+
+          setModalContent({
+            title: "Success",
+            description: "Collection created successfully!",
+          });
+          setShowModal(true);
+
+          setTimeout(() => {
+            routeTo(`/collection/${data.collection.collectionId}`);
+          }, 1500);
+        } catch (error) {
+          console.error("Error storing collection in backend:", error);
+          setModalContent({
+            title: "Warning",
+            description:
+              "Collection created on blockchain but failed to store in backend.",
+          });
+          setShowModal(true);
+        } finally {
+          setIsLoading((prev) => ({ ...prev, collectionCreate: false }));
+        }
+      } else if (txReceiptError) {
+        console.error("Transaction error:", txReceiptError);
+        setModalContent({
+          title: "Error",
+          description: "Failed to create collection on blockchain.",
+        });
+        setShowModal(true);
+        setIsLoading((prev) => ({ ...prev, collectionCreate: false }));
+      }
+    };
+
+    completeCollectionCreation();
+  }, [txReceiptData, txReceiptLoading, txReceiptError]);
+
   const handleImageSelect = (file) => {
     try {
       if (file && validateImage(file)) {
@@ -80,10 +205,10 @@ export default function CreateCollection() {
 
     setIsLoading((prev) => ({ ...prev, imageUpload: true }));
     const formData = new FormData();
-    formData.append("profilePicture", collectionData.imageFile); // Using the same field name as profile upload
+    formData.append("profilePicture", collectionData.imageFile);
     const authToken = localStorage.getItem("@appkit/siwx-auth-token");
     const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
-    console.log(authToken, nonceToken);
+
     try {
       if (!authToken || !nonceToken) {
         throw new Error("Authentication token not found");
@@ -177,58 +302,16 @@ export default function CreateCollection() {
         throw new Error("Authentication token not found");
       }
 
-      const collectionParams = {
-        name: sanitizeString(collectionData.name),
-        description: sanitizeString(collectionData.description),
-        imageUrl: collectionData.imageUrl,
-        type: collectionData.type,
-        isPublic: true,
-      };
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/collection/collections`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-            "x-nonce-token": nonceToken,
-            "x-user-address": address,
-            "x-chain-id": wagmiChainId.toString(),
-          },
-          credentials: "include",
-          body: JSON.stringify(collectionParams),
-        }
+      await createCollection(
+        collectionData.name,
+        collectionData.description,
+        collectionData.type === "album"
+          ? 0
+          : collectionData.type === "mixtape"
+          ? 1
+          : 2,
+        collectionData.imageUrl
       );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create collection");
-      }
-
-      const data = await response.json();
-
-      setCollectionData({
-        imageFile: null,
-        imageUrl: "",
-        name: "",
-        description: "",
-        type: "album",
-      });
-      setIsModified({
-        image: false,
-        name: false,
-        description: false,
-        type: false,
-      });
-
-      // Show success message
-      setModalContent({
-        title: "Success",
-        description: "Collection created successfully!",
-      });
-
-      routeTo(`/collection/${data.collection.collectionId}`);
     } catch (error) {
       console.error("Error creating collection:", error);
       setModalContent({

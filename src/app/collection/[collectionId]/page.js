@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import Image from "next/image";
 import ColorThief from "colorthief";
 import LoaderWhiteSmall from "@/app/components/animations/loaders/loaderWhiteSmall";
-import styles from "./styles/CollectionId.module.css"; // Will reuse the same or similar styles
+import styles from "./styles/CollectionId.module.css";
 import Link from "next/link";
 import GetUsernameByAddress from "@/app/helpers/profile/GetUsernameByAddress";
 import RouterPushLink from "@/app/helpers/RouterPushLink";
@@ -213,12 +213,12 @@ export default function CollectionDetails() {
 
   return (
     <div
-      className={styles.collectionContainer}
+      className={styles.playlistContainer}
       style={{
         background: `linear-gradient(180deg, ${dominantColor}99 0%, #121212 100%)`,
       }}
     >
-      <section className={styles.collectionHeader}>
+      <section className={styles.playlistHeader}>
         <div className={styles.headerContent}>
           <div className={styles.coverImage}>
             <Image
@@ -232,36 +232,31 @@ export default function CollectionDetails() {
               priority
               unoptimized
             />
-            {tracks.length > 0 && (
-              <div className={styles.playOverlay}>
-                <button
-                  onClick={handleCollectionPlay}
-                  className={styles.playButton}
-                  aria-label={
-                    isPlaying && currentTrack === tracks[0] ? "Pause" : "Play"
+            <div className={styles.playOverlay}>
+              <button
+                className={styles.playButton}
+                onClick={handleCollectionPlay}
+              >
+                <i
+                  className={
+                    isPlaying && currentTrack?.dsrcId === tracks[0]?.dsrcId
+                      ? "fi fi-sr-pause"
+                      : "fi fi-sr-play"
                   }
-                >
-                  <i
-                    className={`fi ${
-                      isPlaying && currentTrack === tracks[0]
-                        ? "fi-sr-pause"
-                        : "fi-sr-play"
-                    }`}
-                  />
-                </button>
-              </div>
-            )}
+                ></i>
+              </button>
+            </div>
           </div>
 
-          <div className={styles.collectionInfo}>
-            <span className={styles.collectionType}>
+          <div className={styles.playlistInfo}>
+            <span className={styles.playlistType}>
               {collection.type
                 ? collection.type.charAt(0).toUpperCase() +
                   collection.type.slice(1)
                 : "Collection"}
             </span>
-            <h1 className={styles.collectionTitle}>{collection.name}</h1>
-            <div className={styles.collectionMeta}>
+            <h1 className={styles.playlistTitle}>{collection.name}</h1>
+            <div className={styles.playlistMeta}>
               <Link
                 href={`/profile?address=${collection.creator}`}
                 className={styles.creatorName}
@@ -286,8 +281,7 @@ export default function CollectionDetails() {
                 <DSRCPlaylistView
                   key={track.dsrcId}
                   dsrcId={track.dsrcId}
-                  playlistId={playlistId}
-                  onRemoveSuccess={handleTrackRemove}
+                  playlistId={collectionId}
                 />
               ))}
             </div>
@@ -309,7 +303,7 @@ export default function CollectionDetails() {
             )}
           </>
         ) : (
-          <div className={styles.emptyCollection}>
+          <div className={styles.emptyPlaylist}>
             <i className="fi fi-rr-music-note"></i>
             <p>This collection is empty</p>
             <span>No DSRCs have been added yet</span>
