@@ -2,13 +2,15 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { useAccount } from "wagmi";
+import { useAccount, useWatchContractEvent } from "wagmi";
 import styles from "./styles/Collection.module.css";
 import HitmakrMiniModal from "@/app/components/modals/HitmakrMiniModal";
 import HitmakrButton from "@/app/components/buttons/HitmakrButton";
 import "@flaticon/flaticon-uicons/css/all/all.css";
 import RouterPushLink from "@/app/helpers/RouterPushLink";
 import {
+  createCollection2,
+  extractCollectionId,
   fetchCreatorCollectionsDirectly,
   useCreateCollection,
   useGetCreatorCollections,
@@ -31,21 +33,12 @@ export default function CreateCollection() {
   } = useCreateCollection();
 
   const { totalCollections } = useGetTotalCollections();
-
   const { collections } = useGetCreatorCollections(address);
 
-  console.log("coll", collections, address, totalCollections);
+  // console.log("printing data ", totalCollections, collections, address);
 
   const { txReceiptData, txReceiptLoading, txReceiptError } =
     GetTransactionStatus(createData, skaleChainId);
-  console.log(
-    isCreating,
-    txReceiptData,
-    txReceiptLoading,
-    txReceiptError,
-    createError,
-    createData
-  );
 
   const [collectionData, setCollectionData] = useState({
     imageFile: null,
@@ -93,6 +86,10 @@ export default function CreateCollection() {
     const completeCollectionCreation = async () => {
       if (txReceiptData && !txReceiptLoading && !txReceiptError) {
         console.log("Transaction confirmed:", txReceiptData);
+
+        // const newCollectionId = extractCollectionId(txReceiptData);
+        // console.log("Extracted collection ID:", newCollectionId);
+
         const authToken = localStorage.getItem("@appkit/siwx-auth-token");
         const nonceToken = localStorage.getItem("@appkit/siwx-nonce-token");
 
@@ -319,153 +316,142 @@ export default function CreateCollection() {
         description:
           error.message || "Failed to create collection. Please try again.",
       });
+      setShowModal(true);
     } finally {
       setIsLoading((prev) => ({ ...prev, collectionCreate: false }));
-      setShowModal(true);
     }
   };
 
   const isFormModified = Object.values(isModified).some((value) => value);
 
   return (
-    <div className={styles.hitmakrForm}>
-      <div className={styles.hitmakrFormContainer}>
-        <div>
-          <div className={styles.formDetails}>
-            <label
-              htmlFor="collectionImage"
-              className={styles.formDetailsLabel}
-            >
-              Collection Cover
-            </label>
-            <div
-              className={styles.createUploadContainerInputImage}
-              onDrop={(e) => {
-                e.preventDefault();
-                const file = e.dataTransfer.files[0];
-                if (file) handleImageSelect(file);
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = "copy";
-              }}
-            >
-              <input
-                type="file"
-                id="collectionImage"
-                ref={collectionImageInputRef}
-                style={{ display: "none" }}
-                onChange={(e) => handleImageSelect(e.target.files[0])}
-                accept=".jpg, .png, .gif"
-              />
+    <div className={styles.formContainer}>
+      <div className={styles.formWrapper}>
+        {/* Cover Image Upload */}
+        <div className={styles.imageUploadSection}>
+          <label className={styles.formLabel}>Collection Cover</label>
+          <div
+            className={styles.imageDropzone}
+            onDrop={(e) => {
+              e.preventDefault();
+              const file = e.dataTransfer.files[0];
+              if (file) handleImageSelect(file);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "copy";
+            }}
+            onClick={() => collectionImageInputRef.current.click()}
+          >
+            <input
+              type="file"
+              ref={collectionImageInputRef}
+              style={{ display: "none" }}
+              onChange={(e) => handleImageSelect(e.target.files[0])}
+              accept=".jpg, .png, .gif"
+            />
 
-              <div className={styles.imageContainer}>
-                {(collectionData.imageFile || collectionData.imageUrl) && (
-                  <Image
-                    src={
-                      collectionData.imageFile
-                        ? URL.createObjectURL(collectionData.imageFile)
-                        : collectionData.imageUrl
-                    }
-                    alt="Collection Cover"
-                    width={300}
-                    height={300}
-                    style={{ objectFit: "cover", borderRadius: "10px" }}
-                    priority
-                  />
-                )}
-
-                <div
-                  className={styles.imageOverlay}
-                  onClick={() => collectionImageInputRef.current.click()}
-                >
+            {collectionData.imageFile || collectionData.imageUrl ? (
+              <div className={styles.imagePreviewContainer}>
+                <Image
+                  src={
+                    collectionData.imageFile
+                      ? URL.createObjectURL(collectionData.imageFile)
+                      : collectionData.imageUrl
+                  }
+                  alt="Collection Cover"
+                  width={300}
+                  height={300}
+                  className={styles.imagePreview}
+                  priority
+                />
+                <div className={styles.imageOverlay}>
                   <i className="fi fi-rr-picture" />
                   <p>Drag & Drop or Click to Change</p>
                   <small>1MB MAX (400 x 400)</small>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className={styles.formDetailsSave}>
-            {collectionData.imageFile && (
-              <div className="mt-4">
-                <HitmakrButton
-                  buttonWidth="100px"
-                  buttonFunction={handleImageUpload}
-                  buttonName="Save"
-                  isLoading={isLoading.imageUpload}
-                />
+            ) : (
+              <div className={styles.placeholderContent}>
+                <i className="fi fi-rr-picture" />
+                <p>Drag & Drop or Click to Upload</p>
+                <small>1MB MAX (400 x 400)</small>
               </div>
             )}
           </div>
 
-          <div className={styles.formDetails}>
-            <label htmlFor="name" className={styles.formDetailsLabel}>
-              Collection Name{" "}
-              <small className={styles.inputLimit}>
-                {collectionData.name.length}/{COLLECTION_NAME_MAX_LENGTH}
-              </small>
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={collectionData.name}
-              onChange={handleChange}
-              className={styles.formDetailsInput}
-              maxLength={COLLECTION_NAME_MAX_LENGTH}
-              placeholder="Give your collection a name"
-            />
-          </div>
-
-          <div className={styles.formDetails}>
-            <label htmlFor="type" className={styles.formDetailsLabel}>
-              Collection Type
-            </label>
-            <select
-              id="type"
-              name="type"
-              value={collectionData.type}
-              onChange={handleChange}
-              className={styles.formDetailsInput}
-            >
-              <option value="album">Album</option>
-              <option value="mixtape">Mixtape</option>
-              <option value="pack">Pack</option>
-            </select>
-          </div>
-
-          <div className={styles.formDetails}>
-            <label htmlFor="description" className={styles.formDetailsLabel}>
-              Description{" "}
-              <small className={styles.inputLimit}>
-                {collectionData.description.length}/
-                {COLLECTION_DESCRIPTION_MAX_LENGTH}
-              </small>
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={collectionData.description}
-              onChange={handleChange}
-              className={styles.formDetailsInput}
-              maxLength={COLLECTION_DESCRIPTION_MAX_LENGTH}
-              placeholder="Describe your collection"
-            />
-          </div>
-
-          <div className={styles.submitButton}>
-            <HitmakrButton
-              buttonWidth="50%"
-              buttonFunction={handleCreateCollection}
-              buttonName="Create Collection"
-              isDark={!isFormModified}
-              isLoading={isLoading.collectionCreate}
-            />
-          </div>
+          {collectionData.imageFile && (
+            <div className={styles.uploadButtonContainer}>
+              <HitmakrButton
+                buttonWidth="100px"
+                buttonFunction={handleImageUpload}
+                buttonName="Save"
+                isLoading={isLoading.imageUpload}
+              />
+            </div>
+          )}
         </div>
-        <div className="margin50vh"></div>
+
+        {/* Form Fields */}
+        <div className={styles.formField}>
+          <label className={styles.formLabel}>
+            Collection Name{" "}
+            <span className={styles.counter}>
+              {collectionData.name.length}/{COLLECTION_NAME_MAX_LENGTH}
+            </span>
+          </label>
+          <input
+            type="text"
+            name="name"
+            value={collectionData.name}
+            onChange={handleChange}
+            className={styles.formInput}
+            maxLength={COLLECTION_NAME_MAX_LENGTH}
+            placeholder="Give your collection a name"
+          />
+        </div>
+
+        <div className={styles.formField}>
+          <label className={styles.formLabel}>Collection Type</label>
+          <select
+            name="type"
+            value={collectionData.type}
+            onChange={handleChange}
+            className={styles.formInput}
+          >
+            <option value="album">Album</option>
+            <option value="mixtape">Mixtape</option>
+            <option value="pack">Pack</option>
+          </select>
+        </div>
+
+        <div className={styles.formField}>
+          <label className={styles.formLabel}>
+            Description{" "}
+            <span className={styles.counter}>
+              {collectionData.description.length}/
+              {COLLECTION_DESCRIPTION_MAX_LENGTH}
+            </span>
+          </label>
+          <textarea
+            name="description"
+            value={collectionData.description}
+            onChange={handleChange}
+            className={styles.formTextarea}
+            maxLength={COLLECTION_DESCRIPTION_MAX_LENGTH}
+            placeholder="Describe your collection"
+          />
+        </div>
+
+        <div className={styles.buttonContainer}>
+          <HitmakrButton
+            buttonWidth="100%"
+            buttonFunction={handleCreateCollection}
+            buttonName="Create Collection"
+            isDark={!isFormModified}
+            isLoading={isLoading.collectionCreate}
+          />
+        </div>
       </div>
 
       {showModal && (

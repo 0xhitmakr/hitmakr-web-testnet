@@ -89,7 +89,6 @@ export default function AddToCollectionModal({
         );
       }
 
-      // Check if DSRC is already in collection
       const checkResponse = await fetch(
         `${process.env.NEXT_PUBLIC_HITMAKR_SERVER}/collection/collections/${collectionId}`,
         {

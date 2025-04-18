@@ -40,7 +40,7 @@ const HitmakrVerificationForm = atom({
 });
 
 const CreativesUpload = atom({
-  key: 'CreativesUpload',
+  key: "CreativesUpload",
   default: {
     selectedFile: null,
     selectedCover: null,
@@ -57,16 +57,17 @@ const CreativesUpload = atom({
     selectedCategory: "music",
     selectedLyrics: null,
     royaltySplits: [],
-    newAddress: '',
+    newAddress: "",
     copyrightChecked: false,
     copyrightOverwrite: false,
     editions: {
       streaming: { enabled: true, price: 0 },
       collectors: { enabled: false, price: 5 },
-      licensing: { enabled: false, price: 100 }
+      licensing: { enabled: false, price: 100 },
     },
-    selectedChain: 'SKL',
+    selectedChain: "SKL",
     deadline: null,
+    selectedCollectionId: null,
   },
 });
 

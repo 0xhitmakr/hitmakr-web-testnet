@@ -8,6 +8,7 @@ import { countryData } from "@/lib/metadata/CountryData";
 import HitmakrCreativesStore from "@/app/config/store/HitmakrCreativesStore";
 import { languagesData } from "@/lib/metadata/LanguageData";
 import { useRecoilState } from "recoil";
+import CollectionSelector from "./CollectionSelector";
 
 const DetailsInput = () => {
   const [uploadState, setUploadState] = useRecoilState(
@@ -48,6 +49,7 @@ const DetailsInput = () => {
     return "";
   };
 
+  console.log(uploadState.selectedCollectionId);
   return (
     <div className={styles.createUploadContainerInput}>
       <div className={styles.createUploadContainerInputCover}>
@@ -162,6 +164,8 @@ const DetailsInput = () => {
             ))}
           </select>
         </div>
+
+        <CollectionSelector />
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import AddToPlaylistModal from "../profile/components/releases/components/AddToP
 import styles from "./styles/TopLiked.module.css";
 import SkeletonCard from "./SkeletonCard";
 import HashTagsModal from "./hashtags";
+import AddToCollectionModal from "../profile/components/releases/components/AddToCollectionModal";
 
 export default function DSRCCard({
   dsrcId,
@@ -37,6 +38,8 @@ export default function DSRCCard({
 
   const { dsrcAddress, isLoading: addressLoading } = useGetDSRC(dsrcId);
   const { details, loading: detailsLoading } = useGetDSRCDetails(dsrcAddress);
+
+  const [showAddToCollection, setShowAddToCollection] = useState(false);
 
   const { playTrack, playPause, isPlaying, currentTrack, addToQueue } =
     useMusicPlayer();
@@ -167,6 +170,10 @@ export default function DSRCCard({
         setShowAddToPlaylist(true);
         setActiveDropdown(false);
         break;
+      case "collection":
+        setShowAddToCollection(true);
+        setShowDropdown(false);
+        break;
       case "copy":
         handleCopyAddress();
         break;
@@ -225,6 +232,12 @@ export default function DSRCCard({
                   Add hashtags
                 </button>
               )}
+              {address === details?.creator && songId && (
+                <button onClick={() => handleOptionClick("collection")}>
+                  <i className="fi fi-rr-album" />
+                  Add to collection
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -274,7 +287,6 @@ export default function DSRCCard({
             >
               <GetUsernameByAddress address={details.creator} />
             </p>
-            
           </div>
 
           {hashTags?.length > 0 && (
@@ -310,6 +322,19 @@ export default function DSRCCard({
           closeFunction={() => setShowHashTags(false)}
           id={songId}
           hashTags={hashTags}
+        />
+      )}
+      {showAddToCollection && (
+        <AddToCollectionModal
+          dsrcId={songId}
+          onClose={() => setShowAddToCollection(false)}
+          showSuccessMessage={(title, description) =>
+            setModalState({
+              show: true,
+              title,
+              description,
+            })
+          }
         />
       )}
 

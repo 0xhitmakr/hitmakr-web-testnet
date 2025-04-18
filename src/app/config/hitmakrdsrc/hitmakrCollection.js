@@ -2,146 +2,21 @@
 
 import { ethers } from "ethers";
 import { useQuery } from "@tanstack/react-query";
-import { useReadContract, useWriteContract, useReadContracts } from "wagmi";
+import {
+  useReadContract,
+  useWriteContract,
+  useReadContracts,
+  usePublicClient,
+} from "wagmi";
 import { useAccount } from "wagmi";
 import { useSkaleChainValidation } from "@/app/helpers/SkaleChainValidation";
 import { useCallback, useEffect, useState } from "react";
+import { decodeEventLog } from "viem";
+import collectionAbi from "./abi/collection.json";
 
 const RPC_URL = process.env.NEXT_PUBLIC_SKALE_RPC_URL;
 const COLLECTION_CONTRACT_ADDRESS =
   process.env.NEXT_PUBLIC_HITMAKR_COLLECTION_ADDRESS;
-
-// Collection contract ABI
-const collectionAbi = [
-  {
-    type: "constructor",
-    inputs: [
-      {
-        name: "_verificationContract",
-        type: "address",
-        internalType: "address",
-      },
-      { name: "_dsrcFactory", type: "address", internalType: "address" },
-    ],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "addDSRCToCollection",
-    inputs: [
-      { name: "collectionId", type: "uint256", internalType: "uint256" },
-      { name: "dsrcAddress", type: "address", internalType: "address" },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "collections",
-    inputs: [{ name: "", type: "uint256", internalType: "uint256" }],
-    outputs: [
-      { name: "name", type: "string", internalType: "string" },
-      { name: "description", type: "string", internalType: "string" },
-      {
-        name: "collectionType",
-        type: "uint8",
-        internalType: "enum HitmakrCollection.CollectionType",
-      },
-      { name: "createdAt", type: "uint40", internalType: "uint40" },
-      { name: "exists", type: "bool", internalType: "bool" },
-      { name: "coverArtUri", type: "string", internalType: "string" },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "createCollection",
-    inputs: [
-      { name: "name", type: "string", internalType: "string" },
-      { name: "description", type: "string", internalType: "string" },
-      {
-        name: "collectionType",
-        type: "uint8",
-        internalType: "enum HitmakrCollection.CollectionType",
-      },
-      { name: "coverArtUri", type: "string", internalType: "string" },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "creatorCollections",
-    inputs: [
-      { name: "", type: "address", internalType: "address" },
-      { name: "", type: "uint256", internalType: "uint256" },
-    ],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "getCollection",
-    inputs: [
-      { name: "collectionId", type: "uint256", internalType: "uint256" },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "tuple",
-        internalType: "struct HitmakrCollection.Collection",
-        components: [
-          { name: "name", type: "string", internalType: "string" },
-          { name: "description", type: "string", internalType: "string" },
-          {
-            name: "collectionType",
-            type: "uint8",
-            internalType: "enum HitmakrCollection.CollectionType",
-          },
-          { name: "createdAt", type: "uint40", internalType: "uint40" },
-          { name: "exists", type: "bool", internalType: "bool" },
-          {
-            name: "dsrcAddresses",
-            type: "address[]",
-            internalType: "address[]",
-          },
-          { name: "coverArtUri", type: "string", internalType: "string" },
-        ],
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "getCreatorCollections",
-    inputs: [{ name: "creator", type: "address", internalType: "address" }],
-    outputs: [
-      { name: "collectionIds", type: "uint256[]", internalType: "uint256[]" },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "paused",
-    inputs: [],
-    outputs: [{ name: "", type: "bool", internalType: "bool" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "totalCollections",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "toggleEmergencyPause",
-    inputs: [],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-];
 
 // Collection type enum to match contract
 const CollectionType = {
@@ -150,12 +25,207 @@ const CollectionType = {
   Pack: 2,
 };
 
+export const listenForCollectionCreation = async (
+  contractAddress,
+  abi,
+  provider,
+  userAddress
+) => {
+  // Create a contract instance
+  const contract = new ethers.Contract(contractAddress, abi, provider);
+
+  // Create a filter for the CollectionCreated event, filtered by the user's address
+  const filter = contract.filters.CollectionCreated(null, userAddress);
+
+  console.log(
+    `Setting up listener for CollectionCreated events from ${userAddress}...`
+  );
+
+  // Listen for the event
+  contract.on(
+    filter,
+    (collectionId, creator, name, collectionType, timestamp, event) => {
+      console.log("Collection created!");
+      console.log("Collection ID:", collectionId.toString());
+      console.log("Creator:", creator);
+      console.log("Collection Name:", name);
+      console.log("Collection Type:", collectionType);
+      console.log("Timestamp:", timestamp);
+      console.log("Transaction hash:", event.transactionHash);
+
+      // You can do something with the collectionId here
+      // e.g., call a function, update state, etc.
+    }
+  );
+
+  return () => {
+    // Return a cleanup function to remove the listener when done
+    contract.removeAllListeners(filter);
+    console.log("Event listener removed");
+  };
+};
+
+export const extractCollectionId = (txReceipt) => {
+  console.log(txReceipt);
+
+  if (!txReceipt || !txReceipt.logs || txReceipt.logs.length === 0) {
+    return null;
+  }
+
+  try {
+    console.log(txReceipt);
+    // Find the CollectionCreated event in the logs
+    const collectionCreatedLog = txReceipt.logs.find((log) => {
+      // Check if the log is from the collection contract
+      console.log("log ", log);
+      if (
+        log.address.toLowerCase() !== COLLECTION_CONTRACT_ADDRESS.toLowerCase()
+      ) {
+        return false;
+      }
+
+      try {
+        // Try to decode the log
+        const decodedLog = decodeEventLog({
+          abi: collectionAbi,
+          data: log.data,
+          topics: log.topics,
+        });
+
+        return decodedLog.eventName === "CollectionCreated";
+      } catch {
+        return false;
+      }
+    });
+
+    if (collectionCreatedLog) {
+      // Decode the event to extract the collection ID
+      const decodedEvent = decodeEventLog({
+        abi: collectionAbi,
+        data: collectionCreatedLog.data,
+        topics: collectionCreatedLog.topics,
+      });
+
+      return decodedEvent.args.collectionId;
+    }
+  } catch (error) {
+    console.error("Error extracting collection ID:", error);
+  }
+
+  return null;
+};
+
+export const getCollectionIdAfterCreation = async (
+  txHash,
+  publicClient,
+  userAddress
+) => {
+  try {
+    // First wait for transaction to be confirmed
+    const receipt = await publicClient.waitForTransactionReceipt({
+      hash: txHash,
+    });
+
+    console.log(receipt);
+    // Check if transaction was successful
+    if (receipt.status !== "success") {
+      console.error("Transaction failed");
+      return null;
+    }
+
+    // Try to extract ID from logs first (standard approach)
+    if (receipt.logs && receipt.logs.length > 0) {
+      const collectionCreatedLog = receipt.logs.find((log) => {
+        if (
+          log.address.toLowerCase() !==
+          COLLECTION_CONTRACT_ADDRESS.toLowerCase()
+        ) {
+          return false;
+        }
+
+        try {
+          const decodedLog = decodeEventLog({
+            abi: collectionAbi,
+            data: log.data,
+            topics: log.topics,
+          });
+
+          return decodedLog.eventName === "CollectionCreated";
+        } catch {
+          return false;
+        }
+      });
+
+      if (collectionCreatedLog) {
+        const decodedEvent = decodeEventLog({
+          abi: collectionAbi,
+          data: collectionCreatedLog.data,
+          topics: collectionCreatedLog.topics,
+        });
+
+        return decodedEvent.args.collectionId;
+      }
+    }
+
+    // Fallback: If logs are empty or ID not found, query the user's collections
+    console.log(
+      "Logs empty or collection ID not found in logs, trying fallback method..."
+    );
+
+    // Get the total number of collections
+    const totalCollections = await publicClient.readContract({
+      address: COLLECTION_CONTRACT_ADDRESS,
+      abi: collectionAbi,
+      functionName: "totalCollections",
+    });
+
+    // Get the user's collections
+    const userCollections = await publicClient.readContract({
+      address: COLLECTION_CONTRACT_ADDRESS,
+      abi: collectionAbi,
+      functionName: "getCreatorCollections",
+      args: [userAddress],
+    });
+
+    if (userCollections && userCollections.length > 0) {
+      // Assuming the most recently created collection would be the last one in the array
+      const mostRecentCollectionId =
+        userCollections[userCollections.length - 1];
+
+      // Double-check by getting the collection details
+      const collectionDetails = await publicClient.readContract({
+        address: COLLECTION_CONTRACT_ADDRESS,
+        abi: collectionAbi,
+        functionName: "getCollection",
+        args: [mostRecentCollectionId],
+      });
+
+      // Verify that this is indeed a recent collection
+      if (collectionDetails && collectionDetails.exists) {
+        console.log(
+          "Found collection ID via fallback method:",
+          mostRecentCollectionId
+        );
+        return mostRecentCollectionId;
+      }
+    }
+
+    console.error("Could not retrieve collection ID by any method");
+    return null;
+  } catch (error) {
+    console.error("Error getting collection ID:", error);
+    return null;
+  }
+};
+
 /**
  * Hook for creating a collection using Wagmi (following the pattern from useRegisterCreativeID)
  */
 export const useCreateCollection = () => {
   const { writeContract, isPending, data, isError, error } = useWriteContract();
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
+  const publicClient = usePublicClient();
+
   const { validateAndSwitchChain, isSwitchingChain, isValidChain } =
     useSkaleChainValidation();
 
@@ -198,15 +268,54 @@ export const useCreateCollection = () => {
         args: [name, description, collectionType, coverArtUri],
       });
 
-      writeContract({
+      const hash = await writeContract({
         address: COLLECTION_CONTRACT_ADDRESS,
         abi: collectionAbi,
         functionName: "createCollection",
         args: [name, description, collectionType, coverArtUri],
-        enabled: isConnected && !isPaused,
       });
 
-      console.log("writeContract called successfully");
+      console.log("Transaction submitted with hash:", hash);
+
+      // Now fetch collection ID directly
+      try {
+        console.log(
+          "Waiting for transaction confirmation and retrieving collection ID..."
+        );
+
+        console.log("address contract ", COLLECTION_CONTRACT_ADDRESS);
+        const totalCollections = await publicClient.readContract({
+          address: COLLECTION_CONTRACT_ADDRESS,
+          abi: collectionAbi,
+          functionName: "totalCollections",
+        });
+
+        // Get the user's collections
+        const userCollections = await publicClient.readContract({
+          address: COLLECTION_CONTRACT_ADDRESS,
+          abi: collectionAbi,
+          functionName: "getCreatorCollections",
+          args: [userAddress],
+        });
+
+        console.log("somth ", totalCollections, userCollections);
+        const collectionId = await getCollectionIdAfterCreation(
+          hash,
+          publicClient,
+          address
+        );
+        if (collectionId) {
+          console.log("Successfully retrieved collection ID:", collectionId);
+          return { hash, collectionId: Number(collectionId) };
+        } else {
+          console.log("Transaction confirmed but couldn't get collection ID");
+          return { hash, collectionId: null };
+        }
+      } catch (idError) {
+        console.error("Error getting collection ID:", idError);
+        // Still return the hash even if ID retrieval failed
+        return { hash, collectionId: null };
+      }
     } catch (error) {
       console.error("Error creating collection:", error);
       throw error;
@@ -343,7 +452,6 @@ export const useGetCollection = (collectionId) => {
   return { collection, loading, error, refetch };
 };
 
-
 export const useGetCreatorCollections = (creatorAddress) => {
   const { isConnected } = useAccount();
 
@@ -453,7 +561,6 @@ export const useGetTotalCollections = () => {
     refetch,
   };
 };
-
 
 /**
  * Hook to check if contract is paused

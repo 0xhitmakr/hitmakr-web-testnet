@@ -1,185 +1,27 @@
-.collection {
+.formContainer {
     width: 100%;
-}
-
-.collectionHeader {
-    display: flex;
-    align-items: center;
-    padding: 18px;
-}
-
-.collectionHeader p {
-    font-family: "Rubik Mono One", monospace;
-    font-size: 18px;
-}
-
-.collectionHeaderOptions {
-    display: flex;
-    padding: 0px 10px;
-}
-
-.collectionHeaderOption {
-    padding: 5px 12.5px;
-    background-color: #202020;
-    margin: 0px 5px;
-    border-radius: 100px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 14px;
-}
-
-.collectionHeaderOption:hover {
-    background-color: #252525;
-}
-
-.collectionHeaderOption span {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.collectionHeaderOption span i {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.collectionHeaderOptionActive {
-    padding: 5px 12.5px;
-    background-color: #8023E4;
-    margin: 0px 5px;
-    border-radius: 100px;
-    cursor: pointer;
-    color: #fff;
-}
-
-.collectionContainer {
-    display: flex;
-    width: 100%;
-    height: 65vh;
-    margin-top: 10px;
-}
-
-.collectionContainerLeft,
-.collectionContainerCenter,
-.collectionContainerRight {
-    display: flex;
-    flex: 1;
-    width: 100%;
-    justify-content: left;
-    height: 100%;
-    background-color: #252525;
-    margin: 5px;
-    border-radius: 10px;
-}
-
-
-.hitmakrForm {
-    width: 100%;
+    max-width: 750px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    height: 100%;
+    padding: 20px;
 }
 
-.hitmakrFormContainer {
-    border-radius: 10px;
-    position: relative;
-    margin-left: 0px;
-    width: 400px;
-}
-
-.formDetailsSave {
-    width: 350px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.formDetails {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.formDetailsLabel {
-    padding: 10px;
-    font-size: 14px;
-    margin: 0px 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.inputLimit {
-    color: #808080;
-    font-size: 12px;
-}
-
-.formDetailsInput {
-    margin: 0px 10px;
-    padding: 10px;
-    outline: none;
-    background-color: #202020;
-    border: none;
-    color: white;
-    font-weight: 600;
-    border-radius: 5px;
-    font-size: 18px;
-}
-
-.formDetails textarea {
-    resize: none;
-    height: 150px;
-}
-
-.formDetails textarea::-webkit-scrollbar {
-    width: 7.5px;
-    height: 7.5px;
-}
-
-.formDetails textarea::-webkit-scrollbar-thumb {
-    background-color: #303030;
-    border-radius: 10px;
-}
-
-
-.submitButton {
-    margin: 25px 0px;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-.formDetails {
+.formWrapper {
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-bottom: 20px;
+    max-width: 750px;
 }
 
-.formDetailsRow {
+/* Image Upload Section */
+.imageUploadSection {
     display: flex;
-    justify-content: space-between;
-    gap: 10px;
+    flex-direction: column;
+    margin-bottom: 24px;
+    width: 100%;
 }
 
-.formDetailsRow .formDetails {
-    flex: 1;
-}
-
-.formDetailsLabel p {
-    color: #808080;
-}
-
-.formDetailsLabel p b {
-    color: white;
-    font-weight: 600;
-}
-
-.createUploadContainerInputImage {
+.imageDropzone {
     width: 300px;
     height: 300px;
     border: 2px dashed #8b8b8b;
@@ -189,130 +31,47 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    margin-left: 20px;
+    overflow: hidden;
+    position: relative;
 }
 
-
-.createUploadContainerInputImage:hover {
+.imageDropzone:hover {
     background-color: #252525;
 }
 
-
-.createUploadContainerInputImageCover {
-    width: 640px;
-    height: 213px;
-    border: 2px dashed #8b8b8b;
-    border-radius: 10px;
-    background-color: #202020;
+.placeholderContent {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    color: #8b8b8b;
+    text-align: center;
+    padding: 20px;
 }
 
-.createUploadContainerInputImageCover:hover {
-    background-color: #252525;
+.placeholderContent i {
+    font-size: 40px;
+    margin-bottom: 15px;
 }
 
-.createUploadContainerInputImageCover img {
-    border-radius: 10px;
+.placeholderContent p {
+    margin: 5px 0;
+}
+
+.placeholderContent small {
+    margin-top: 5px;
+}
+
+.imagePreviewContainer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.imagePreview {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-}
-
-.placeholderImage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #828282;
-    width: 300px;
-    height: 300px;
-}
-
-.placeholderImage i {
-    font-size: 30px;
-    margin-bottom: 10px;
-}
-
-.createUploadContainerInputCover img {
-    border-radius: 10px;
-}
-
-/* Select input styling */
-.formDetailsInput select {
-    background-color: #202020;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    appearance: none;
-    width: 100%;
-}
-
-.formDetailsInput select:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(128, 35, 228, 0.5);
-}
-
-.formDetailsInput select option {
-    background-color: #252525;
-    color: white;
-    padding: 10px;
-}
-
-@media (max-width: 950px) {
-    .hitmakrFormContainer {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-    }
-
-    .createUploadContainerInputImageCover {
-        width: 90%;
-    }
-}
-
-@media (max-width: 750px) {
-    .hitmakrFormContainer {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-    }
-
-    .createUploadContainerInputImageCover {
-        width: 100%;
-    }
-
-    .createUploadContainerInputImage {
-        width: 300px;
-        height: 300px;
-        border: 2px dashed #8b8b8b;
-        border-radius: 10px;
-        background-color: #202020;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        margin-left: 10px;
-    }
-}
-
-.profileSettingsOption:active {
-    transform: scale(0.95);
-    transition: transform 0.1s ease;
-}
-
-.imageContainer {
-    position: relative;
-    width: 100%;
-    min-height: 300px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
 }
 
 .imageOverlay {
@@ -321,7 +80,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -329,34 +88,110 @@
     color: white;
     opacity: 0;
     transition: opacity 0.3s ease;
-    border-radius: 10px;
 }
 
-.imageContainer:hover .imageOverlay {
+.imagePreviewContainer:hover .imageOverlay {
     opacity: 1;
 }
 
-.imageOverlay i {
-    font-size: 2rem;
-    margin-bottom: 1rem;
+.uploadButtonContainer {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
 }
 
-.imageOverlay p {
-    margin: 0.5rem 0;
+.formField {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+    width: 100%;
 }
 
-.imageOverlay small {
-    opacity: 0.8;
+.formLabel {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.createUploadContainerInputImage {
-    cursor: pointer;
-    border: 2px dashed #ccc;
-    border-radius: 10px;
-    padding: 1rem;
-    transition: border-color 0.3s ease;
+.counter {
+    font-size: 14px;
+    color: #8b8b8b;
 }
 
-.createUploadContainerInputImage:hover {
-    border-color: #666;
+.formInput {
+    background-color: #202020;
+    border: none;
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-size: 16px;
+    color: #ffffff;
+    width: 100%;
+    height: 50px;
+}
+
+.formInput:focus {
+    outline: none;
+    background-color: #252525;
+}
+
+.formTextarea {
+    background-color: #202020;
+    border: none;
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-size: 16px;
+    color: #ffffff;
+    width: 100%;
+    height: 120px;
+    resize: none;
+}
+
+.formTextarea:focus {
+    outline: none;
+    background-color: #252525;
+}
+
+.buttonContainer {
+    margin-top: 24px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+/* Placeholder styling */
+.formInput::placeholder,
+.formTextarea::placeholder {
+    color: #8b8b8b;
+}
+
+/* Scrollbar styling for textarea */
+.formTextarea::-webkit-scrollbar {
+    width: 8px;
+}
+
+.formTextarea::-webkit-scrollbar-track {
+    background: #202020;
+    border-radius: 4px;
+}
+
+.formTextarea::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 4px;
+}
+
+.formTextarea::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+}
+
+@media (max-width: 768px) {
+    .formContainer {
+        padding: 16px;
+    }
+
+    .formField {
+        margin-bottom: 16px;
+    }
 }
